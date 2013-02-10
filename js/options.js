@@ -77,42 +77,43 @@ function setupShortcuts()
 					)
 					.appendTo('#edit');
 			});
-
-			// Add input fields
-			$(document.createElement('tr'))
-				.attr("id", "input")
-				.append($(document.createElement('td'))
-					.attr('width', '16px')
-				)
-				.append($(document.createElement('td'))
-					.attr('width', '92px')
-					.append($(document.createElement('input'))
-						.attr('type', 'text')
-						.addClass('shortcut')
-						.attr('value', DEFAULT_SHORTCUT)
-					)
-				)
-				.append($(document.createElement('td'))
-					.append($(document.createElement('input'))
-						.attr('type', 'text')
-						.addClass('autotext')
-						.attr('value', DEFAULT_AUTOTEXT)
-					)
-				)
-				.appendTo('#edit');
-
-			// Add some delay so it looks like it's doing some work
-			var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
-			var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
-			if (reloadIconRefreshDelay < 0) {
-				reloadIconRefreshDelay = 0;
-			}
-
-			// Done! Set reloader icon back to default reload
-			setTimeout(function() {
-				$('#refresh').find('img').attr('src', 'images/reload.png');
-			}, reloadIconRefreshDelay);
 		}
+
+		// Add input fields
+		$(document.createElement('tr'))
+			.attr("id", "input")
+			.append($(document.createElement('td'))
+				.attr('width', '16px')
+			)
+			.append($(document.createElement('td'))
+				.attr('width', '92px')
+				.append($(document.createElement('input'))
+					.attr('type', 'text')
+					.addClass('shortcut')
+					.attr('value', DEFAULT_SHORTCUT)
+				)
+			)
+			.append($(document.createElement('td'))
+				.append($(document.createElement('input'))
+					.attr('type', 'text')
+					.addClass('autotext')
+					.attr('value', DEFAULT_AUTOTEXT)
+				)
+			)
+			.appendTo('#edit');
+
+		// Add some delay so it looks like it's doing some work
+		var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
+		var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
+		if (reloadIconRefreshDelay < 0) {
+			reloadIconRefreshDelay = 0;
+		}
+
+		// Done! Set reloader icon back to default reload
+		setTimeout(function() {
+			$('#refresh').find('img').attr('src', 'images/reload.png');
+		}, reloadIconRefreshDelay);
+
 	});
 }
 
