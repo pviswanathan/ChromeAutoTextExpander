@@ -15,6 +15,8 @@ $(function()
 	$('#input').on('keydown', 'input', inputHandler);
 
 	// Button handlers
+	$('#refresh').click(setupShortcuts);
+	$('#edit').on('click', '.remove', removeRow);
 	$('#add').click(function(event) {
 		event.preventDefault();
 		addRow();
@@ -31,6 +33,11 @@ $(function()
 // Setup and populate edit table shortcuts
 function setupShortcuts()
 {
+	// Clear table
+	$('#edit').html('');
+	$('#refresh').find('img').attr('src', 'images/refresh.gif');
+	var reloadStartTime = new Date();	// Keep track of time
+
 	// Get existing shortcuts
 	chrome.storage.sync.get(STORAGE_KEY, function(data)
 	{
@@ -42,6 +49,19 @@ function setupShortcuts()
 			{
 				$(document.createElement('tr'))
 					.append($(document.createElement('td'))
+						.attr('width', '16px')
+						.append($(document.createElement('a'))
+							.attr('href', '#')
+							.addClass('remove')
+							.attr('title', 'Remove Shortcut')
+							.append($(document.createElement('img'))
+								.attr('src', 'images/remove.png')
+								.attr('alt', 'x')
+							)
+						)
+					)
+					.append($(document.createElement('td'))
+						.attr('width', '92px')
 						.append($(document.createElement('input'))
 							.attr('type', 'text')
 							.addClass('shortcut')
@@ -55,8 +75,43 @@ function setupShortcuts()
 							.attr('value', value)
 						)
 					)
-					.insertBefore('#input');
+					.appendTo('#edit');
 			});
+
+			// Add input fields
+			$(document.createElement('tr'))
+				.attr("id", "input")
+				.append($(document.createElement('td'))
+					.attr('width', '16px')
+				)
+				.append($(document.createElement('td'))
+					.attr('width', '92px')
+					.append($(document.createElement('input'))
+						.attr('type', 'text')
+						.addClass('shortcut')
+						.attr('value', DEFAULT_SHORTCUT)
+					)
+				)
+				.append($(document.createElement('td'))
+					.append($(document.createElement('input'))
+						.attr('type', 'text')
+						.addClass('autotext')
+						.attr('value', DEFAULT_AUTOTEXT)
+					)
+				)
+				.appendTo('#edit');
+
+			// Add some delay so it looks like it's doing some work
+			var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
+			var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
+			if (reloadIconRefreshDelay < 0) {
+				reloadIconRefreshDelay = 0;
+			}
+
+			// Done! Set reloader icon back to default reload
+			setTimeout(function() {
+				$('#refresh').find('img').attr('src', 'images/reload.png');
+			}, reloadIconRefreshDelay);
 		}
 	});
 }
@@ -112,6 +167,12 @@ function inputHandler(event)
 	}
 }
 
+// Remove shortcut row in edit table
+function removeRow(event)
+{
+	$(this).parents('tr').fadeOut('fast', function() {$(this).remove();});
+}
+
 // Add new row to shortcuts edit table
 function addRow(callback)
 {
@@ -123,6 +184,7 @@ function addRow(callback)
 	$input.find('input').css('color', '#aaa').val(DEFAULT_AUTOTEXT).removeClass('error');
 	$input.find('.shortcut').val(DEFAULT_SHORTCUT);
 
+	// Call callback if given
 	if (callback) {
 		callback();
 	}
@@ -177,6 +239,9 @@ function saveShortcuts()
 
 				// Indicate success saving
 				alert('Shortcuts saved!');
+
+				// Refresh
+				setupShortcuts();
 			}
 		});
 

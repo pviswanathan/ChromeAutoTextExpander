@@ -15,6 +15,15 @@ body, html {
 
 h1 {
 	font: bold 16pt/16px 'Helvetica Neue', Helvetica, Verdana;
+	vertical-align: middle;
+	margin-bottom: 0;
+}
+h1 img {
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0;
 }
 
 ul li {

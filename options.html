@@ -10,8 +10,13 @@
 	<body>
 
 		<div id="content">
-			<h1>Auto Text Expander Options</h1>
+			<h1><img src="images/icon48.png" alt="" /> Auto Text Expander Options
+				<span>
+					<a href="#" id="refresh" title="Refresh"><img src="images/reload.png" alt="Reload" /></a>
+				</span>
+			</h1>
 			<p>Edit your database of shortcuts and expansions here! Some tips:</p>
+
 			<ul>
 				<li>Shortcuts are case sensitive!</li>
 				<li>Shortcuts and expanded text cannot be blank.</li>
@@ -25,6 +30,7 @@
 				<form>
 					<table id="edit" border="0" cellpadding="0" cellspacing="0">
 						<tr id="input">
+							<td><a href="#" class="remove" title="Remove Shortcut"><img src="images/remove.png" alt="x" /></a></td>
 							<td><input type="text" class="shortcut" value="Shortcut" /></td>
 							<td><input type="text" class="autotext" value="Expanded Text" /></td>
 						</tr>
