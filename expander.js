@@ -18,7 +18,6 @@ $(function()
 function keyPressHandler(event)
 {
 	var char = String.fromCharCode(event.which);
-	console.log("keyPressHandler:", event.which, char);
 
 	// Clear timer if still running, and start it again
 	clearTypingTimer();
@@ -57,15 +56,12 @@ function checkShortcuts(lastChar, textBuffer, textInput)
 	// Get shortcuts
 	chrome.storage.sync.get(STORAGE_KEY, function(data)
 	{
-		console.log("checkShortcuts", data);
-
 		// Check that data is returned and shortcut library exists
-		if (data && !data[STORAGE_KEY])
+		if (data && data[STORAGE_KEY])
 		{
 			// Check if shortcut exists and should be triggered
 			var shortcut = textBuffer.join('');
 			var autotext = data[STORAGE_KEY][shortcut];
-			console.log("shortcut:", shortcut);
 
 			if (autotext)	// Shortcut exists! Expand and replace text
 			{
