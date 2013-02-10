@@ -1,0 +1,22 @@
+{
+	"EXTENSION_NAME": {
+		"message": "Auto Text Expander Google Chrome™"
+		, "description": "Extension name."
+	}
+
+	, "EXTENSION_DESCRIPTION": {
+		"message": "Create custom keyboard shortcuts to expand and replace text as you type!"
+		, "description": "Extension description."
+	}
+
+	, "BROWSER_ACTION_TITLE": {
+		"message": "Auto Text Expander"
+		, "description": "Browser action default title."
+	}
+
+	, "TEMPLATE": {
+		"message": "Text"
+		, "description": "Template"
+	}
+
+}

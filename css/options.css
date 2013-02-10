@@ -1,0 +1,11 @@
+
+/* General UI */
+body, html {
+	height: 100%;
+	width: 100%;
+	background: white;
+	color: #222;
+}
+
+
+/* Forms */
