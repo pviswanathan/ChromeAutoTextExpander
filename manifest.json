@@ -1,6 +1,6 @@
 {
 	"name": "__MSG_EXTENSION_NAME__"
-	, "version": "1.0.2"
+	, "version": "1.0.3"
 	, "manifest_version": 2
 
 	, "description": "__MSG_EXTENSION_DESCRIPTION__"
@@ -20,7 +20,7 @@
 			"js/jquery-1.8.3.js"
 			, "expander.js"
 		]
-		, "run_at": "document_end"
+		, "run_at": "document_start"
 	}]
 
 	, "permissions": [

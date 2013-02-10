@@ -11,13 +11,14 @@ var typingTimer;			// Keep track of time between keypresses
 $(function()
 {
 	// Add listener to when user types
-	$(document).on('keypress', 'input[type=text]', keyPressHandler);
+	$(document).on('keypress', 'textarea,input[type=text]', keyPressHandler);
 });
 
 // When user presses a key
 function keyPressHandler(event)
 {
 	var char = String.fromCharCode(event.which);
+	console.log("keyPressHandler", char);
 
 	// Clear timer if still running, and start it again
 	clearTypingTimer();
@@ -62,6 +63,9 @@ function checkShortcuts(lastChar, textBuffer, textInput)
 			// Check if shortcut exists and should be triggered
 			var shortcut = textBuffer.join('');
 			var autotext = data[STORAGE_KEY][shortcut];
+
+			console.log("checkShortcuts", shortcut, autotext, textInput);
+
 
 			if (autotext)	// Shortcut exists! Expand and replace text
 			{
