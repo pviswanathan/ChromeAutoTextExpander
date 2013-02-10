@@ -18,7 +18,6 @@ $(function()
 function keyPressHandler(event)
 {
 	var char = String.fromCharCode(event.which);
-	console.log("keyPressHandler", char);
 
 	// Clear timer if still running, and start it again
 	clearTypingTimer();
@@ -63,9 +62,6 @@ function checkShortcuts(lastChar, textBuffer, textInput)
 			// Check if shortcut exists and should be triggered
 			var shortcut = textBuffer.join('');
 			var autotext = data[STORAGE_KEY][shortcut];
-
-			console.log("checkShortcuts", shortcut, autotext, textInput);
-
 
 			if (autotext)	// Shortcut exists! Expand and replace text
 			{
