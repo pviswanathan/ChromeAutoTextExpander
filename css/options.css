@@ -5,7 +5,77 @@ body, html {
 	width: 100%;
 	background: white;
 	color: #222;
+	font: normal 12pt/16px 'Helvetica Neue', Helvetica, Verdana;
+}
+
+#content {
+	width: 480px;
+	margin: 24px auto;
+}
+
+h1 {
+	font: bold 16pt/16px 'Helvetica Neue', Helvetica, Verdana;
+}
+
+ul li {
+	margin: 8px 0;
 }
 
 
 /* Forms */
+
+form {
+	margin: 16px;
+}
+
+table {
+	width: 100%;
+	margin-bottom: 16px;
+	border: 1px solid #ddd;
+	-moz-border-radius: 4px;	/* Firefox */
+	-webkit-border-radius: 4px;	/* Safari, Chrome */
+	border-radius: 4px;			/* CSS3 */
+}
+
+td {
+	padding: 8px 4px;
+}
+td:first-child {
+	padding-left: 8px;
+}
+td:last-child {
+	padding-right: 8px;
+}
+input {
+	font: normal 10pt/10px Verdana;
+	color: #444;
+	padding: 4px;
+	height: 2em;
+	width: 100%;
+	background: #f8fbff;
+
+	border: 1px solid #ddd;
+	-moz-border-radius: 4px;	/* Firefox */
+	-webkit-border-radius: 4px;	/* Safari, Chrome */
+	border-radius: 4px;			/* CSS3 */
+}
+input.error {
+	background: #fff0e0;
+}
+#input input {
+	color: #aaa;
+}
+#input input:focus {
+	color: #444;
+}
+
+span {
+	float: right;
+	text-align: right;
+}
+
+button {
+	padding: 6px 8px;
+	font: bold 11pt/11px 'Helvetica Neue', Helvetica, Verdana;
+	color: #444;
+}

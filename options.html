@@ -9,10 +9,34 @@
 
 	<body>
 
-		<h1>Options</h1>
+		<div id="content">
+			<h1>Auto Text Expander Options</h1>
+			<p>Edit your database of shortcuts and expansions here! Some tips:</p>
+			<ul>
+				<li>Shortcuts are case sensitive!</li>
+				<li>Shortcuts and expanded text cannot be blank.</li>
+				<li>Add a space to the end of your shortcut if you want it to trigger after typing a space.</li>
+				<li>Shortcuts should trigger in any textbox / input field on a page.</li>
+				<li>Shortcuts will not trigger in this options page.</li>
+			</ul>
 
-		<div id="status"></div>
-		<button id="save">Save</button>
+			<section>
+				<form>
+					<table id="edit" border="0" cellpadding="0" cellspacing="0">
+						<tr id="input">
+							<td><input type="text" class="shortcut" value="Shortcut" /></td>
+							<td><input type="text" class="autotext" value="Expanded Text" /></td>
+						</tr>
+					</table>
+					<span>
+						<button id="add">Add Shortcut</button>
+						<button type="reset" id="reset">Reset</button>
+						<button type="submit" id="save">Save</button>
+					</span>
+				</form>
+			</section>
+
+		</div>
 
 	</body>
 
