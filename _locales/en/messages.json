@@ -9,9 +9,9 @@
 		, "description": "Extension description."
 	}
 
-	, "BROWSER_ACTION_TITLE": {
-		"message": "Auto Text Expander"
-		, "description": "Browser action default title."
+	, "PAGE_ACTION_TITLE": {
+		"message": "Auto Text Expander available on this page! Click to view options."
+		, "description": "Page action default title."
 	}
 
 	, "TEMPLATE": {

@@ -82,6 +82,13 @@ span {
 	float: right;
 	text-align: right;
 }
+h1 span {
+	margin-right: 16px;
+}
+h1 span a, h1 span a img {
+	outline: none;
+	text-decoration: none;
+}
 
 button {
 	padding: 6px 8px;
