@@ -85,6 +85,7 @@ jQuery.noConflict();
 	var LISTENER_EVENT = 'keypress.auto-expander';
 	var STORAGE_KEY = 'autoTextExpanderShortcuts';
 	var GMAIL_DOMAIN = /mail.google.com/;
+	var GDOCS_DOMAIN = /docs.google.com/;
 	var FACEBOOK_DOMAIN = /facebook.com/;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -176,7 +177,7 @@ jQuery.noConflict();
 						var domain = window.location.host;
 						if (GMAIL_DOMAIN.test(domain))
 						{
-							$textInput = findGmailDiv($textInput);
+							$textInput = findFocusedDiv($textInput);
 							text = $textInput.text();
 						}
 						else if (FACEBOOK_DOMAIN.test(domain))
@@ -209,8 +210,8 @@ jQuery.noConflict();
 		});
 	}
 
-	// Gmail-specific: find div that user is editing right now
-	function findGmailDiv($input) {
+	// Find div that user is editing right now (mostly Google products)
+	function findFocusedDiv($input) {
 		return $(window.getSelection().getRangeAt(0).startContainer.parentNode);
 	}
 
@@ -230,9 +231,10 @@ jQuery.noConflict();
 		// Add listener to when user types
 		addListeners();
 
-		// Show page action if ready function ran
-		chrome.runtime.sendMessage({request: "showPageAction"});
+		// Show page action if ready function ran (and not Google Docs)
+		if (!GDOCS_DOMAIN.test(domain)) {
+			chrome.runtime.sendMessage({request: "showPageAction"});
+		}
 	});
 
 })(jQuery);
-

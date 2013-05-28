@@ -1,6 +1,6 @@
 {
 	"name": "__MSG_EXTENSION_NAME__"
-	, "version": "1.0.6"
+	, "version": "1.0.7"
 	, "manifest_version": 2
 
 	, "description": "__MSG_EXTENSION_DESCRIPTION__"
