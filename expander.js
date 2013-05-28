@@ -24,7 +24,6 @@ jQuery.noConflict();
 	{
 		event.stopPropagation();
 		var char = String.fromCharCode(event.which);
-		console.log("keyPressed:", char);
 
 		// Clear timer if still running, and start it again
 		clearTypingTimer();
@@ -60,7 +59,7 @@ jQuery.noConflict();
 	// Replacing text
 	function replaceText(text, shortcut, autotext, cursorPosition)
 	{
-		console.log(text, shortcut, autotext, cursorPosition);
+		console.log("expandText:", text, shortcut, autotext, cursorPosition);
 		return text.substr(0, cursorPosition - shortcut.length)
 			+ autotext + text.substr(cursorPosition);
 	}
@@ -174,12 +173,15 @@ jQuery.noConflict();
 	// Attach listener to keypresses
 	function addListeners()
 	{
+		// Special google docs handlings - still doesn't work yet
 		if (GDOCS_DOMAIN.test(window.location.host)) {
 			$(document).find('iframe').each(function(index) {
 				$(this).contents().on(LISTENER_EVENT, keyPressHandler);
 			});
 		} else {
 			$(document).on(LISTENER_EVENT, 'div,textarea,input[type=text]', keyPressHandler);
+			// Show page action if handlers attach
+			chrome.runtime.sendMessage({request: "showPageAction"});
 		}
 	}
 
@@ -193,9 +195,6 @@ jQuery.noConflict();
 	{
 		// Add listener to when user types
 		addListeners();
-
-		// Show page action if ready function ran
-		chrome.runtime.sendMessage({request: "showPageAction"});
 	});
 
 })(jQuery);
