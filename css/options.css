@@ -92,6 +92,22 @@ h1 span a, h1 span a img {
 
 button {
 	padding: 6px 8px;
-	font: bold 11pt/11px 'Helvetica Neue', Helvetica, Verdana;
+	font: bold 11pt/11pt 'Helvetica Neue', Helvetica, Verdana;
 	color: #444;
 }
+
+.crouton {
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	padding: 6px 12px;
+	text-align: center;
+	font: bold 12px/12px 'Helvetica Neue', Helvetica, Verdana;
+	color: #fff;
+	background-color: #bbb;
+	display: none;
+}
+.crouton.red { background-color: #6f6; }
+.crouton.green { background-color: #6f6; }

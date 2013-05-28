@@ -26,6 +26,11 @@ $(function()
 		saveShortcuts();
 	});
 
+	// Prevent form submit
+	$('form').submit(function(event) {
+		event.preventDefault();
+	});
+
 	// Setup shortcut edit table
 	setupShortcuts();
 });
@@ -239,11 +244,23 @@ function saveShortcuts()
 				console.log("saveShortcuts success:", data);
 
 				// Indicate success saving
-				alert('Shortcuts saved!');
+				showCrouton('Shortcuts saved!');
 
 				// Refresh
 				setupShortcuts();
 			}
 		});
+}
 
+// Create and show and eventually hide a message crouton
+function showCrouton(message)
+{
+	$('body').append($(document.createElement('div'))
+		.addClass('crouton').addClass('green').text(message)
+		.fadeIn('fast', function() {
+			$(this).delay(1000).slideUp('fast', function() {
+				$(this).remove();
+			})
+		})
+	);
 }

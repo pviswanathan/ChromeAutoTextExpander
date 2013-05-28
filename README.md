@@ -6,9 +6,6 @@ Another fun side project in my spare time. This simple chrome extension uses con
 
 It basically keeps track of any consecutive keystrokes within 500ms or since the last space character you typed, and checks to see if the series of keystrokes matches any of a number of custom shortcuts you may have defined, and will then replace and expand the text in the field if it matches anything.
 
-Known Bugs:
- - Does not work well on Facebook or Gmail, since they use custom divs instead of regular html form text inputs / textareas.
-
 Technologies used:
  - jQuery
  - Chrome's Sync Storage (shortcuts are synced across browsers)

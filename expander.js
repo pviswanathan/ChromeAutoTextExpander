@@ -84,7 +84,7 @@ jQuery.noConflict();
 	var WHITESPACE_REGEX = /(\s)/;
 	var LISTENER_EVENT = 'keypress.auto-expander';
 	var STORAGE_KEY = 'autoTextExpanderShortcuts';
-	var GOOGLE_DOMAIN = /mail.google.com/;
+	var GMAIL_DOMAIN = /mail.google.com/;
 	var FACEBOOK_DOMAIN = /facebook.com/;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -132,6 +132,7 @@ jQuery.noConflict();
 	// Replacing text
 	function replaceText(text, shortcut, autotext, cursorPosition)
 	{
+		console.log(text, shortcut, autotext, cursorPosition);
 		return text.substr(0, cursorPosition - shortcut.length)
 			+ autotext + text.substr(cursorPosition);
 	}
@@ -173,9 +174,9 @@ jQuery.noConflict();
 					{
 						// Test what domain is
 						var domain = window.location.host;
-						if (GOOGLE_DOMAIN.test(domain))
+						if (GMAIL_DOMAIN.test(domain))
 						{
-							$textInput = $textInput.find('div.gmail_default').first();
+							$textInput = findGmailDiv($textInput);
 							text = $textInput.text();
 						}
 						else if (FACEBOOK_DOMAIN.test(domain))
@@ -189,7 +190,7 @@ jQuery.noConflict();
 							text = $textInput.text();
 						}
 
-						$textInput.html(replaceText(
+						$textInput.text(replaceText(
 							text,
 							shortcut,
 							autotext,
@@ -206,6 +207,11 @@ jQuery.noConflict();
 				clearTypingBuffer();
 			}
 		});
+	}
+
+	// Gmail-specific: find div that user is editing right now
+	function findGmailDiv($input) {
+		return $(window.getSelection().getRangeAt(0).startContainer.parentNode);
 	}
 
 	// Attach listener to keypresses
