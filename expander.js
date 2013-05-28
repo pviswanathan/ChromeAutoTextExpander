@@ -5,14 +5,37 @@ jQuery.noConflict();
 // Cross-browser solution for setting cursor position
 (function($) {
 	$.fn.setCursorPosition = function(pos) {
-		if ($(this).get(0).setSelectionRange) {
-			$(this).get(0).setSelectionRange(pos, pos);
-		} else if ($(this).get(0).createTextRange) {
-			var range = $(this).get(0).createTextRange();
-			range.collapse(true);
-			range.moveEnd('character', pos);
-			range.moveStart('character', pos);
-			range.select();
+		var input = $(this).get(0);
+		var sel, range;
+		if ($(this).is('input') || $(this).is('textarea')) {
+			if (input.setSelectionRange) {
+				input.setSelectionRange(pos, pos);
+			} else if (input.createTextRange) {
+				range = input.createTextRange();
+				range.collapse(true);
+				range.moveEnd('character', pos);
+				range.moveStart('character', pos);
+				range.select();
+			}
+		} else {	// Other elements
+			var node = input.childNodes[0];	// Need to get text node
+			if (window.getSelection && document.createRange) {
+				range = document.createRange();
+				range.selectNodeContents(input);
+				range.collapse(true);
+				range.setEnd(node, pos);
+				range.setStart(node, pos);
+				sel = window.getSelection();
+				sel.removeAllRanges();
+				sel.addRange(range);
+			} else if (document.body.createTextRange) {
+				range = document.body.createTextRange();
+				range.moveToElementText(input);
+				range.collapse(true);
+				range.setEnd(node, pos);
+				range.setStart(node, pos);
+				range.select();
+			}
 		}
 	}
 })(jQuery);
@@ -20,18 +43,35 @@ jQuery.noConflict();
 // Cross-browser solution for getting cursor position
 (function($) {
     $.fn.getCursorPosition = function() {
-        var el = $(this).get(0);
-        var pos = 0;
-        if('selectionStart' in el) {
-            pos = el.selectionStart;
-        } else if('selection' in document) {
-            el.focus();
-            var Sel = document.selection.createRange();
-            var SelLength = document.selection.createRange().text.length;
-            Sel.moveStart('character', -el.value.length);
-            pos = Sel.text.length - SelLength;
-        }
-        return pos;
+		var el = $(this).get(0);
+		var pos = 0, sel;
+		if ($(this).is('input') || $(this).is('textarea')) {
+			if('selectionStart' in el) {
+				pos = el.selectionStart;
+			} else if('selection' in document) {
+				el.focus();
+				sel = document.selection.createRange();
+				var SelLength = document.selection.createRange().text.length;
+				Sel.moveStart('character', -el.value.length);
+				pos = Sel.text.length - SelLength;
+			}
+		} else {	// Other elements
+			if (window.getSelection) {
+				sel = window.getSelection();
+				if (sel.rangeCount) {
+					pos = sel.getRangeAt(0).endOffset;
+				}
+			} else if (document.selection && document.selection.createRange) {
+				sel = document.selection.createRange();
+				var tempEl = document.createElement("span");
+				el.insertBefore(tempEl, el.firstChild);
+				var tempRange = sel.duplicate();
+				tempRange.moveToElementText(tempEl);
+				tempRange.setEndPoint("EndToEnd", sel);
+				pos = tempRange.text.length;
+			}
+		}
+		return pos;
     }
 })(jQuery);
 
@@ -92,12 +132,8 @@ jQuery.noConflict();
 	// Replacing text
 	function replaceText(text, shortcut, autotext, cursorPosition)
 	{
-		console.log("replaceText:", text, shortcut, autotext, cursorPosition);
-		var replacePosition = cursorPosition - shortcut.length;
-		var replaceText = text.substr(0, replacePosition)
+		return text.substr(0, cursorPosition - shortcut.length)
 			+ autotext + text.substr(cursorPosition);
-		console.log(replaceText);
-		return replaceText;
 	}
 
 	// Check to see if text in argument corresponds to any shortcuts
@@ -118,45 +154,49 @@ jQuery.noConflict();
 					// Setup - add whitespace if was last character
 					autotext += (WHITESPACE_REGEX.test(lastChar) ? lastChar : "");
 					var $textInput = $(textInput);
+					var cursorPosition = $textInput.getCursorPosition()
 					var text;
 
 					// If input or textarea field, can easily change the val
 					if ($textInput.is("textarea") || $textInput.is("input"))
 					{
-						var cursorPosition = $textInput.getCursorPosition()
 						$textInput.val(replaceText(
 							$textInput.val(),
 							shortcut,
 							autotext,
 							cursorPosition
 						));
-						$textInput.setCursorPosition(cursorPosition + (autotext.length - shortcut.length));
+						$textInput.setCursorPosition(cursorPosition
+							- shortcut.length + autotext.length);
 					}
-					else if ($textInput.is("div"))	// More trouble, special cases
+					else	// Trouble... special cases
 					{
-						// Test what domain is, use special cases
-						console.log($textInput);
+						// Test what domain is
 						var domain = window.location.host;
 						if (GOOGLE_DOMAIN.test(domain))
 						{
 							$textInput = $textInput.find('div.gmail_default').first();
-							text = $textInput.html();
+							text = $textInput.text();
 						}
 						else if (FACEBOOK_DOMAIN.test(domain))
 						{
-							$textInput = $textInput.find('span').first();
-							text = $textInput.html();
+							if ($textInput.find('span').get().length) {
+								$textInput = $textInput.find('span').first();
+							}
+							text = $textInput.text();
 						}
-						else	// Not sure, try something
-						{
-							text = $textInput.html();
+						else {	// Not sure, try something
+							text = $textInput.text();
 						}
 
-						console.log(text);
-						var newText = text.replace(shortcut, autotext)
-							+ (WHITESPACE_REGEX.test(lastChar) ? lastChar : "");
-						console.log($textInput, newText);
-						$textInput.html(newText);
+						$textInput.html(replaceText(
+							text,
+							shortcut,
+							autotext,
+							cursorPosition
+						));
+						$textInput.setCursorPosition(cursorPosition
+							- shortcut.length + autotext.length);
 					}
 				}
 			}
