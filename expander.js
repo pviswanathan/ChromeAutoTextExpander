@@ -57,11 +57,40 @@ jQuery.noConflict();
 	}
 
 	// Replacing text
-	function replaceText(text, shortcut, autotext, cursorPosition)
+	function replaceText($field, text, shortcut, autotext, cursorPosition)
 	{
 		console.log("expandText:", text, shortcut, autotext, cursorPosition);
-		return text.substr(0, cursorPosition - shortcut.length)
-			+ autotext + text.substr(cursorPosition);
+
+		// Special handling for Gmail message body
+		if (GMAIL_DOMAIN.test(window.location.host) && $field.hasClass('gmail_default'))
+		{
+			// Get escaped text
+			var replaced = $('<div/>').text(text.substr(0, cursorPosition - shortcut.length)
+				+ autotext + text.substr(cursorPosition)).html();
+
+			// Split into lines based on line breaks
+			var lines = replaced.split('\n');
+			if (lines.length > 1)
+			{
+				// Copy gmail's line break divs
+				var container = $field.clone().text('')[0].outerHTML;
+
+				// Put closing tag at the beginning so we can use it in a join
+				var tagIndex = container.indexOf('<', container.indexOf('<') + 1);
+				var containerOpenTag = container.substring(0, tagIndex);
+				var containerCloseTag = container.substr(tagIndex);
+				container = containerCloseTag + containerOpenTag;
+
+				// Join and return
+				replaced = containerOpenTag + lines.join(container) + containerCloseTag;
+			}
+
+			return replaced;
+		}
+		else {	// Regular
+			return text.substr(0, cursorPosition - shortcut.length)
+				+ autotext + text.substr(cursorPosition);
+		}
 	}
 
 	// Check to see if text in argument corresponds to any shortcuts
@@ -90,6 +119,7 @@ jQuery.noConflict();
 					if ($textInput.is("textarea") || $textInput.is("input"))
 					{
 						$textInput.val(replaceText(
+							$textInput,
 							$textInput.val(),
 							shortcut,
 							autotext,
@@ -116,27 +146,66 @@ jQuery.noConflict();
 					else	// Trouble... special cases
 					{
 						// Test what domain is to see if we need to customize
-						if (GMAIL_DOMAIN.test(domain))
+						if (GMAIL_DOMAIN.test(domain))	// Gmail
 						{
+							// Find focused div instead of what's receiving events
 							$textInput = findFocusedDiv();
-						}
-						else if (FACEBOOK_DOMAIN.test(domain))
-						{
-							if ($textInput.find('span').get().length) {
-								$textInput = $textInput.find('span').first();
+
+							// Get text and replace it
+							text = $textInput.text();
+
+							// Set new cursor position if autotext is single line
+							if (autotext.indexOf('\n') < 0)
+							{
+								$textInput.html(replaceText(
+									$textInput,
+									text,
+									shortcut,
+									autotext,
+									cursorPosition
+								));
+
+								$textInput.setCursorPosition(cursorPosition
+									- shortcut.length + autotext.length);
+							}
+							else	// Multiline expanded text
+							{
+								$textInput.after(replaceText(
+									$textInput,
+									text,
+									shortcut,
+									autotext,
+									cursorPosition
+								)).nextAll()	// Jump to last row
+									.eq(autotext.match(/\n/g).length)
+									.setCursorPosition(
+										autotext.length - autotext.lastIndexOf('\n') - 1
+									);
+								$textInput.remove();
 							}
 						}
+						else	// Other sites
+						{
+							if (FACEBOOK_DOMAIN.test(domain)) {
+								if ($textInput.find('span').get().length) {
+									$textInput = $textInput.find('span').first();
+								}
+							}
 
-						// Get text and replace it
-						text = $textInput.text();
-						$textInput.text(replaceText(
-							text,
-							shortcut,
-							autotext,
-							cursorPosition
-						));
-						$textInput.setCursorPosition(cursorPosition
-							- shortcut.length + autotext.length);
+							// Get text and replace it
+							text = $textInput.text();
+							$textInput.text(replaceText(
+								$textInput,
+								text,
+								shortcut,
+								autotext,
+								cursorPosition
+							));
+
+							// Set new cursor position
+							$textInput.setCursorPosition(cursorPosition
+								- shortcut.length + autotext.length);
+						}
 					}
 				}
 			}

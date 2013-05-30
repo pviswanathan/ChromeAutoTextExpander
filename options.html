@@ -18,12 +18,20 @@
 			<p>Edit your database of shortcuts and expansions here! Some tips:</p>
 
 			<ul>
-				<li>Shortcuts are case sensitive!</li>
-				<li>Shortcuts and expanded text cannot be blank.</li>
-				<li>Invalid shortcuts / expanded text will be highlighted red and not be saved.</li>
-				<li>Add a space to the end of your shortcut if you want it to trigger after typing a space.</li>
-				<li>Shortcuts should trigger in any textbox / input field on a page.</li>
-				<li>Shortcuts will not trigger in this options page.</li>
+				<li>Shortcuts and expanded text are case sensitive!</li>
+				<li>Shortcuts and expanded text cannot be blank.
+					Invalid shortcuts / expanded text will be highlighted red
+					and will not be saved.</li>
+				<li>Add a space to the end of your shortcut if you want
+					it to trigger after typing a space. Line breaks are supported
+					in expanded text now!</li>
+				<li>Hit enter or return to add a line break in the expanded text;<br />
+					hit shift to move to the next field or to the buttons.</li>
+				<li>Shortcuts should trigger in any textarea / input field
+					on pages that support this, indicated by the (txt)^r
+					icon in the address bar.</li>
+				<li>Saving should sync across all Chrome browsers you sync with.
+					New to Auto Text Expander? We'll provide you with some examples!</li>
 			</ul>
 
 			<section>
@@ -31,8 +39,8 @@
 					<table id="edit" border="0" cellpadding="0" cellspacing="0">
 						<tr id="input">
 							<td><a href="#" class="remove" title="Remove Shortcut"><img src="images/remove.png" alt="x" /></a></td>
-							<td><input type="text" class="shortcut" value="Shortcut" /></td>
-							<td><input type="text" class="autotext" value="Expanded Text" /></td>
+							<td><input type="text" class="shortcut" value="Shortcut" onclick="if (this.value == 'Shortcut') {this.value = '';}" /></td>
+							<td><input type="text" class="autotext" value="Expanded Text" onclick="if (this.value == 'Expanded Text') {this.value = '';}" /></td>
 						</tr>
 					</table>
 					<span>
