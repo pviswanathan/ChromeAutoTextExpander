@@ -100,8 +100,8 @@ h1 span {
 	margin-right: 16px;
 }
 h1 span a, h1 span a img {
+	font: normal 9pt/9pt 'Helvetica Neue', Helvetica, Verdana;
 	outline: none;
-	text-decoration: none;
 }
 
 button {
