@@ -2,27 +2,38 @@
 // Prevent conflicts
 jQuery.noConflict();
 
-// Encapsulated anonymouse function
+// Encapsulated anonymous function
 (function($) {
 
 	// Global Variables & Constants
 	var OK = 0;
 	var BACKSPACE_CODE = 8;
 	var WHITESPACE_REGEX = /(\s)/;
-	var LISTENER_EVENT = 'keypress.auto-expander';
+	var EVENT_NAME_KEYPRESS = 'keypress.auto-expander';
+	var EVENT_NAME_KEYUP = 'keyup.auto-expander';
 	var STORAGE_KEY = 'autoTextExpanderShortcuts';
 	var GMAIL_DOMAIN = /mail.google.com/;
 	var GDOCS_DOMAIN = /docs.google.com/;
 	var FACEBOOK_DOMAIN = /facebook.com/;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
-	var typingTimeout = 500;	// Half a second
+	var typingTimeout = 750;	// Delay before we clear buffer
 	var typingTimer;			// Keep track of time between keypresses
+
+	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
+	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
 
 	// When user presses a key
 	function keyPressHandler(event)
 	{
-		event.stopPropagation();
+		// Make sure it's not the same event firing over and over again
+		if (keyPressEvent == event) {
+			return;
+		} else {
+			keyPressEvent = event;
+		}
+
+		// Get character that was typed
 		var char = String.fromCharCode(event.which);
 
 		// Clear timer if still running, and start it again
@@ -36,9 +47,33 @@ jQuery.noConflict();
 		checkShortcuts(char, typingBuffer, event.target);
 	}
 
+	// When user lifts up on a key, to catch backspace
+	function keyUpHandler(event)
+	{
+		// Make sure it's not the same event firing over and over again
+		if (keyUpEvent == event) {
+			return;
+		} else {
+			keyUpEvent = event;
+		}
+
+		if (event.keyCode == BACKSPACE_CODE)
+		{
+			// Clear timer and restart
+			clearTypingTimer();
+			typingTimer = setTimeout(clearTypingBuffer, typingTimeout);
+
+			// Remove last character typed
+			typingBuffer.pop();
+		}
+	}
+
 	// Clears the typing timer
 	function clearTypingTimer()
 	{
+		// Clear flags for event firing
+
+
 		// Clear timer handle
 		if (typingTimer) {
 			clearTimeout(typingTimer);
@@ -56,46 +91,11 @@ jQuery.noConflict();
 		typingBuffer.length = 0;
 	}
 
-	// Replacing text
-	function replaceText($field, text, shortcut, autotext, cursorPosition)
-	{
-		console.log("expandText:", text, shortcut, autotext, cursorPosition);
-
-		// Special handling for Gmail message body
-		if (GMAIL_DOMAIN.test(window.location.host) && $field.hasClass('gmail_default'))
-		{
-			// Get escaped text
-			var replaced = $('<div/>').text(text.substr(0, cursorPosition - shortcut.length)
-				+ autotext + text.substr(cursorPosition)).html();
-
-			// Split into lines based on line breaks
-			var lines = replaced.split('\n');
-			if (lines.length > 1)
-			{
-				// Copy gmail's line break divs
-				var container = $field.clone().text('')[0].outerHTML;
-
-				// Put closing tag at the beginning so we can use it in a join
-				var tagIndex = container.indexOf('<', container.indexOf('<') + 1);
-				var containerOpenTag = container.substring(0, tagIndex);
-				var containerCloseTag = container.substr(tagIndex);
-				container = containerCloseTag + containerOpenTag;
-
-				// Join and return
-				replaced = containerOpenTag + lines.join(container) + containerCloseTag;
-			}
-
-			return replaced;
-		}
-		else {	// Regular
-			return text.substr(0, cursorPosition - shortcut.length)
-				+ autotext + text.substr(cursorPosition);
-		}
-	}
-
 	// Check to see if text in argument corresponds to any shortcuts
 	function checkShortcuts(lastChar, textBuffer, textInput)
 	{
+		console.log("checkShortcuts:", lastChar, textBuffer);
+
 		// Get shortcuts
 		chrome.storage.sync.get(STORAGE_KEY, function(data)
 		{
@@ -217,6 +217,44 @@ jQuery.noConflict();
 		});
 	}
 
+	// Replacing text
+	function replaceText($field, text, shortcut, autotext, cursorPosition)
+	{
+		console.log("expandText:", text, "shortcut:", shortcut,
+					"autotext:", autotext, "cursorPosition:", cursorPosition);
+
+		// Special handling for Gmail message body
+		if (GMAIL_DOMAIN.test(window.location.host) && $field.hasClass('gmail_default'))
+		{
+			// Get escaped text
+			var replaced = $('<div/>').text(text.substr(0, cursorPosition - shortcut.length)
+				+ autotext + text.substr(cursorPosition)).html();
+
+			// Split into lines based on line breaks
+			var lines = replaced.split('\n');
+			if (lines.length > 1)
+			{
+				// Copy gmail's line break divs
+				var container = $field.clone().text('')[0].outerHTML;
+
+				// Put closing tag at the beginning so we can use it in a join
+				var tagIndex = container.indexOf('<', container.indexOf('<') + 1);
+				var containerOpenTag = container.substring(0, tagIndex);
+				var containerCloseTag = container.substr(tagIndex);
+				container = containerCloseTag + containerOpenTag;
+
+				// Join and return
+				replaced = containerOpenTag + lines.join(container) + containerCloseTag;
+			}
+
+			return replaced;
+		}
+		else {	// Regular
+			return text.substr(0, cursorPosition - shortcut.length)
+				+ autotext + text.substr(cursorPosition);
+		}
+	}
+
 	// Find div that user is editing right now (mostly for Google products)
 	function findFocusedDiv() {
 		var $div = null;
@@ -245,10 +283,15 @@ jQuery.noConflict();
 		// Special google docs handlings - still doesn't work yet
 		if (GDOCS_DOMAIN.test(window.location.host)) {
 			$(document).find('iframe').each(function(index) {
-				$(this).contents().on(LISTENER_EVENT, keyPressHandler);
+				$(this).contents().on(EVENT_NAME_KEYPRESS, keyPressHandler);
+				$(this).contents().on(EVENT_NAME_KEYUP, keyUpHandler);
 			});
-		} else {
-			$(document).on(LISTENER_EVENT, 'div,textarea,input[type=text]', keyPressHandler);
+		}
+		else	// Attach handlers normally
+		{
+			$(document).on(EVENT_NAME_KEYPRESS, 'div,textarea,input[type=text]', keyPressHandler);
+			$(document).on(EVENT_NAME_KEYUP, 'div,textarea,input[type=text]', keyUpHandler);
+
 			// Show page action if handlers attach
 			chrome.runtime.sendMessage({request: "showPageAction"});
 		}
@@ -256,7 +299,8 @@ jQuery.noConflict();
 
 	// Detach listener for keypresses
 	function removeListeners() {
-		$(document).off(LISTENER_EVENT);
+		$(document).off(EVENT_NAME_KEYPRESS);
+		$(document).off(EVENT_NAME_KEYUP);
 	}
 
 	// Document ready function
@@ -267,6 +311,7 @@ jQuery.noConflict();
 	});
 
 })(jQuery);
+
 
 /////////////////////////////////////////////////////////////////////////////////
 // Utility Functions

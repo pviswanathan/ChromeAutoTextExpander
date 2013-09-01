@@ -12,6 +12,28 @@ $(function()
 	// When user types into input fields
 	$('#edit').on('keydown', 'input', editRowHandler);
 
+	// Need to do the onclick clearing here, inline js not allowed
+	$('input.shortcut').focus(function(event) {
+		if (this.value == DEFAULT_SHORTCUT) {
+			this.value = '';
+		}
+	});
+	$('input.autotext').focus(function(event) {
+		if (this.value == DEFAULT_AUTOTEXT) {
+			this.value = '';
+		}
+	});
+	$('input.shortcut').blur(function(event) {
+		if (this.value == '') {
+			this.value = DEFAULT_SHORTCUT;
+		}
+	});
+	$('input.autotext').blur(function(event) {
+		if (this.value == '') {
+			this.value = DEFAULT_AUTOTEXT;
+		}
+	});
+
 	// Button handlers
 	$('#refresh').click(setupShortcuts);
 	$('#edit').on('click', '.remove', removeRow);
@@ -64,13 +86,11 @@ function setupShortcuts()
 		{
 			addRow('thx', 'thanks');
 			addRow('brb', 'be right back');
-			addRow('lol', 'haha');
-			addRow('ure', "you're");
+			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
 			addRow('jk', 'just kidding');
-			addRow('sh ', 'should');
-			addRow('w ', 'with');
 			addRow('w?', 'what do you think?');
-			addRow('SIG ', '. Carlin\nChrome Extension Developer\nemail.me@carlinyuen.com');
+			addRow('e@', 'email.me@carlinyuen.com');
+			addRow('MYSIG ', '. Carlin\nChrome Extension Developer\nemail.me@carlinyuen.com');
 		}
 
 		// Add extra input field if no existing shortcuts
@@ -217,9 +237,6 @@ function saveShortcuts()
 
 			// Indicate success saving
 			showCrouton('Shortcuts saved!');
-
-			// Refresh
-			setupShortcuts();
 		}
 	});
 }
@@ -230,7 +247,7 @@ function showCrouton(message)
 	$('body').append($(document.createElement('div'))
 		.addClass('crouton').addClass('green').text(message)
 		.fadeIn('fast', function() {
-			$(this).delay(1000).slideUp('fast', function() {
+			$(this).delay(1000).fadeOut('fast', function() {
 				$(this).remove();
 			})
 		})

@@ -66,6 +66,7 @@ tr.saved {
 
 td {
 	padding: 8px 4px;
+	vertical-align: top;
 }
 td:first-child {
 	padding-left: 8px;
@@ -114,7 +115,7 @@ button {
 .crouton {
 	width: 100%;
 	position: fixed;
-	top: 0;
+	bottom: 0;
 	left: 0;
 	right: 0;
 	padding: 6px 12px;
