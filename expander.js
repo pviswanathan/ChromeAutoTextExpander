@@ -7,7 +7,9 @@ jQuery.noConflict();
 
 	// Global Variables & Constants
 	var OK = 0;
-	var BACKSPACE_CODE = 8;
+	var KEYCODE_BACKSPACE = 8;
+	var KEYCODE_RETURN = 13;
+	var KEYCODE_SPACEBAR = 32;
 	var WHITESPACE_REGEX = /(\s)/;
 	var EVENT_NAME_KEYPRESS = 'keypress.auto-expander';
 	var EVENT_NAME_KEYUP = 'keyup.auto-expander';
@@ -33,8 +35,12 @@ jQuery.noConflict();
 			keyPressEvent = event;
 		}
 
-		// Get character that was typed
-		var char = String.fromCharCode(event.which);
+		// Get character that was typed, if was carriage return, replace with space
+		var charCode = event.which;
+		if (charCode == KEYCODE_RETURN) {
+			charCode = KEYCODE_SPACEBAR;
+		}
+		var char = String.fromCharCode(charCode);
 
 		// Clear timer if still running, and start it again
 		clearTypingTimer();
@@ -57,7 +63,7 @@ jQuery.noConflict();
 			keyUpEvent = event;
 		}
 
-		if (event.keyCode == BACKSPACE_CODE)
+		if (event.keyCode == KEYCODE_BACKSPACE)
 		{
 			// Clear timer and restart
 			clearTypingTimer();
@@ -135,7 +141,7 @@ jQuery.noConflict();
 
 						// Backspace
 						for (var i = shortcut.length - 1; i >= 0; --i) {
-							simulateKeyEvent($textInput, BACKSPACE_CODE);
+							simulateKeyEvent($textInput, KEYCODE_BACKSPACE);
 						}
 
 						// Type out letters
@@ -151,8 +157,10 @@ jQuery.noConflict();
 							// Find focused div instead of what's receiving events
 							$textInput = findFocusedDiv();
 
-							// Get text and replace it
+							// Get text to replace it
 							text = $textInput.text();
+
+							console.log($textInput, text);
 
 							// Set new cursor position if autotext is single line
 							if (autotext.indexOf('\n') < 0)
