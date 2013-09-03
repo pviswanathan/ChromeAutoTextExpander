@@ -1,6 +1,6 @@
 {
 	"name": "__MSG_EXTENSION_NAME__"
-	, "version": "1.1.4"
+	, "version": "1.1.5"
 	, "manifest_version": 2
 
 	, "description": "__MSG_EXTENSION_DESCRIPTION__"
@@ -28,6 +28,7 @@
 		"matches": [ "<all_urls>" ]
 		, "js": [
 			"js/jquery-1.8.3.js"
+			, "js/moment.min.js"
 			, "expander.js"
 		]
 		, "run_at": "document_end"

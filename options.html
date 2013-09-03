@@ -12,7 +12,7 @@
 		<div id="content">
 			<h1><img src="images/icon48.png" alt="" /> Auto Text Expander Options
 				<span>
-					<a href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" title="Feedback on the Chrome Webstore">Feedback</a>
+					<a href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" title="Feedback on the Chrome Webstore"><strong>Feedback</strong></a>
 					<a href="#" id="refresh" title="Refresh"><img src="images/reload.png" alt="Reload" /></a>
 				</span>
 			</h1>
@@ -21,17 +21,21 @@
 				(link in upper right). Some usage tips:</p>
 
 			<ul>
-				<li>Shortcuts and expanded text are case sensitive!</li>
-				<li>Invalid shortcuts / expanded text will be highlighted red
-					and will not be saved.</li>
+				<li><strong>Shortcuts and expanded text are case sensitive!</strong></li>
+				<li><strong>Date/time macros are now supported!</strong>
+					We use <strong><a href="http://momentjs.com/" target="_blank" title="Moment.js Site">Moment.js</a></strong>
+					to do this; all you have to do is wrap your date format with <strong>%d(</strong>dateFormat<strong>)</strong>.
+					Please see <strong><a href="http://momentjs.com/docs/#/displaying/format/" target="_blank" title="Date Formatting Documentation">this</a></strong>
+					for how to format dates to work in your expanded text. An example
+					expanded text could look something like: <strong>%d(MMMM Do YYYY)</strong>,
+					and would spit out something like: <strong>September 4rd 2013</strong>.
+				</li>
 				<li>Add a space to the end of your shortcut if you want
-					it to trigger after typing a space. Line breaks are supported
-					in expanded text now!</li>
+					it to trigger after typing a space. <strong>Line breaks are supported
+					in expanded text now!</strong></li>
 				<li>Shortcuts should trigger in any textarea / input field
 					on pages that let the extension load, indicated by the
 					<strong>(txt)^r</strong> icon in the address bar.</li>
-				<li>Hit enter or return to add a line break in the expanded text;<br />
-					hit shift to move to the next field or to the buttons.</li>
 				<li>Saving should sync across all Chrome browsers you sync with.
 					New to Auto Text Expander? We'll provide you with some examples!</li>
 			</ul>
