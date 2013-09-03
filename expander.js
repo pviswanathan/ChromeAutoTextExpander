@@ -6,6 +6,7 @@ jQuery.noConflict();
 (function($) {
 
 	// Global Variables & Constants
+	var DEBUG = true;
 	var OK = 0;
 	var KEYCODE_BACKSPACE = 8;
 	var KEYCODE_RETURN = 13;
@@ -98,7 +99,7 @@ jQuery.noConflict();
 	// Check to see if text in argument corresponds to any shortcuts
 	function checkShortcuts(lastChar, textBuffer, textInput)
 	{
-/* 		console.log("checkShortcuts:", lastChar, textBuffer);	//	*/
+ 		console.log("checkShortcuts:", lastChar, textBuffer);
 
 		// Get shortcuts
 		chrome.storage.sync.get(STORAGE_KEY, function(data)
@@ -133,8 +134,29 @@ jQuery.noConflict();
 					}
 					else	// Trouble... editable divs & special cases
 					{
-						// Test what domain is to see if we need to customize
-						if (GMAIL_DOMAIN.test(domain))	// Gmail
+						// If on Facebook.com
+						if (FACEBOOK_DOMAIN.test(domain))
+						{
+							if ($textInput.find('span').get().length) {
+								$textInput = $textInput.find('span').first();
+							}
+
+							// Get text and replace it
+							text = $textInput.text();
+							$textInput.text(replaceText(
+								text,
+								shortcut,
+								autotext,
+								cursorPosition
+							));
+
+							// Set new cursor position
+							$textInput.setCursorPosition(
+								cursorPosition - shortcut.length + autotext.length);
+						}
+
+						// All other elements
+						else	//if ($textInput.is('[contenteditable]'))
 						{
 							// Get the focused / selected text node
 							var node = findFocusedNode();
@@ -151,10 +173,11 @@ jQuery.noConflict();
 							if (autotext.indexOf('\n') < 0)
 							{
 								// Set text node in element
-								$textNode.replaceWith(text);
+								node = document.createTextNode(text);
+ 								$textNode.replaceWith(node);
 
 								// Update cursor position
-								$textInput.setCursorPosition(
+								setCursorPositionInNode(node,
 									cursorPosition - shortcut.length + autotext.length);
 							}
 							else	// Multiline expanded text
@@ -163,29 +186,19 @@ jQuery.noConflict();
 								var lines = text.split('\n');
 
 								// For simplicity, join with <br> tag instead
-								$textNode.replaceWith(lines.join('<br>'));
-							}
-						}
-						else	// Other sites
-						{
-							if (FACEBOOK_DOMAIN.test(domain)) {
-								if ($textInput.find('span').get().length) {
-									$textInput = $textInput.find('span').first();
-								}
-							}
+ 								$textNode.replaceWith(lines.join('<br>'));
 
-							// Get text and replace it
-							text = $textInput.text();
-							$textInput.text(replaceText(
-								text,
-								shortcut,
-								autotext,
-								cursorPosition
-							));
+								// Find the last added text node
+								$textNode = findMatchingTextNode($textInput,
+									lines[lines.length - 1]);
+								node = $textNode.get(0);
+								console.log($textNode);
+								console.log(node);
 
-							// Set new cursor position
-							$textInput.setCursorPosition(
-								cursorPosition - shortcut.length + autotext.length);
+								// Update cursor position
+								setCursorPositionInNode(node,
+									lines[lines.length - 1].length);
+							}
 						}
 					}
 				}
@@ -201,12 +214,25 @@ jQuery.noConflict();
 	// Replacing shortcut with autotext in text at cursorPosition
 	function replaceText(text, shortcut, autotext, cursorPosition)
 	{
-		console.log("expandText:", text, "shortcut:", shortcut,
-					"autotext:", autotext, "cursorPosition:", cursorPosition);
+		console.log("cursorPosition:", cursorPosition);
+		console.log("currentText:", text);
+		console.log("shortcut:", shortcut);
+		console.log("expandedText:", autotext);
 
 		// Replace shortcut based off cursorPosition
 		return [text.slice(0, cursorPosition - shortcut.length),
 			autotext, text.slice(cursorPosition)].join('');
+	}
+
+	// Find node that has text contents that matches text
+	function findMatchingTextNode($div, text)
+	{
+		return $div.contents().filter(function() {
+				return (this.nodeType == 3)						// Return all text nodes
+					&& (this.nodeValue.length == text.length);	// with same text length
+			}).filter(function() {
+				return (this.nodeValue == text);	// Filter for same text
+			}).first();
 	}
 
 	// Find node that user is editing right now, for editable divs
@@ -222,23 +248,18 @@ jQuery.noConflict();
 	}
 
 	// Sets cursor position for a specific node
-	function setCursorPositionInNode($div, node, pos)
+	function setCursorPositionInNode(node, pos)
 	{
-		input = $div.get(0);
 		var sel, range;
 		if (window.getSelection && document.createRange) {
 			range = document.createRange();
-			range.selectNodeContents(input);
-			range.collapse(true);
-			range.setEnd(node, pos);
+ 			range.setEnd(node, pos);
 			range.setStart(node, pos);
 			sel = window.getSelection();
 			sel.removeAllRanges();
 			sel.addRange(range);
 		} else if (document.body.createTextRange) {
 			range = document.body.createTextRange();
-			range.moveToElementText(input);
-			range.collapse(true);
 			range.setEnd(node, pos);
 			range.setStart(node, pos);
 			range.select();
@@ -264,7 +285,12 @@ jQuery.noConflict();
 	}
 
 	// Document ready function
-	$(function() {
+	$(function()
+	{
+		if (!DEBUG) {
+			console.log = function() {};	// Make console.log a no-op
+		}
+
 		addListeners();		// Add listener to track when user types
 	});
 
