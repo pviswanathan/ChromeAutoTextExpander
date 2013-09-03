@@ -6,7 +6,7 @@ jQuery.noConflict();
 (function($) {
 
 	// Global Variables & Constants
-	var DEBUG = true;
+	var DEBUG = false;
 	var OK = 0;
 	var KEYCODE_BACKSPACE = 8;
 	var KEYCODE_RETURN = 13;
@@ -270,9 +270,9 @@ jQuery.noConflict();
 	function addListeners()
 	{
 		$(document).on(EVENT_NAME_KEYPRESS,
-			'div[contenteditable=true],textarea,input[type=text]', keyPressHandler);
+			'div[contenteditable=true],textarea,input', keyPressHandler);
 		$(document).on(EVENT_NAME_KEYUP,
-			'div[contenteditable=true],textarea,input[type=text]', keyUpHandler);
+			'div[contenteditable=true],textarea,input', keyUpHandler);
 
 		// Show page action if handlers attach
 		chrome.runtime.sendMessage({request: "showPageAction"});
