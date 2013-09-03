@@ -6,18 +6,18 @@ jQuery.noConflict();
 (function($) {
 
 	// Global Variables & Constants
-	var DEBUG = false;
+	var DEBUG = true;
 	var OK = 0;
 	var KEYCODE_BACKSPACE = 8;
 	var KEYCODE_RETURN = 13;
 	var KEYCODE_SPACEBAR = 32;
+	var DATE_MACRO_REGEX = /%d\(/g;
+	var DATE_MACRO_CLOSE_TAG = ')';
 	var WHITESPACE_REGEX = /(\s)/;
+	var FACEBOOK_DOMAIN_REGEX = /facebook.com/;
 	var EVENT_NAME_KEYPRESS = 'keypress.auto-expander';
 	var EVENT_NAME_KEYUP = 'keyup.auto-expander';
 	var STORAGE_KEY = 'autoTextExpanderShortcuts';
-	var GMAIL_DOMAIN = /mail.google.com/;
-	var GDOCS_DOMAIN = /docs.google.com/;
-	var FACEBOOK_DOMAIN = /facebook.com/;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
 	var typingTimeout = 750;	// Delay before we clear buffer
@@ -113,8 +113,13 @@ jQuery.noConflict();
 
 				if (autotext)	// Shortcut exists! Expand and replace text
 				{
-					// Setup - add whitespace if was last character
+					// Handle moment.js dates
+					autotext = processDates(autotext);
+
+					// Add whitespace if was last character
 					autotext += (WHITESPACE_REGEX.test(lastChar) ? lastChar : "");
+
+					// Setup for processing
 					var domain = window.location.host;
 					var $textInput = $(textInput);
 					var cursorPosition = $textInput.getCursorPosition()
@@ -135,7 +140,7 @@ jQuery.noConflict();
 					else	// Trouble... editable divs & special cases
 					{
 						// If on Facebook.com
-						if (FACEBOOK_DOMAIN.test(domain))
+						if (FACEBOOK_DOMAIN_REGEX.test(domain))
 						{
 							if ($textInput.find('span').get().length) {
 								$textInput = $textInput.find('span').first();
@@ -264,6 +269,40 @@ jQuery.noConflict();
 			range.setStart(node, pos);
 			range.select();
 		}
+	}
+
+	// Process and replace date tags and formats with moment.js
+	function processDates(text)
+	{
+		var dateOpenTags = [], dateCloseTags = [];
+
+		// Find all indices of opening tags
+		while (result = DATE_MACRO_REGEX.exec(text)) {
+			dateOpenTags.push(result.index);
+		}
+
+		if (!dateOpenTags.length) {
+			return text;
+		}
+
+		// Find matching closing tag for each date
+		for (var i = 0, len = dateOpenTags.length; i < len; ++i) {
+			dateCloseTags[i] = text.indexOf(
+				DATE_MACRO_CLOSE_TAG, dateOpenTags[i] + 1);
+		}
+
+		// Loop through and replace date tags with formatted text
+		var processedText = [text.slice(0, dateOpenTags[0])];
+		for (var i = 0, len = dateOpenTags.length; i < len; ++i)
+		{
+			processedText.push(moment().format(text.slice(
+				dateOpenTags[i] + 3, dateCloseTags[i])));
+			processedText.push(text.slice(dateCloseTags[i] + 1,
+				(i == len - 1) ? undefined : dateOpenTags[i+1]));
+		}
+
+		// Return processed dates
+		return processedText.join('');
 	}
 
 	// Attach listener to keypresses
