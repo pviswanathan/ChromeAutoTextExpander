@@ -154,32 +154,16 @@ jQuery.noConflict();
 								$textNode.replaceWith(text);
 
 								// Update cursor position
-								setCursorPositionInNode(node,
+								$textInput.setCursorPosition(
 									cursorPosition - shortcut.length + autotext.length);
 							}
 							else	// Multiline expanded text
 							{
-								// Split text into lines, need to detect whether
-								// we're in a subdiv or the actual editable div
+								// Split text by lines
 								var lines = text.split('\n');
 
-								// Update input field with first line
-								$textNode.replaceWith(lines[0]);
-
-								// Insert rest of lines wrapped in divs
-								for (var i = lines.length - 1; i > 0; --i) {
-									$textNode.after(
-										$(document.createElement('div')).html(lines[i])
-									);
-								}
-
-								// Update cursor position, get index of last row added
-								cursorPosition = lines.length - 1;
-								$textNode.nextAll()		// Get siblings
-									.eq(cursorPosition)		// Go to last added div
-									.setCursorPosition(
-										lines[cursorPosition].length - 1	// text length
-									);
+								// For simplicity, join with <br> tag instead
+								$textNode.replaceWith(lines.join('<br>'));
 							}
 						}
 						else	// Other sites
@@ -238,9 +222,9 @@ jQuery.noConflict();
 	}
 
 	// Sets cursor position for a specific node
-	function setCursorPositionInNode(node, pos)
+	function setCursorPositionInNode($div, node, pos)
 	{
-		var input = $(node.parentNode);
+		input = $div.get(0);
 		var sel, range;
 		if (window.getSelection && document.createRange) {
 			range = document.createRange();
