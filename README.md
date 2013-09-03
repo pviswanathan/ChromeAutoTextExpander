@@ -1,6 +1,6 @@
 Google Chrome Extension : Auto Text Expander
 =========================
-chrome-auto-text-expander
+Keywords: chrome, extension, expander, auto, automator, replace, text, shortcut, autotext.
 
 Another fun side project in my spare time. This simple chrome extension uses content scripts to insert javascript into any page you're using to attach a handler to your keydown event.
 
