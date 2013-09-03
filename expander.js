@@ -100,7 +100,7 @@ jQuery.noConflict();
 	// Check to see if text in argument corresponds to any shortcuts
 	function checkShortcuts(lastChar, textBuffer, textInput)
 	{
-		console.log("checkShortcuts:", lastChar, textBuffer);
+/* 		console.log("checkShortcuts:", lastChar, textBuffer);	//	*/
 
 		// Get shortcuts
 		chrome.storage.sync.get(STORAGE_KEY, function(data)
@@ -149,23 +149,19 @@ jQuery.noConflict();
 							simulateKeyEvent($textInput, autotext.charCodeAt(i));
 						}
 					}
-					else	// Trouble... special cases
+					else	// Trouble... editable divs & special cases
 					{
 						// Test what domain is to see if we need to customize
 						if (GMAIL_DOMAIN.test(domain))	// Gmail
 						{
 							// Find focused div instead of what's receiving events
 							$textInput = findFocusedDiv();
+							text = retrieveTextFromElement($textInput);
 
-							// Get text to replace it
-							text = $textInput.text();
-
-							console.log($textInput, text);
-
-							// Set new cursor position if autotext is single line
+							// Simply set new cursor position if autotext is one line
 							if (autotext.indexOf('\n') < 0)
 							{
-								$textInput.html(replaceText(
+								setTextInElement($textInput, replaceText(
 									$textInput,
 									text,
 									shortcut,
@@ -173,8 +169,8 @@ jQuery.noConflict();
 									cursorPosition
 								));
 
-								$textInput.setCursorPosition(cursorPosition
-									- shortcut.length + autotext.length);
+								$textInput.setCursorPosition(
+									cursorPosition - shortcut.length + autotext.length);
 							}
 							else	// Multiline expanded text
 							{
@@ -189,7 +185,6 @@ jQuery.noConflict();
 									.setCursorPosition(
 										autotext.length - autotext.lastIndexOf('\n') - 1
 									);
-								$textInput.remove();
 							}
 						}
 						else	// Other sites
@@ -211,8 +206,8 @@ jQuery.noConflict();
 							));
 
 							// Set new cursor position
-							$textInput.setCursorPosition(cursorPosition
-								- shortcut.length + autotext.length);
+							$textInput.setCursorPosition(
+								cursorPosition - shortcut.length + autotext.length);
 						}
 					}
 				}
@@ -231,40 +226,44 @@ jQuery.noConflict();
 		console.log("expandText:", text, "shortcut:", shortcut,
 					"autotext:", autotext, "cursorPosition:", cursorPosition);
 
-		// Special handling for Gmail message body
-		if (GMAIL_DOMAIN.test(window.location.host) && $field.hasClass('gmail_default'))
+		// Special handling for contenteditable divs
+		if ($field.is("div[contenteditable=true]"))
 		{
-			// Get escaped text
-			var replaced = $('<div/>').text(text.substr(0, cursorPosition - shortcut.length)
-				+ autotext + text.substr(cursorPosition)).html();
+			console.log("contenteditable div");
 
-			// Split into lines based on line breaks
+			// Build replacement string
+			var replaced = [text.slice(0, cursorPosition - shortcut.length),
+				autotext, text.slice(cursorPosition)].join('');
+
+			// Check to see if multiline and process accordingly
 			var lines = replaced.split('\n');
 			if (lines.length > 1)
 			{
-				// Copy gmail's line break divs
+				// Copy gmail's line break divs, this produces '<tag></tag>'
 				var container = $field.clone().text('')[0].outerHTML;
 
 				// Put closing tag at the beginning so we can use it in a join
 				var tagIndex = container.indexOf('<', container.indexOf('<') + 1);
-				var containerOpenTag = container.substring(0, tagIndex);
-				var containerCloseTag = container.substr(tagIndex);
+				var containerOpenTag = container.slice(0, tagIndex);
+				var containerCloseTag = container.slice(tagIndex);
 				container = containerCloseTag + containerOpenTag;
 
 				// Join and return
-				replaced = containerOpenTag + lines.join(container) + containerCloseTag;
+				replaced = [containerOpenTag, lines.join(container), containerCloseTag].join('');
 			}
 
+			console.log("replaced:", replaced);
 			return replaced;
 		}
-		else {	// Regular
-			return text.substr(0, cursorPosition - shortcut.length)
-				+ autotext + text.substr(cursorPosition);
+		else {	// Regular handling of replacement
+			return [text.slice(0, cursorPosition - shortcut.length),
+				autotext, text.slice(cursorPosition)].join('');
 		}
 	}
 
 	// Find div that user is editing right now (mostly for Google products)
-	function findFocusedDiv() {
+	function findFocusedDiv()
+	{
 		var $div = null;
 		if (window.getSelection) {
 			var selection = window.getSelection();
@@ -273,6 +272,27 @@ jQuery.noConflict();
 			}
 		}
 		return $div;
+	}
+
+	// Get only the text in an element without its children
+	function retrieveTextFromElement($element)
+	{
+		return $element
+			.clone()    // clone the element
+			.children() // select all the children
+			.remove()   // remove all the children
+			.end()		// again go back to selected element
+			.text();
+	}
+
+	// Set the text in an element without disturbing its children
+	function setTextInElement($element, text)
+	{
+		$element.contents()
+			.filter(function() {	// Filter on node type, return on first text node
+				return (this.nodeType == 3);	// www.w3schools.com/dom/dom_nodetype.asp
+			})
+			.first().replaceWith(text);
 	}
 
 	// Simulate key event
@@ -297,8 +317,10 @@ jQuery.noConflict();
 		}
 		else	// Attach handlers normally
 		{
-			$(document).on(EVENT_NAME_KEYPRESS, 'div,textarea,input[type=text]', keyPressHandler);
-			$(document).on(EVENT_NAME_KEYUP, 'div,textarea,input[type=text]', keyUpHandler);
+			$(document).on(EVENT_NAME_KEYPRESS,
+				'div[contenteditable=true],textarea,input[type=text]', keyPressHandler);
+			$(document).on(EVENT_NAME_KEYUP,
+				'div[contenteditable=true],textarea,input[type=text]', keyUpHandler);
 
 			// Show page action if handlers attach
 			chrome.runtime.sendMessage({request: "showPageAction"});
@@ -312,10 +334,8 @@ jQuery.noConflict();
 	}
 
 	// Document ready function
-	$(function()
-	{
-		// Add listener to when user types
-		addListeners();
+	$(function() {
+		addListeners();		// Add listener to track when user types
 	});
 
 })(jQuery);
