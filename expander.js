@@ -125,7 +125,6 @@ jQuery.noConflict();
 					if ($textInput.is("textarea") || $textInput.is("input"))
 					{
 						$textInput.val(replaceText(
-							$textInput,
 							$textInput.val(),
 							shortcut,
 							autotext,
@@ -154,36 +153,49 @@ jQuery.noConflict();
 						// Test what domain is to see if we need to customize
 						if (GMAIL_DOMAIN.test(domain))	// Gmail
 						{
-							// Find focused div instead of what's receiving events
-							$textInput = findFocusedDiv();
-							text = retrieveTextFromElement($textInput);
+							// Get the focused / selected text node
+							var node = findFocusedNode();
+							var $textNode = $(node);
 
-							// Simply set new cursor position if autotext is one line
+							// Find focused div instead of what's receiving events
+							$textInput = $(node.parentNode);
+
+							// Get and process text
+							text = $textNode.text();
+							text = replaceText(text, shortcut, autotext, cursorPosition);
+
+							// If autotext is single line, simple case
 							if (autotext.indexOf('\n') < 0)
 							{
-								setTextInElement($textInput, replaceText(
-									$textInput,
-									text,
-									shortcut,
-									autotext,
-									cursorPosition
-								));
+								// Set text node in element
+								$textNode.replaceWith(text);
 
-								$textInput.setCursorPosition(
+								// Update cursor position
+								setCursorPositionInNode(node,
 									cursorPosition - shortcut.length + autotext.length);
 							}
 							else	// Multiline expanded text
 							{
-								$textInput.after(replaceText(
-									$textInput,
-									text,
-									shortcut,
-									autotext,
-									cursorPosition
-								)).nextAll()	// Jump to last row
-									.eq(autotext.match(/\n/g).length)
+								// Split text into lines, need to detect whether
+								// we're in a subdiv or the actual editable div
+								var lines = text.split('\n');
+
+								// Update input field with first line
+								$textNode.replaceWith(lines[0]);
+
+								// Insert rest of lines wrapped in divs
+								for (var i = lines.length - 1; i > 0; --i) {
+									$textNode.after(
+										$(document.createElement('div')).html(lines[i])
+									);
+								}
+
+								// Update cursor position, get index of last row added
+								cursorPosition = lines.length - 1;
+								$textNode.nextAll()		// Get siblings
+									.eq(cursorPosition)		// Go to last added div
 									.setCursorPosition(
-										autotext.length - autotext.lastIndexOf('\n') - 1
+										lines[cursorPosition].length - 1	// text length
 									);
 							}
 						}
@@ -198,7 +210,6 @@ jQuery.noConflict();
 							// Get text and replace it
 							text = $textInput.text();
 							$textInput.text(replaceText(
-								$textInput,
 								text,
 								shortcut,
 								autotext,
@@ -220,58 +231,50 @@ jQuery.noConflict();
 		});
 	}
 
-	// Replacing text
-	function replaceText($field, text, shortcut, autotext, cursorPosition)
+	// Replacing shortcut with autotext in text at cursorPosition
+	function replaceText(text, shortcut, autotext, cursorPosition)
 	{
 		console.log("expandText:", text, "shortcut:", shortcut,
 					"autotext:", autotext, "cursorPosition:", cursorPosition);
 
-		// Special handling for contenteditable divs
-		if ($field.is("div[contenteditable=true]"))
-		{
-			console.log("contenteditable div");
-
-			// Build replacement string
-			var replaced = [text.slice(0, cursorPosition - shortcut.length),
-				autotext, text.slice(cursorPosition)].join('');
-
-			// Check to see if multiline and process accordingly
-			var lines = replaced.split('\n');
-			if (lines.length > 1)
-			{
-				// Copy gmail's line break divs, this produces '<tag></tag>'
-				var container = $field.clone().text('')[0].outerHTML;
-
-				// Put closing tag at the beginning so we can use it in a join
-				var tagIndex = container.indexOf('<', container.indexOf('<') + 1);
-				var containerOpenTag = container.slice(0, tagIndex);
-				var containerCloseTag = container.slice(tagIndex);
-				container = containerCloseTag + containerOpenTag;
-
-				// Join and return
-				replaced = [containerOpenTag, lines.join(container), containerCloseTag].join('');
-			}
-
-			console.log("replaced:", replaced);
-			return replaced;
-		}
-		else {	// Regular handling of replacement
-			return [text.slice(0, cursorPosition - shortcut.length),
-				autotext, text.slice(cursorPosition)].join('');
-		}
+		// Replace shortcut based off cursorPosition
+		return [text.slice(0, cursorPosition - shortcut.length),
+			autotext, text.slice(cursorPosition)].join('');
 	}
 
-	// Find div that user is editing right now (mostly for Google products)
-	function findFocusedDiv()
+	// Find node that user is editing right now, for editable divs
+	function findFocusedNode()
 	{
-		var $div = null;
 		if (window.getSelection) {
 			var selection = window.getSelection();
 			if (selection.rangeCount) {
-				$div = $(selection.getRangeAt(0).startContainer.parentNode);
+				return selection.getRangeAt(0).startContainer;
 			}
 		}
-		return $div;
+		return null;
+	}
+
+	// Sets cursor position for a specific node
+	function setCursorPositionInNode(node, pos)
+	{
+		var sel, range;
+		if (window.getSelection && document.createRange) {
+			range = document.createRange();
+			range.selectNodeContents(input);
+			range.collapse(true);
+			range.setEnd(node, pos);
+			range.setStart(node, pos);
+			sel = window.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+		} else if (document.body.createTextRange) {
+			range = document.body.createTextRange();
+			range.moveToElementText(input);
+			range.collapse(true);
+			range.setEnd(node, pos);
+			range.setStart(node, pos);
+			range.select();
+		}
 	}
 
 	// Get only the text in an element without its children
