@@ -144,8 +144,8 @@ jQuery.noConflict();
 							$textInput = $(node.parentNode);
 
 							// Get and process text
-							text = $textNode.text();
-							text = replaceText(text, shortcut, autotext, cursorPosition);
+							text = replaceText($textNode.text(),
+								shortcut, autotext, cursorPosition);
 
 							// If autotext is single line, simple case
 							if (autotext.indexOf('\n') < 0)
