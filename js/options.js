@@ -10,28 +10,20 @@ var DEFAULT_SHORTCUT = "Shortcut"
 $(function()
 {
 	// When user types into input fields
-	$('#edit').on('keydown', 'input', editRowHandler);
+	$('#edit').on('keydown', 'input, textarea', editRowHandler);
 
 	// Need to do the onclick clearing here, inline js not allowed
-	$('input.shortcut').focus(function(event) {
-		if (this.value == DEFAULT_SHORTCUT) {
-			this.value = '';
-		}
+	$('#edit').on('focus', 'input.shortcut', function(event) {
+		if (this.value == DEFAULT_SHORTCUT) { this.value = ''; }
 	});
-	$('input.autotext').focus(function(event) {
-		if (this.value == DEFAULT_AUTOTEXT) {
-			this.value = '';
-		}
+	$('#edit').on('focus', 'textarea.autotext', function(event) {
+		if (this.value == DEFAULT_AUTOTEXT) { this.value = ''; }
 	});
-	$('input.shortcut').blur(function(event) {
-		if (this.value == '') {
-			this.value = DEFAULT_SHORTCUT;
-		}
+	$('#edit').on('blur', 'input.shortcut', function(event) {
+		if (this.value == '') { this.value = DEFAULT_SHORTCUT; }
 	});
-	$('input.autotext').blur(function(event) {
-		if (this.value == '') {
-			this.value = DEFAULT_AUTOTEXT;
-		}
+	$('#edit').on('blur', 'textarea.autotext', function(event) {
+		if (this.value == '') { this.value = DEFAULT_AUTOTEXT; }
 	});
 
 	// Button handlers
@@ -136,7 +128,6 @@ function editRowHandler(event)
 	});
 
 	// If enter pressed on shortcut field, move to autotext
-	console.log($target, keyCode, KEYCODE_ENTER, KEYCODE_TAB);
 	if (keyCode == KEYCODE_ENTER && $target.hasClass('shortcut'))
 	{
 		event.preventDefault();		// prevent submitting form
@@ -194,6 +185,7 @@ function validateRow($input, callback)
 	var errors = {};
 	var shortcut = $input.find('.shortcut').val();
 	var autotext = $input.find('.autotext').val();
+	console.log(autotext);
 	if (!shortcut || shortcut == DEFAULT_SHORTCUT || !shortcut.length) {
 		errors.shortcut = ' - Invalid shortcut text.';
 	}
