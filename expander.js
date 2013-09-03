@@ -63,6 +63,7 @@ jQuery.noConflict();
 			keyUpEvent = event;
 		}
 
+		// When user types backspace, pop character off buffer
 		if (event.keyCode == KEYCODE_BACKSPACE)
 		{
 			// Clear timer and restart
@@ -77,9 +78,6 @@ jQuery.noConflict();
 	// Clears the typing timer
 	function clearTypingTimer()
 	{
-		// Clear flags for event firing
-
-
 		// Clear timer handle
 		if (typingTimer) {
 			clearTimeout(typingTimer);
@@ -132,21 +130,6 @@ jQuery.noConflict();
 						));
 						$textInput.setCursorPosition(cursorPosition
 							- shortcut.length + autotext.length);
-					}
-					// Extra special case for Gdocs
-					else if (GDOCS_DOMAIN.test(domain))
-					{
-						// TODO : Can't seem to get this to work!
-
-						// Backspace
-						for (var i = shortcut.length - 1; i >= 0; --i) {
-							simulateKeyEvent($textInput, KEYCODE_BACKSPACE);
-						}
-
-						// Type out letters
-						for (var i = 0; i < autotext.length; ++i) {
-							simulateKeyEvent($textInput, autotext.charCodeAt(i));
-						}
 					}
 					else	// Trouble... editable divs & special cases
 					{
@@ -277,57 +260,16 @@ jQuery.noConflict();
 		}
 	}
 
-	// Get only the text in an element without its children
-	function retrieveTextFromElement($element)
-	{
-		return $element
-			.clone()    // clone the element
-			.children() // select all the children
-			.remove()   // remove all the children
-			.end()		// again go back to selected element
-			.text();
-	}
-
-	// Set the text in an element without disturbing its children
-	function setTextInElement($element, text)
-	{
-		$element.contents()
-			.filter(function() {	// Filter on node type, return on first text node
-				return (this.nodeType == 3);	// www.w3schools.com/dom/dom_nodetype.asp
-			})
-			.first().replaceWith(text);
-	}
-
-	// Simulate key event
-	function simulateKeyEvent($target, keyCode)
-	{
- 		// JQuery method
-		var event = jQuery.Event("keydown");
-		event.ctrlKey = false;
-		event.which = keyCode;
-		$target.trigger(event);
-	}
-
 	// Attach listener to keypresses
 	function addListeners()
 	{
-		// Special google docs handlings - still doesn't work yet
-		if (GDOCS_DOMAIN.test(window.location.host)) {
-			$(document).find('iframe').each(function(index) {
-				$(this).contents().on(EVENT_NAME_KEYPRESS, keyPressHandler);
-				$(this).contents().on(EVENT_NAME_KEYUP, keyUpHandler);
-			});
-		}
-		else	// Attach handlers normally
-		{
-			$(document).on(EVENT_NAME_KEYPRESS,
-				'div[contenteditable=true],textarea,input[type=text]', keyPressHandler);
-			$(document).on(EVENT_NAME_KEYUP,
-				'div[contenteditable=true],textarea,input[type=text]', keyUpHandler);
+		$(document).on(EVENT_NAME_KEYPRESS,
+			'div[contenteditable=true],textarea,input[type=text]', keyPressHandler);
+		$(document).on(EVENT_NAME_KEYUP,
+			'div[contenteditable=true],textarea,input[type=text]', keyUpHandler);
 
-			// Show page action if handlers attach
-			chrome.runtime.sendMessage({request: "showPageAction"});
-		}
+		// Show page action if handlers attach
+		chrome.runtime.sendMessage({request: "showPageAction"});
 	}
 
 	// Detach listener for keypresses
