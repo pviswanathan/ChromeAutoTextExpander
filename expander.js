@@ -240,6 +240,7 @@ jQuery.noConflict();
 	// Sets cursor position for a specific node
 	function setCursorPositionInNode(node, pos)
 	{
+		var input = $(node.parentNode);
 		var sel, range;
 		if (window.getSelection && document.createRange) {
 			range = document.createRange();
