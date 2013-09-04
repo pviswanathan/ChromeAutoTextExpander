@@ -308,10 +308,19 @@ jQuery.noConflict();
 	// Attach listener to keypresses
 	function addListeners()
 	{
+		// Add to editable divs, textareas, inputs
 		$(document).on(EVENT_NAME_KEYPRESS,
 			'div[contenteditable=true],textarea,input', keyPressHandler);
 		$(document).on(EVENT_NAME_KEYUP,
 			'div[contenteditable=true],textarea,input', keyUpHandler);
+
+		// Attach to iframes as well
+		$(document).find('iframe').each(function(index) {
+			$(this).contents().on(EVENT_NAME_KEYPRESS,
+				'div[contenteditable=true],textarea,input', keyPressHandler);
+			$(this).contents().on(EVENT_NAME_KEYUP,
+				'div[contenteditable=true],textarea,input', keyUpHandler);
+		});
 
 		// Show page action if handlers attach
 		chrome.runtime.sendMessage({request: "showPageAction"});
