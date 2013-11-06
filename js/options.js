@@ -74,11 +74,6 @@ function setupShortcuts()
 
 			// Add special class to these rows to indicate saved
 			$('tr').addClass('saved');
-
-			// Set textareas to be scroll height
-			$('textarea').each(function(index) {
-				$(this).css('min-height', this.scrollHeight);
-			});
 		}
 		else	// First time? Add some defaults
 		{
@@ -88,6 +83,9 @@ function setupShortcuts()
 			addRow('MYSIG ', '. Carlin\nChrome Extension Developer\nemail.me@carlinyuen.com');
 			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
 		}
+
+		// Set textarea height to fit content and resize as user types
+		$('textarea').autosize();
 
 		// Add extra input field if no existing shortcuts
 		if (!$('tr').get().length) {
