@@ -9,7 +9,7 @@ jQuery.noConflict();
 	var KEYCODE_BACKSPACE = 8;
 	var KEYCODE_RETURN = 13;
 	var KEYCODE_SPACEBAR = 32;
-	var DEFAULT_TYPING_TIMEOUT = 750;	// Delay before we clear buffer
+	var DEFAULT_TYPING_TIMEOUT = 750;
 	var DATE_MACRO_REGEX = /%d\(/g;
 	var DATE_MACRO_CLOSE_TAG = ')';
 	var WHITESPACE_REGEX = /(\s)/;
@@ -21,6 +21,8 @@ jQuery.noConflict();
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
 	var typingTimer;			// Keep track of time between keypresses
+	var typingTimeout		 	// Delay before we clear buffer
+		= DEFAULT_TYPING_TIMEOUT;
 
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
@@ -308,19 +310,14 @@ jQuery.noConflict();
 	// Attach listener to keypresses
 	function addListeners()
 	{
+		// Show page action so users can change settings
+		chrome.runtime.sendMessage({request: "showPageAction"});
+
 		// Add to editable divs, textareas, inputs
 		$(document).on(EVENT_NAME_KEYPRESS,
 			'div[contenteditable=true],textarea,input', keyPressHandler);
 		$(document).on(EVENT_NAME_KEYUP,
 			'div[contenteditable=true],textarea,input', keyUpHandler);
-
-		// Attach to iframes as well
-		$(document).find('iframe').each(function(index) {
-			$(this).contents().on(EVENT_NAME_KEYPRESS,
-				'div[contenteditable=true],textarea,input', keyPressHandler);
-			$(this).contents().on(EVENT_NAME_KEYUP,
-				'div[contenteditable=true],textarea,input', keyUpHandler);
-		});
 
 		// Attach to future iframes
 		$(document).on(EVENT_NAME_LOAD, 'iframe', function(e) {
@@ -330,8 +327,14 @@ jQuery.noConflict();
 				'div[contenteditable=true],textarea,input', keyUpHandler);
 		});
 
-		// Show page action if handlers attach
-		chrome.runtime.sendMessage({request: "showPageAction"});
+		// Attach to existing iframes as well - this needs to be at the end
+		//  because sometimes this breaks depending on cross-domain policy
+		$(document).find('iframe').each(function(index) {
+			$(this).contents().on(EVENT_NAME_KEYPRESS,
+				'div[contenteditable=true],textarea,input', keyPressHandler);
+			$(this).contents().on(EVENT_NAME_KEYUP,
+				'div[contenteditable=true],textarea,input', keyUpHandler);
+		});
 	}
 
 	// Detach listener for keypresses

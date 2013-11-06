@@ -2,6 +2,9 @@
 // Listen for whether or not to show the pageAction icon
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
+	console.log(request);
+	console.log(sender);
+
 	switch (request.request)
 	{
 		case "showPageAction":

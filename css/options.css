@@ -6,14 +6,13 @@ body, html {
 	background: white;
 	color: #222;
 	font: normal 10pt/16px 'Helvetica Neue', Helvetica, Verdana;
+	margin: 0;
+	padding: 0;
 }
 
 #content {
 	width: 480px;
 	margin: 24px auto;
-}
-
-form {
 }
 
 h1 {
@@ -37,16 +36,12 @@ ul li {
 /* Forms */
 
 form {
-	margin: 16px;
+	margin-top: 32px;
+	margin-left: 16px;
 }
 
 table {
 	width: 100%;
-	margin-bottom: 16px;
-	border: 1px solid #ddd;
-	-moz-border-radius: 4px;	/* Firefox */
-	-webkit-border-radius: 4px;	/* Safari, Chrome */
-	border-radius: 4px;			/* CSS3 */
 }
 
 tr {
@@ -65,28 +60,26 @@ tr.saved {
 }
 
 td {
-	padding: 8px 4px;
+	padding: 0 4px 24px 2px;
 	vertical-align: top;
 }
 td:first-child {
-	padding-left: 8px;
-}
-td:last-child {
-	padding-right: 8px;
+	padding-left: 3px;
+	padding-top: 6px;
 }
 
 input, textarea {
 	font: normal 10pt/auto Verdana;
 	color: #444;
-	padding: 4px;
+	padding: 6px;
 	height: 2em;
 	width: 100%;
 	background: #f8fbff;
 
 	border: 1px solid #ddd;
-	-moz-border-radius: 4px;	/* Firefox */
-	-webkit-border-radius: 4px;	/* Safari, Chrome */
-	border-radius: 4px;			/* CSS3 */
+	-moz-border-radius: 3px;	/* Firefox */
+	-webkit-border-radius: 3px;	/* Safari, Chrome */
+	border-radius: 3px;			/* CSS3 */
 }
 input.error, textarea.error {
 	background: #f99;
@@ -110,6 +103,16 @@ button {
 	padding: 6px 8px;
 	font: bold 10pt/10pt 'Helvetica Neue', Helvetica, Verdana;
 	color: #444;
+}
+
+#refresh {
+	position: relative;
+	padding-left: 24px;
+}
+#refresh img {
+	position: absolute;
+	left: 6px;
+	top: 5px;
 }
 
 .crouton {

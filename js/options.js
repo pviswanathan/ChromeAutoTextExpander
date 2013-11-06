@@ -97,7 +97,7 @@ function portOldShortcuts()
 		{
 			setupShortcuts();
 		}
-	}
+	});
 }
 
 // Setup and populate edit table shortcuts
@@ -111,15 +111,22 @@ function setupShortcuts()
 	// Get existing shortcuts
 	chrome.storage.sync.get(null, function(data)
 	{
+		console.log(data);
+
 		if (chrome.runtime.lastError) {	// Check for errors
 			console.log(chrome.runtime.lastError);
 			alert("Error retrieving shortcuts!");
 		}
 		else if (!$.isEmptyObject(data)) // Check that data is returned
 		{
-			// Loop through shortcuts and add to edit table
-			$.each(data, function(key, value) {
-				addRow(key, value);
+			// Loop through shortcuts and add to edit table,
+			//  case insensitive sorted by shortcut
+			var keys = Object.keys(data);
+			keys.sort(function(a, b) {
+				return a.toLowerCase().localeCompare(b.toLowerCase());
+			});
+			$.each(keys, function(index, key) {
+				addRow(key, data[key]);
 			});
 
 			// Add special class to these rows to indicate saved
@@ -132,13 +139,11 @@ function setupShortcuts()
 		}
 		else	// First time? Add some defaults
 		{
-			addRow('thx', 'thanks');
 			addRow('brb', 'be right back');
-			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
-			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
-			addRow('w?', 'what do you think?');
 			addRow('e@', 'email.me@carlinyuen.com');
+			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
 			addRow('MYSIG ', '. Carlin\nChrome Extension Developer\nemail.me@carlinyuen.com');
+			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
 		}
 
 		// Add extra input field if no existing shortcuts
@@ -171,15 +176,15 @@ function editRowHandler(event)
 	validateRow($input, function(errors)
 	{
 		if (errors.shortcut) {
-			$input.find('.shortcut').addClass('error');
+			$input.find('.shortcut').addClass('error').attr('title', errors.shortcut);
 		} else {
-			$input.find('.shortcut').removeClass('error');
+			$input.find('.shortcut').removeClass('error').removeAttr('title');
 		}
 
 		if (errors.autotext) {
-			$input.find('.autotext').addClass('error');
+			$input.find('.autotext').addClass('error').attr('title', errors.autotext);
 		} else {
-			$input.find('.autotext').removeClass('error');
+			$input.find('.autotext').removeClass('error').removeAttr('title');
 		}
 	});
 
@@ -204,10 +209,10 @@ function removeRow(event) {
 // Add new row to shortcuts edit table
 function addRow(shortcut, autotext)
 {
-	if ($('tr').length >= chrome.sync.MAX_ITEMS) {
+	if ($('tr').length >= chrome.storage.sync.MAX_ITEMS) {
 		console.log(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA"));
 		alert(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA")
-			+ " Max # Items: " + chrome.sync.MAX_ITEMS);
+			+ " Max # Items: " + chrome.storage.sync.MAX_ITEMS);
 		return $(this);
 	}
 
@@ -249,11 +254,20 @@ function validateRow($input, callback)
 	var shortcut = $input.find('.shortcut').val();
 	var autotext = $input.find('.autotext').val();
 	console.log(autotext);
+
+	// Check not empty
 	if (!shortcut || shortcut == DEFAULT_SHORTCUT || !shortcut.length) {
 		errors.shortcut = ' - Invalid shortcut text.';
 	}
 	if (!autotext || autotext == DEFAULT_AUTOTEXT || !autotext.length) {
 		errors.autotext = ' - Invalid expanded text.';
+	}
+
+	// Check not over max size
+	var itemSize = JSON.stringify({shortcut:autotext}).length;
+	if (itemSize >= chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
+		console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
+		errors.autotext = " - Over max storage item size. Please reduce shortcut or autotext length.";
 	}
 
 	// Callback if given
@@ -266,6 +280,8 @@ function validateRow($input, callback)
 // Save shortcuts to chrome sync data
 function saveShortcuts()
 {
+	console.log("saveShortcuts");
+
 	// Collect list of valid shortcuts
 	var shortcuts = {};
 	$('tr').each(function(index)
@@ -279,10 +295,10 @@ function saveShortcuts()
 	});
 
 	// Check storage capacity
-	if (JSON.stringify(shortcuts) >= chrome.sync.QUOTA_BYTES) {
+	if (JSON.stringify(shortcuts).length >= chrome.storage.sync.QUOTA_BYTES) {
 		console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
 		alert(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
-			+ " Chrome max capacity: " + chrome.sync.QUOTA_BYTES + " characters");
+			+ " Chrome max capacity: " + chrome.storage.sync.QUOTA_BYTES + " characters");
 		return false;
 	}
 
@@ -295,7 +311,7 @@ function saveShortcuts()
 		}
 		else	// Success! Shortcuts saved
 		{
-			console.log("saveShortcuts success:", data);
+			console.log("saveShortcuts success:", shortcuts);
 
 			// Indicate success saving
 			showCrouton('Shortcuts saved!');
