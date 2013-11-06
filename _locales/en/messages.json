@@ -14,6 +14,21 @@
 		, "description": "Page action default title."
 	}
 
+	, "ERROR_OVER_SPACE_QUOTA": {
+		"message": "Over Chrome user storage quota!"
+		, "description": "Error message to be displayed when user goes over the quota for space per item that Chrome's sync API allows."
+	}
+
+	, "ERROR_OVER_ITEM_SPACE_QUOTA": {
+		"message": "Over shortcut max length!"
+		, "description": "Error message to be displayed when user goes over the quota for space per item that Chrome's sync API allows."
+	}
+
+	, "ERROR_OVER_ITEM_QUOTA": {
+		"message": "Over Chrome user storage quota!"
+		, "description": "Error message to be displayed when user goes over the max number of items that Chrome's sync API allows."
+	}
+
 	, "TEMPLATE": {
 		"message": "Text"
 		, "description": "Template"

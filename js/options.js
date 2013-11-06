@@ -55,6 +55,7 @@ function portOldShortcuts()
 	{
 		if (chrome.runtime.lastError) {	// Check for errors
 			console.log(chrome.runtime.lastError);
+			alert("Error retrieving shortcuts!");
 		}
 		else if (data && data[OLD_STORAGE_KEY])
 		{
@@ -68,15 +69,25 @@ function portOldShortcuts()
 			chrome.storage.sync.remove(OLD_STORAGE_KEY, function() {
 				if (chrome.runtime.lastError) {	// Check for errors
 					console.log(chrome.runtime.lastError);
+					alert("Error porting old shortcut database!");
 				} else {
 					chrome.storage.sync.set(newDataStore, function() {
 						if (chrome.runtime.lastError) {	// Check for errors
 							console.log(chrome.runtime.lastError);
-						} else {
+							alert("Error porting old shortcut database!");
+						}
+						else	// Done with porting
+						{
+							// Send notification
+							chrome.notifications.create("", {
+								type: "basic"
+								, iconUrl: "images/icon128.png"
+								, title: "Database Update"
+								, message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
+							}, function(id) {});
+
 							// Setup shortcut edit table
 							setupShortcuts();
-
-							// Send notification
 						}
 					});
 				}
@@ -98,13 +109,16 @@ function setupShortcuts()
 	var reloadStartTime = new Date();	// Keep track of time
 
 	// Get existing shortcuts
-	chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
+	chrome.storage.sync.get(null, function(data)
 	{
-		// Check that data is returned and shortcut library exists
-		if (data && data[OLD_STORAGE_KEY])
+		if (chrome.runtime.lastError) {	// Check for errors
+			console.log(chrome.runtime.lastError);
+			alert("Error retrieving shortcuts!");
+		}
+		else if (!$.isEmptyObject(data)) // Check that data is returned
 		{
 			// Loop through shortcuts and add to edit table
-			$.each(data[OLD_STORAGE_KEY], function(key, value) {
+			$.each(data, function(key, value) {
 				addRow(key, value);
 			});
 
@@ -121,7 +135,6 @@ function setupShortcuts()
 			addRow('thx', 'thanks');
 			addRow('brb', 'be right back');
 			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
-			addRow('jk', 'just kidding');
 			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
 			addRow('w?', 'what do you think?');
 			addRow('e@', 'email.me@carlinyuen.com');
@@ -191,6 +204,13 @@ function removeRow(event) {
 // Add new row to shortcuts edit table
 function addRow(shortcut, autotext)
 {
+	if ($('tr').length >= chrome.sync.MAX_ITEMS) {
+		console.log(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA"));
+		alert(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA")
+			+ " Max # Items: " + chrome.sync.MAX_ITEMS);
+		return $(this);
+	}
+
 	return $(document.createElement('tr'))
 		.append($(document.createElement('td'))
 			.attr('width', '16px')
@@ -258,13 +278,20 @@ function saveShortcuts()
 		}
 	});
 
+	// Check storage capacity
+	if (JSON.stringify(shortcuts) >= chrome.sync.QUOTA_BYTES) {
+		console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
+		alert(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
+			+ " Chrome max capacity: " + chrome.sync.QUOTA_BYTES + " characters");
+		return false;
+	}
+
 	// Save data into storage
-	var data = {};
-	data[OLD_STORAGE_KEY] = shortcuts;
-	chrome.storage.sync.set(data, function()
+	chrome.storage.sync.set(shortcuts, function()
 	{
 		if (chrome.runtime.lastError) {
 			console.log(chrome.runtime.lastError);
+			alert("Error saving shortcuts!");
 		}
 		else	// Success! Shortcuts saved
 		{
