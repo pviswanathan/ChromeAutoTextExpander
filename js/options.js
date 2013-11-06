@@ -2,9 +2,7 @@
 var DEFAULT_SHORTCUT = "Shortcut"
   , DEFAULT_AUTOTEXT = "Expanded Text"
   , KEYCODE_ENTER = 13
-  , KEYCODE_TAB = 9
-  , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
-
+  , KEYCODE_TAB = 9;
 
 // Document ready
 $(function()
@@ -43,62 +41,9 @@ $(function()
 		event.preventDefault();
 	});
 
-	// Port old shortcuts if needed
-	portOldShortcuts();
+	// Setup shortcut edit table
+	setupShortcuts();
 });
-
-// Port old shortcuts over to new shortcut syntax
-function portOldShortcuts()
-{
-	// Get old shortcuts
-	chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
-	{
-		if (chrome.runtime.lastError) {	// Check for errors
-			console.log(chrome.runtime.lastError);
-			alert("Error retrieving shortcuts!");
-		}
-		else if (data && data[OLD_STORAGE_KEY])
-		{
-			// Loop through and them to object to store
-			var newDataStore = {};
-			$.each(data[OLD_STORAGE_KEY], function(key, value) {
-				newDataStore[key] = value;
-			});
-
-			// Delete old data, add new data
-			chrome.storage.sync.remove(OLD_STORAGE_KEY, function() {
-				if (chrome.runtime.lastError) {	// Check for errors
-					console.log(chrome.runtime.lastError);
-					alert("Error porting old shortcut database!");
-				} else {
-					chrome.storage.sync.set(newDataStore, function() {
-						if (chrome.runtime.lastError) {	// Check for errors
-							console.log(chrome.runtime.lastError);
-							alert("Error porting old shortcut database!");
-						}
-						else	// Done with porting
-						{
-							// Send notification
-							chrome.notifications.create("", {
-								type: "basic"
-								, iconUrl: "images/icon128.png"
-								, title: "Database Update"
-								, message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
-							}, function(id) {});
-
-							// Setup shortcut edit table
-							setupShortcuts();
-						}
-					});
-				}
-			});
-		}
-		else	// Setup shortcut edit table
-		{
-			setupShortcuts();
-		}
-	});
-}
 
 // Setup and populate edit table shortcuts
 function setupShortcuts()
@@ -111,8 +56,6 @@ function setupShortcuts()
 	// Get existing shortcuts
 	chrome.storage.sync.get(null, function(data)
 	{
-		console.log(data);
-
 		if (chrome.runtime.lastError) {	// Check for errors
 			console.log(chrome.runtime.lastError);
 			alert("Error retrieving shortcuts!");
@@ -253,7 +196,6 @@ function validateRow($input, callback)
 	var errors = {};
 	var shortcut = $input.find('.shortcut').val();
 	var autotext = $input.find('.autotext').val();
-	console.log(autotext);
 
 	// Check not empty
 	if (!shortcut || shortcut == DEFAULT_SHORTCUT || !shortcut.length) {
