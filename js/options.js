@@ -3,7 +3,7 @@ var DEFAULT_SHORTCUT = "Shortcut"
   , DEFAULT_AUTOTEXT = "Expanded Text"
   , KEYCODE_ENTER = 13
   , KEYCODE_TAB = 9
-  , STORAGE_KEY = 'autoTextExpanderShortcuts';
+  , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
 
 
 // Document ready
@@ -43,9 +43,51 @@ $(function()
 		event.preventDefault();
 	});
 
-	// Setup shortcut edit table
-	setupShortcuts();
+	// Port old shortcuts if needed
+	portOldShortcuts();
 });
+
+// Port old shortcuts over to new shortcut syntax
+function portOldShortcuts()
+{
+	// Get old shortcuts
+	chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
+	{
+		if (chrome.runtime.lastError) {	// Check for errors
+			console.log(chrome.runtime.lastError);
+		}
+		else if (data && data[OLD_STORAGE_KEY])
+		{
+			// Loop through and them to object to store
+			var newDataStore = {};
+			$.each(data[OLD_STORAGE_KEY], function(key, value) {
+				newDataStore[key] = value;
+			});
+
+			// Delete old data, add new data
+			chrome.storage.sync.remove(OLD_STORAGE_KEY, function() {
+				if (chrome.runtime.lastError) {	// Check for errors
+					console.log(chrome.runtime.lastError);
+				} else {
+					chrome.storage.sync.set(newDataStore, function() {
+						if (chrome.runtime.lastError) {	// Check for errors
+							console.log(chrome.runtime.lastError);
+						} else {
+							// Setup shortcut edit table
+							setupShortcuts();
+
+							// Send notification
+						}
+					});
+				}
+			});
+		}
+		else	// Setup shortcut edit table
+		{
+			setupShortcuts();
+		}
+	}
+}
 
 // Setup and populate edit table shortcuts
 function setupShortcuts()
@@ -56,13 +98,13 @@ function setupShortcuts()
 	var reloadStartTime = new Date();	// Keep track of time
 
 	// Get existing shortcuts
-	chrome.storage.sync.get(STORAGE_KEY, function(data)
+	chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
 	{
 		// Check that data is returned and shortcut library exists
-		if (data && data[STORAGE_KEY])
+		if (data && data[OLD_STORAGE_KEY])
 		{
 			// Loop through shortcuts and add to edit table
-			$.each(data[STORAGE_KEY], function(key, value) {
+			$.each(data[OLD_STORAGE_KEY], function(key, value) {
 				addRow(key, value);
 			});
 
@@ -218,7 +260,7 @@ function saveShortcuts()
 
 	// Save data into storage
 	var data = {};
-	data[STORAGE_KEY] = shortcuts;
+	data[OLD_STORAGE_KEY] = shortcuts;
 	chrome.storage.sync.set(data, function()
 	{
 		if (chrome.runtime.lastError) {

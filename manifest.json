@@ -1,6 +1,6 @@
 {
 	"name": "__MSG_EXTENSION_NAME__"
-	, "version": "1.1.6"
+	, "version": "1.2.0"
 	, "manifest_version": 2
 
 	, "description": "__MSG_EXTENSION_DESCRIPTION__"
@@ -38,5 +38,6 @@
 		"tabs"
 		, "storage"
 		, "<all_urls>"
+		, "notifications"
 	]
 }

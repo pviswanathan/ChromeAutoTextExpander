@@ -1,26 +1,25 @@
-
 // Prevent conflicts
 jQuery.noConflict();
 
 // Encapsulated anonymous function
 (function($) {
 
-	// Global Variables & Constants
-	var DEBUG = true;
+	// Variables & Constants
 	var OK = 0;
 	var KEYCODE_BACKSPACE = 8;
 	var KEYCODE_RETURN = 13;
 	var KEYCODE_SPACEBAR = 32;
+	var DEFAULT_TYPING_TIMEOUT = 750;	// Delay before we clear buffer
 	var DATE_MACRO_REGEX = /%d\(/g;
 	var DATE_MACRO_CLOSE_TAG = ')';
 	var WHITESPACE_REGEX = /(\s)/;
 	var FACEBOOK_DOMAIN_REGEX = /facebook.com/;
 	var EVENT_NAME_KEYPRESS = 'keypress.auto-expander';
 	var EVENT_NAME_KEYUP = 'keyup.auto-expander';
-	var STORAGE_KEY = 'autoTextExpanderShortcuts';
+	var EVENT_NAME_LOAD = 'load.auto-expander';
+	var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
-	var typingTimeout = 750;	// Delay before we clear buffer
 	var typingTimer;			// Keep track of time between keypresses
 
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
@@ -36,11 +35,8 @@ jQuery.noConflict();
 			keyPressEvent = event;
 		}
 
-		// Get character that was typed, if was carriage return, replace with space
+		// Get character that was typed
 		var charCode = event.which;
-		if (charCode == KEYCODE_RETURN) {
-			charCode = KEYCODE_SPACEBAR;
-		}
 		var char = String.fromCharCode(charCode);
 
 		// Clear timer if still running, and start it again
@@ -102,14 +98,18 @@ jQuery.noConflict();
  		console.log("checkShortcuts:", lastChar, textBuffer);
 
 		// Get shortcuts
-		chrome.storage.sync.get(STORAGE_KEY, function(data)
+		chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
 		{
+			// Check for errors
+			if (chrome.runtime.lastError) {
+				console.log(chrome.runtime.lastError);
+			}
 			// Check that data is returned and shortcut library exists
-			if (data && data[STORAGE_KEY])
+			else if (data && data[OLD_STORAGE_KEY])
 			{
 				// Check if shortcut exists and should be triggered
 				var shortcut = textBuffer.join('');
-				var autotext = data[STORAGE_KEY][shortcut];
+				var autotext = data[OLD_STORAGE_KEY][shortcut];
 
 				if (autotext)	// Shortcut exists! Expand and replace text
 				{
@@ -179,7 +179,7 @@ jQuery.noConflict();
 							{
 								// Set text node in element
 								node = document.createTextNode(text);
- 								$textNode.replaceWith(node);
+								$textNode.replaceWith(node);
 
 								// Update cursor position
 								setCursorPositionInNode(node,
@@ -191,7 +191,7 @@ jQuery.noConflict();
 								var lines = text.split('\n');
 
 								// For simplicity, join with <br> tag instead
- 								$textNode.replaceWith(lines.join('<br>'));
+								$textNode.replaceWith(lines.join('<br>'));
 
 								// Find the last added text node
 								$textNode = findMatchingTextNode($textInput,
@@ -322,6 +322,14 @@ jQuery.noConflict();
 				'div[contenteditable=true],textarea,input', keyUpHandler);
 		});
 
+		// Attach to future iframes
+		$(document).on(EVENT_NAME_LOAD, 'iframe', function(e) {
+			$(this).contents().on(EVENT_NAME_KEYPRESS,
+				'div[contenteditable=true],textarea,input', keyPressHandler);
+			$(this).contents().on(EVENT_NAME_KEYUP,
+				'div[contenteditable=true],textarea,input', keyUpHandler);
+		});
+
 		// Show page action if handlers attach
 		chrome.runtime.sendMessage({request: "showPageAction"});
 	}
@@ -333,12 +341,7 @@ jQuery.noConflict();
 	}
 
 	// Document ready function
-	$(function()
-	{
-		if (!DEBUG) {
-			console.log = function() {};	// Make console.log a no-op
-		}
-
+	$(function() {
 		addListeners();		// Add listener to track when user types
 	});
 
