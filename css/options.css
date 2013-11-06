@@ -29,6 +29,9 @@ p {
 	margin-top: 0;
 }
 
+ul {
+	padding-left: 24px;
+}
 ul li {
 	margin: 8px 0;
 }
@@ -38,7 +41,6 @@ ul li {
 
 form {
 	margin-top: 32px;
-	margin-left: 16px;
 }
 
 table {
@@ -76,6 +78,7 @@ input, textarea {
 	height: 2em;
 	width: 100%;
 	background: #f8fbff;
+	overflow: auto;
 
 	border: 1px solid #ddd;
 	-moz-border-radius: 3px;	/* Firefox */
