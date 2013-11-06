@@ -12,7 +12,7 @@
 	, "default_locale": "en"
 
 	, "background": {
-		"scripts": [ "background.js" ]
+		"scripts": [ "js/background.js" ]
 	}
 	, "page_action": {
 		"default_icon": {
@@ -29,7 +29,7 @@
 		, "js": [
 			"js/jquery-1.8.3.js"
 			, "js/moment.min.js"
-			, "expander.js"
+			, "js/expander.js"
 		]
 		, "run_at": "document_start"
 	}]
