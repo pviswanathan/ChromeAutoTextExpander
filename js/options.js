@@ -80,7 +80,7 @@ function setupShortcuts()
 			addRow('brb', 'be right back');
 			addRow('e@', 'email.me@carlinyuen.com');
 			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
-			addRow('MYSIG ', '. Carlin\nChrome Extension Developer\nemail.me@carlinyuen.com');
+			addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
 			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
 		}
 

@@ -39,13 +39,19 @@ jQuery.noConflict();
 
 		// Get character that was typed
 		var charCode = event.which;
-		var char = String.fromCharCode(charCode);
+		if (charCode == KEYCODE_RETURN)	// If return, clear and get out
+		{
+			clearTypingBuffer();
+			clearTypingTimer();
+			return;
+		}
 
 		// Clear timer if still running, and start it again
 		clearTypingTimer();
 		typingTimer = setTimeout(clearTypingBuffer, typingTimeout);
 
 		// Add new character to typing buffer
+		var char = String.fromCharCode(charCode);
 		typingBuffer.push(char);
 
 		// Check typed text for shortcuts
