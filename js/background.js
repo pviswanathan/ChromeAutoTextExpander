@@ -52,12 +52,12 @@ chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
 							, message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
 						}, function(id) {});
 
-						// Open up options page
-						chrome.tabs.create({url: "options.html"});
 					}
 				});
 			}
 		});
 	}
+	// Open up options page
+	chrome.tabs.create({url: "options.html"});
 });
 
