@@ -19,12 +19,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 
 // If old database still exists, port old shortcuts over to new shortcut syntax
 var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
+var FIRST_RUN_KEY = 'autoTextExpanderFirstRun';
 chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
 {
 	if (chrome.runtime.lastError) {	// Check for errors
 		console.log(chrome.runtime.lastError);
 	}
-	else if (data && data[OLD_STORAGE_KEY])
+	else if (data && data[OLD_STORAGE_KEY])	// Has old data
 	{
 		// Loop through and them to object to store
 		var newDataStore = {};
@@ -52,6 +53,11 @@ chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
 							, message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
 						}, function(id) {});
 
+						// Flag first run
+						var data = {};
+						data[FIRST_RUN_KEY] = true;
+						chrome.storage.local.set(data)
+
 						// Open options page for users to see
 						OpenOptionsPage(data);
 					}
@@ -59,16 +65,17 @@ chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
 			}
 		});
 	}
-});
-
-var FIRST_RUN_KEY = 'autoTextExpanderFirstRun';
-chrome.storage.local.get(FIRST_RUN_KEY, function(data)
-{
-	if (chrome.runtime.lastError) {	// Check for errors
-		console.log(chrome.runtime.lastError);
-	}
-	else if (!data[FIRST_RUN_KEY]) {
-		OpenOptionsPage();			// Open options page on first install
+	else	// Check if first run
+	{
+		chrome.storage.local.get(FIRST_RUN_KEY, function(data)
+		{
+			if (chrome.runtime.lastError) {	// Check for errors
+				console.log(chrome.runtime.lastError);
+			}
+			else if (!data[FIRST_RUN_KEY]) {
+				OpenOptionsPage();			// Open options page on first install
+			}
+		});
 	}
 });
 

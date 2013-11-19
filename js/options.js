@@ -259,23 +259,33 @@ function saveShortcuts(completionBlock)
 		return false;
 	}
 
-	// Save data into storage
-	chrome.storage.sync.set(shortcuts, function()
+	// Clear old shortcuts
+	chrome.storage.sync.clear(function()
 	{
 		if (chrome.runtime.lastError) {
 			console.log(chrome.runtime.lastError);
-			alert("Error saving shortcuts!");
 		}
-		else	// Success! Shortcuts saved
+		else	// Success! Shortcuts cleared
 		{
-			console.log("saveShortcuts success:", shortcuts);
+			// Save data into storage
+			chrome.storage.sync.set(shortcuts, function()
+			{
+				if (chrome.runtime.lastError) {
+					console.log(chrome.runtime.lastError);
+					alert("Error saving shortcuts!");
+				}
+				else	// Success! Shortcuts saved
+				{
+					console.log("saveShortcuts success:", shortcuts);
 
-			// Run completion block if exists
-			if (completionBlock) {
-				completionBlock();
-			} else {
-				showCrouton('Shortcuts saved!');	// Indicate success saving
-			}
+					// Run completion block if exists
+					if (completionBlock) {
+						completionBlock();
+					} else {
+						showCrouton('Shortcuts saved!');	// Indicate success saving
+					}
+				}
+			});
 		}
 	});
 }
