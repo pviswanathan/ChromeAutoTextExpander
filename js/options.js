@@ -82,6 +82,7 @@ function setupShortcuts()
 			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
 			addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
 			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
+			saveShortcuts();
 		}
 
 		// Set textarea height to fit content and resize as user types

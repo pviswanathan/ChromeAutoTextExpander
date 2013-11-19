@@ -51,13 +51,27 @@ chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
 							, title: "Database Update"
 							, message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
 						}, function(id) {});
-
-						// Open up options page
-						chrome.tabs.create({url: "options.html"});
 					}
+					OpenOptionsPage(data);
 				});
 			}
 		});
 	}
 });
 
+var FIRST_RUN_KEY = 'autoTextExpanderFirstRun';
+chrome.storage.local.get(FIRST_RUN_KEY, function(data)
+{
+	if (chrome.runtime.lastError) {	// Check for errors
+		console.log(chrome.runtime.lastError);
+	}
+	else if (!data[FIRST_RUN_KEY]) {
+		OpenOptionsPage(data);
+		chrome.storage.local.set(data);
+	}
+});
+
+function OpenOptionsPage(data) {
+		chrome.tabs.create({url: "options.html"});
+		data[FIRST_RUN_KEY] = true;
+}
