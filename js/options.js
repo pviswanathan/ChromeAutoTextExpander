@@ -3,6 +3,7 @@ var DEFAULT_SHORTCUT = "Shortcut"
   , DEFAULT_AUTOTEXT = "Expanded Text"
   , KEYCODE_ENTER = 13
   , KEYCODE_TAB = 9;
+var FIRST_RUN_KEY = 'autoTextExpanderFirstRun';
 
 // Document ready
 $(function()
@@ -41,8 +42,32 @@ $(function()
 		event.preventDefault();
 	});
 
-	// Setup shortcut edit table
-	setupShortcuts();
+	// First time user? Check on open
+	chrome.storage.local.get(FIRST_RUN_KEY, function(data)
+	{
+		if (chrome.runtime.lastError) {		// Check for errors
+			console.log(chrome.runtime.lastError);
+		}
+		else if (!data[FIRST_RUN_KEY])		// First run
+		{
+			// Flag first run
+			data[FIRST_RUN_KEY] = true;
+			chrome.storage.local.set(data);
+
+			// Example shortcuts
+			addRow('brb', 'be right back');
+			addRow('e@', 'email.me@carlinyuen.com');
+			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
+			addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
+			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
+
+			// Save
+			saveShortcuts(setupShortcuts);
+		}
+		else {
+			setupShortcuts();	// Setup shortcut edit table
+		}
+	});
 });
 
 // Setup and populate edit table shortcuts
@@ -74,15 +99,6 @@ function setupShortcuts()
 
 			// Add special class to these rows to indicate saved
 			$('tr').addClass('saved');
-		}
-		else	// First time? Add some defaults
-		{
-			addRow('brb', 'be right back');
-			addRow('e@', 'email.me@carlinyuen.com');
-			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
-			addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
-			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
-			saveShortcuts();
 		}
 
 		// Set textarea height to fit content and resize as user types
@@ -219,7 +235,7 @@ function validateRow($input, callback)
 }
 
 // Save shortcuts to chrome sync data
-function saveShortcuts()
+function saveShortcuts(completionBlock)
 {
 	console.log("saveShortcuts");
 
@@ -254,8 +270,12 @@ function saveShortcuts()
 		{
 			console.log("saveShortcuts success:", shortcuts);
 
-			// Indicate success saving
-			showCrouton('Shortcuts saved!');
+			// Run completion block if exists
+			if (completionBlock) {
+				completionBlock();
+			} else {
+				showCrouton('Shortcuts saved!');	// Indicate success saving
+			}
 		}
 	});
 }

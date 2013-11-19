@@ -18,3 +18,9 @@ Technologies used:
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
 
 . Carlin
+
+## Credits
+Thanks to Jake (https://github.com/jstrength) for his contributions.
+
+## License
+MIT
