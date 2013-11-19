@@ -7,6 +7,7 @@ jQuery.noConflict();
 	// Variables & Constants
 	var OK = 0;
 	var KEYCODE_BACKSPACE = 8;
+	var KEYCODE_TAB = 9;
 	var KEYCODE_RETURN = 13;
 	var KEYCODE_SPACEBAR = 32;
 	var DEFAULT_TYPING_TIMEOUT = 750;
@@ -38,7 +39,7 @@ jQuery.noConflict();
 		}
 
 		// Get character that was typed
-		var charCode = event.which;
+		var charCode = event.keyCode || event.which;
 		if (charCode == KEYCODE_RETURN)	// If return, clear and get out
 		{
 			clearTypingBuffer();
@@ -68,8 +69,11 @@ jQuery.noConflict();
 			keyUpEvent = event;
 		}
 
+		// Get key that was lifted on
+		var charCode = event.keyCode || event.which;
+
 		// When user types backspace, pop character off buffer
-		if (event.keyCode == KEYCODE_BACKSPACE)
+		if (charCode == KEYCODE_BACKSPACE)
 		{
 			// Clear timer and restart
 			clearTypingTimer();
@@ -77,6 +81,14 @@ jQuery.noConflict();
 
 			// Remove last character typed
 			typingBuffer.pop();
+		}
+
+		// If user uses tab, treat like return, clear and get out
+		if (charCode == KEYCODE_TAB)
+		{
+			clearTypingBuffer();
+			clearTypingTimer();
+			return;
 		}
 	}
 
