@@ -375,10 +375,11 @@ function updateBackupTimestamp()
 		}
 		else if (data)	// Set date
 		{
-			var date = new Date(data[BACKUP_TIMESTAMP_KEY]);
-			if (date) {
-				console.log("Last local backup date: " + date.toLocaleString());
-				$('#restore').text(date.toLocaleString()).removeClass('disabled');
+			var timestamp = data[BACKUP_TIMESTAMP_KEY];
+			if (timestamp) {
+				var date = new Date(timestamp).toLocaleString();
+				console.log("Last local backup date: " + date);
+				$('#restore').text(date).removeClass('disabled');
 			} else {
 				console.log("No last backup date");
 				$('#restore').text("Never").addClass('disabled');
