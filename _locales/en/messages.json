@@ -14,6 +14,31 @@
 		, "description": "Page action default title."
 	}
 
+	, "TITLE_WARNING_POPUP": {
+		"message": "Warning"
+		, "description": "Title of warning popup."
+	}
+
+	, "MESSAGE_BACKUP_WARNING": {
+		"message": "This will save your currently defined shortcuts on the screen and then overwrite the old backup."
+		, "description": "Warning message when user is about to attempt backing up his or her shortcuts."
+	}
+
+	, "MESSAGE_RESTORE_WARNING": {
+		"message": "This will overwrite your current shortcuts with your last backup!"
+		, "description": "Warning message when user is about to attempt restoring his or her shortcuts from their last backup."
+	}
+
+	, "ERROR_BACKUP_FAILED": {
+		"message": "Could not backup shortcuts! May be over size limit."
+		, "description": "Error message to be displayed to user when backup fails."
+	}
+
+	, "ERROR_RESTORE_FAILED": {
+		"message": "Could not restore backup! Data may be corrupted or storage limits may have changed."
+		, "description": "Error message to be displayed to user when restore from backup fails."
+	}
+
 	, "ERROR_OVER_SPACE_QUOTA": {
 		"message": "Over Chrome user storage quota!"
 		, "description": "Error message to be displayed when user goes over the quota for total storage space that Chrome's sync API allows."

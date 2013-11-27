@@ -217,8 +217,8 @@ jQuery.noConflict();
 								$textNode = findMatchingTextNode($textInput,
 									lines[lines.length - 1]);
 								node = $textNode.get(0);
-								console.log($textNode);
-								console.log(node);
+//								console.log($textNode);
+//								console.log(node);
 
 								// Update cursor position
 								setCursorPositionInNode(node,
@@ -239,10 +239,10 @@ jQuery.noConflict();
 	// Replacing shortcut with autotext in text at cursorPosition
 	function replaceText(text, shortcut, autotext, cursorPosition)
 	{
-		console.log("cursorPosition:", cursorPosition);
-		console.log("currentText:", text);
-		console.log("shortcut:", shortcut);
-		console.log("expandedText:", autotext);
+//		console.log("cursorPosition:", cursorPosition);
+//		console.log("currentText:", text);
+//		console.log("shortcut:", shortcut);
+//		console.log("expandedText:", autotext);
 
 		// Replace shortcut based off cursorPosition
 		return [text.slice(0, cursorPosition - shortcut.length),
