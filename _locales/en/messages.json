@@ -29,6 +29,11 @@
 		, "description": "Error message to be displayed when user goes over the max number of items that Chrome's sync API allows."
 	}
 
+	, "ERROR_DUPLICATE_ITEMS": {
+		"message": "Duplicate shortcuts found!"
+		, "description": "Error message to be displayed when duplicate shortcuts are found"
+	}
+
 	, "TEMPLATE": {
 		"message": "Text"
 		, "description": "Template"

@@ -1,16 +1,15 @@
 <html>
 	<head>
 		<title>Auto Text Expander : Options</title>
-
 		<meta charset="utf-8" />
-
 		<link rel="stylesheet" type="text/css" href="css/options.css" />
 	</head>
 
 	<body>
 
 		<div id="content">
-			<h1><img src="images/icon48.png" alt="" /> Auto Text Expander Options </h1>
+			<h1><img src="images/icon48.png" alt="" /> Auto Text Expander Options
+				<span><a id="feedback" href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" title="Feedback on the Chrome Webstore"><strong>Feedback</strong></a></h1>
 			<p>Edit your database of shortcuts and expansions here! Some usage tips:</p>
 
 			<ul>
@@ -26,11 +25,18 @@
 					it to trigger after typing a space. <strong>Line breaks are supported
 					in expanded text now!</strong> HTML can also be inserted into content-editable divs like Gmail.</li>
 				<li>Saving should sync across all Chrome browsers you login and sync with.
-					First-time user? Here's a few examples! Make sure to refresh your page.</li>
+					First-time user? Here's a few examples! Make sure to refresh your pages to use it.</li>
 			</ul>
 
 			<section>
 				<form>
+					<fieldset>
+						<div class="restoreLabel">Last local backup was<br /><a id="restore" href="#" title="Restore Backup Shortcuts"></a></div>
+						<button type="button" id="backup">Backup</button>
+						<button type="button" id="refresh"><img src="images/reload.png" alt="Reload" /> Refresh</button>
+						<button type="button" id="add">Add</button>
+						<button type="button" id="save">Save</button>
+					</fieldset>
 					<table id="edit" border="0" cellpadding="0" cellspacing="0">
 						<tr id="input">
 							<td><a href="#" class="remove" title="Remove Shortcut"><img src="images/remove.png" alt="x" /></a></td>
@@ -38,14 +44,7 @@
 							<td><input type="text" class="autotext" value="Expanded Text" /></td>
 						</tr>
 					</table>
-					<span>
-						<a href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" title="Feedback on the Chrome Webstore"><button type="button" id="feedback"><strong>Feedback</strong></button></a>
-						<button type="button" id="refresh"><img src="images/reload.png" alt="Reload" /> Refresh</button>
-						<button type="button" id="add">Add Shortcut</button>
-						<button type="submit" id="save">Save</button>
-<span>
-				</span>
-					</span>
+					<p><a class="backToTop" href="#">Back to Top</a></p>
 				</form>
 			</section>
 

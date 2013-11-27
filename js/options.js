@@ -2,8 +2,12 @@
 var DEFAULT_SHORTCUT = "Shortcut"
   , DEFAULT_AUTOTEXT = "Expanded Text"
   , KEYCODE_ENTER = 13
-  , KEYCODE_TAB = 9;
+  , KEYCODE_TAB = 9
+  , ANIMATION_FAST = 200
+  , ANIMATION_NORMAL = 400;
 var FIRST_RUN_KEY = 'autoTextExpanderFirstRun';
+var BACKUP_KEY = 'autoTextExpanderBackup'
+  , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp';
 
 // Document ready
 $(function()
@@ -26,15 +30,19 @@ $(function()
 	});
 
 	// Button handlers
+	$('#restore').click(restoreShortcuts);
+	$('#backup').click(backupShortcuts);
 	$('#refresh').click(setupShortcuts);
 	$('#edit').on('click', '.remove', removeRow);
 	$('#add').click(function(event) {
-		event.preventDefault();
 		addRow().find('.shortcut').focus().select();
 	});
 	$('#save').click(function(event) {
-		event.preventDefault();
 		saveShortcuts();
+	});
+	$('.backToTop').click(function(event) {
+		event.preventDefault();
+		$('html, body').animate({scrollTop: 0}, ANIMATION_NORMAL);
 	});
 
 	// Prevent form submit
@@ -42,86 +50,93 @@ $(function()
 		event.preventDefault();
 	});
 
-	// First time user? Check on open
-	chrome.storage.local.get(FIRST_RUN_KEY, function(data)
-	{
-		if (chrome.runtime.lastError) {		// Check for errors
-			console.log(chrome.runtime.lastError);
-		}
-		else if (!data[FIRST_RUN_KEY])		// First run
-		{
-			// Flag first run
-			data[FIRST_RUN_KEY] = true;
-			chrome.storage.local.set(data);
-
-			// Example shortcuts
-			addRow('brb', 'be right back');
-			addRow('e@', 'email.me@carlinyuen.com');
-			addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
-			addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
-			addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
-
-			// Save
-			saveShortcuts(setupShortcuts);
-		}
-		else {
-			setupShortcuts();	// Setup shortcut edit table
-		}
-	});
+	// Setup shortcuts
+	setupShortcuts();
 });
 
 // Setup and populate edit table shortcuts
 function setupShortcuts()
 {
-	// Clear table
-	$('#edit').html('');
-	$('#refresh').find('img').attr('src', 'images/refresh.gif');
+	console.log("setupShortcuts");
+
 	var reloadStartTime = new Date();	// Keep track of time
-
-	// Get existing shortcuts
-	chrome.storage.sync.get(null, function(data)
-	{
-		if (chrome.runtime.lastError) {	// Check for errors
-			console.log(chrome.runtime.lastError);
-			alert("Error retrieving shortcuts!");
-		}
-		else if (!$.isEmptyObject(data)) // Check that data is returned
+	$('#refresh').find('img').attr('src', 'images/refresh.gif');
+	$('#edit').fadeOut(ANIMATION_FAST, function() {
+		$(this).html('').fadeIn(ANIMATION_FAST, function()
 		{
-			// Loop through shortcuts and add to edit table,
-			//  case insensitive sorted by shortcut
-			var keys = Object.keys(data);
-			keys.sort(function(a, b) {
-				return a.toLowerCase().localeCompare(b.toLowerCase());
+			// Get existing shortcuts
+			chrome.storage.sync.get(null, function(data)
+			{
+				if (chrome.runtime.lastError) {	// Check for errors
+					console.log(chrome.runtime.lastError);
+					alert("Error retrieving shortcuts!");
+				}
+				else if (!$.isEmptyObject(data)) // Check that data is returned
+				{
+					// Loop through shortcuts and add to edit table,
+					//  case insensitive sorted by shortcut
+					var keys = Object.keys(data);
+					keys.sort(function(a, b) {
+						return a.toLowerCase().localeCompare(b.toLowerCase());
+					});
+					$.each(keys, function(index, key) {
+						addRow(key, data[key]);
+					});
+
+					// Add special class to these rows to indicate saved
+					$('tr').addClass('saved');
+				}
+				else	// No shortcuts? Check if first run on this computer
+				{
+					chrome.storage.local.get(FIRST_RUN_KEY, function(firstRun)
+					{
+						if (chrome.runtime.lastError) {		// Check for errors
+							console.log(chrome.runtime.lastError);
+						}
+						else if (!firstRun[FIRST_RUN_KEY])		// First run
+						{
+							// Flag first run
+							firstRun[FIRST_RUN_KEY] = true;
+							chrome.storage.local.set(firstRun);
+
+							// Example shortcuts
+							addRow('brb', 'be right back');
+							addRow('e@', 'email.me@carlinyuen.com');
+							addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
+							addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
+							addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
+
+							// Save
+							saveShortcuts();
+						}
+					});
+				}
+
+				// Set textarea height to fit content and resize as user types
+				$('textarea').autosize();
+
+				// Add extra input field if no existing shortcuts
+				if (!$('tr').get().length) {
+					addRow().find('.shortcut').focus().select();
+				}
+
+				// Add some delay so it looks like it's doing some work
+				var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
+				var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
+				if (reloadIconRefreshDelay < 0) {
+					reloadIconRefreshDelay = 0;
+				}
+
+				// Done! Set reloader icon back to default reload
+				setTimeout(function() {
+					$('#refresh').find('img').attr('src', 'images/reload.png');
+				}, reloadIconRefreshDelay);
 			});
-			$.each(keys, function(index, key) {
-				addRow(key, data[key]);
-			});
-
-			// Add special class to these rows to indicate saved
-			$('tr').addClass('saved');
-		}
-
-		// Set textarea height to fit content and resize as user types
-		$('textarea').autosize();
-
-		// Add extra input field if no existing shortcuts
-		if (!$('tr').get().length) {
-			addRow().find('.shortcut').focus().select();
-		}
-
-		// Add some delay so it looks like it's doing some work
-		var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
-		var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
-		if (reloadIconRefreshDelay < 0) {
-			reloadIconRefreshDelay = 0;
-		}
-
-		// Done! Set reloader icon back to default reload
-		setTimeout(function() {
-			$('#refresh').find('img').attr('src', 'images/reload.png');
-		}, reloadIconRefreshDelay);
-
+		});
 	});
+
+	// Update timestamp of backup
+	updateBackupTimestamp();
 }
 
 // When a row in the edit table gets typed in
@@ -201,7 +216,7 @@ function addRow(shortcut, autotext)
 				.text(autotext || DEFAULT_AUTOTEXT)
 			)
 		)
-		.appendTo('#edit');
+		.hide().prependTo('#edit').fadeIn(ANIMATION_FAST);
 }
 
 // Validate if row has valid shortcut info
@@ -240,16 +255,31 @@ function saveShortcuts(completionBlock)
 	console.log("saveShortcuts");
 
 	// Collect list of valid shortcuts
+	var duplicates = [];
 	var shortcuts = {};
 	$('tr').each(function(index)
 	{
 		var $row = $(this);
 
-		// If pair is valid, add to list
-		if (validateRow($row)) {
-			shortcuts[$row.find('.shortcut').val()] = $row.find('.autotext').val();
+		// If pair is valid, and no duplicates, add to list
+		if (validateRow($row))
+		{
+			var shortcut = $row.find('.shortcut').val();
+			if (!shortcuts[shortcut]) {
+				shortcuts[shortcut] = $row.find('.autotext').val();
+			} else {
+				duplicates.push(shortcut);
+			}
 		}
 	});
+
+	// Check duplicates
+	if (duplicates.length) {
+		console.log(chrome.i18n.getMessage("ERROR_DUPLICATE_ITEMS"));
+		alert(chrome.i18n.getMessage("ERROR_DUPLICATE_ITEMS")
+			+ '\n - ' + duplicates.join('\n - '));
+		return false;
+	}
 
 	// Check storage capacity
 	if (JSON.stringify(shortcuts).length >= chrome.storage.sync.QUOTA_BYTES) {
@@ -278,6 +308,16 @@ function saveShortcuts(completionBlock)
 				{
 					console.log("saveShortcuts success:", shortcuts);
 
+					// Run through valid shortcuts and set them as saved
+					$('tr').each(function(index)
+					{
+						var $row = $(this);
+						if (shortcuts[$row.find('.shortcut').val()]) {
+							$row.addClass('saved');
+						}
+					});
+
+
 					// Run completion block if exists
 					if (completionBlock) {
 						completionBlock();
@@ -288,6 +328,100 @@ function saveShortcuts(completionBlock)
 			});
 		}
 	});
+}
+
+// Save backup of shortcuts
+function backupShortcuts()
+{
+	var response = confirm("This will save your currently defined shortcuts on the screen and then overwrite the old backup. Continue?");
+	if (response)
+	{
+		saveShortcuts(function() {
+			chrome.storage.sync.get(null, function(data)
+			{
+				if (chrome.runtime.lastError) {	// Check for errors
+					console.log(chrome.runtime.lastError);
+					alert("Error retrieving shortcuts!");
+				}
+				else	// Save backup of shortcuts
+				{
+					var backup = {};
+					backup[BACKUP_KEY] = data;
+					backup[BACKUP_TIMESTAMP_KEY] = new Date().getTime();
+					chrome.storage.local.set(backup, function()
+					{
+						if (chrome.runtime.lastError) {	// Check for errors
+							console.log(chrome.runtime.lastError);
+							alert("Could not backup shortcuts! May be over size limit.");
+						}
+						else {	// Show success
+							showCrouton('Shortcuts backed up locally!');
+							updateBackupTimestamp();
+						}
+					});
+				}
+			});
+		});
+	}
+}
+
+// Update backup timestamp time
+function updateBackupTimestamp()
+{
+	chrome.storage.local.get(BACKUP_TIMESTAMP_KEY, function(data)
+	{
+		if (chrome.runtime.lastError) {	// Check for errors
+			console.log(chrome.runtime.lastError);
+		}
+		else if (data)	// Set date
+		{
+			var date = new Date(data[BACKUP_TIMESTAMP_KEY]);
+			if (date) {
+				console.log("Last local backup date: " + date.toLocaleString());
+				$('#restore').text(date.toLocaleString()).removeClass('disabled');
+			} else {
+				console.log("No last backup date");
+				$('#restore').text("Never").addClass('disabled');
+			}
+		}
+	});
+}
+
+// Restore shortcuts from backup
+function restoreShortcuts()
+{
+	// Only enable if restore is not disabled
+	if ($('#restore').hasClass('disabled')) {
+		return alert("You need to make a backup first!");
+	}
+
+	// Confirm restore
+	var response = confirm("This will overwrite your current shortcuts! Continue?");
+	if (response)
+	{
+		chrome.storage.local.get(BACKUP_KEY, function(data)
+		{
+			if (chrome.runtime.lastError) {	// Check for errors
+				console.log(chrome.runtime.lastError);
+				alert("Error retrieving backup!");
+			}
+			else	// Restore using backup shortcuts
+			{
+				console.log("Restoring shortcuts: ", data[BACKUP_KEY]);
+				chrome.storage.sync.set(data[BACKUP_KEY], function()
+				{
+					if (chrome.runtime.lastError) {	// Check for errors
+						console.log(chrome.runtime.lastError);
+						alert("Could not restore backup! Data may be corrupted or size limits may ahve changed.");
+					}
+					else {	// Show success
+						showCrouton('Shortcuts restored!');
+						setupShortcuts();
+					}
+				});
+			}
+		});
+	}
 }
 
 // Create and show and eventually hide a message crouton

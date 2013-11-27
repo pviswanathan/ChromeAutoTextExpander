@@ -27,6 +27,7 @@ h1 img {
 
 p {
 	margin-top: 0;
+	text-align: center;
 }
 
 ul {
@@ -40,7 +41,7 @@ ul li {
 /* Forms */
 
 form {
-	margin-top: 32px;
+	margin-top: 24px;
 }
 
 table {
@@ -89,13 +90,21 @@ input.error, textarea.error {
 	background: #f99;
 }
 
-span {
+fieldset {
 	float: right;
 	text-align: right;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+.backToTop {
+	color: #888;
+	font: normal 9pt/9pt 'Helvetica Neue', Helvetica, Verdana;
 }
 
 h1 span {
-	margin-right: 16px;
+	margin: 16px 16px 0 0;
+	float: right;
 }
 h1 span a, h1 span a img {
 	font: normal 9pt/9pt 'Helvetica Neue', Helvetica, Verdana;
@@ -117,6 +126,17 @@ button {
 	position: absolute;
 	left: 6px;
 	top: 5px;
+}
+
+.restoreLabel, #restore.disabled {
+	color: #aaa;
+	font: italic 8pt/10pt 'Helvetica Neue', Helvetica, Verdana;
+	display: inline-block;
+	margin: 0 2px 4px 0;
+	vertical-align: middle;
+}
+#restore {
+	color: #66f;
 }
 
 .crouton {
