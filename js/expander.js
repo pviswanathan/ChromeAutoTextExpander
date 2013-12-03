@@ -17,6 +17,7 @@ jQuery.noConflict();
 	var FACEBOOK_DOMAIN_REGEX = /facebook.com/;
 	var EVENT_NAME_KEYPRESS = 'keypress.auto-expander';
 	var EVENT_NAME_KEYUP = 'keyup.auto-expander';
+	var EVENT_NAME_BLUR = 'blur.auto-expander';
 	var EVENT_NAME_LOAD = 'load.auto-expander';
 	var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
 
@@ -40,11 +41,8 @@ jQuery.noConflict();
 
 		// Get character that was typed
 		var charCode = event.keyCode || event.which;
-		if (charCode == KEYCODE_RETURN)	// If return, clear and get out
-		{
-			clearTypingBuffer();
-			clearTypingTimer();
-			return;
+		if (charCode == KEYCODE_RETURN) {	// If return, clear and get out
+			return clearTypingBuffer();
 		}
 
 		// Clear timer if still running, and start it again
@@ -84,11 +82,8 @@ jQuery.noConflict();
 		}
 
 		// If user uses tab, treat like return, clear and get out
-		if (charCode == KEYCODE_TAB)
-		{
-			clearTypingBuffer();
-			clearTypingTimer();
-			return;
+		if (charCode == KEYCODE_TAB) {
+			return clearTypingBuffer();
 		}
 	}
 
@@ -103,7 +98,7 @@ jQuery.noConflict();
 	}
 
 	// Clears the typing buffer
-	function clearTypingBuffer()
+	function clearTypingBuffer(event)
 	{
 		// Clear timer
 		clearTypingTimer();
@@ -336,6 +331,8 @@ jQuery.noConflict();
 			'div[contenteditable=true],textarea,input', keyPressHandler);
 		$(document).on(EVENT_NAME_KEYUP,
 			'div[contenteditable=true],textarea,input', keyUpHandler);
+		$(document).on(EVENT_NAME_BLUR,
+			'div[contenteditable=true],textarea,input', clearTypingBuffer);
 
 		// Attach to future iframes
 		$(document).on(EVENT_NAME_LOAD, 'iframe', function(e) {
@@ -359,6 +356,8 @@ jQuery.noConflict();
 	function removeListeners() {
 		$(document).off(EVENT_NAME_KEYPRESS);
 		$(document).off(EVENT_NAME_KEYUP);
+		$(document).off(EVENT_NAME_LOAD);
+		$(document).off(EVENT_NAME_BLUR);
 	}
 
 	// Document ready function
