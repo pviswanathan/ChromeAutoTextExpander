@@ -81,8 +81,8 @@ jQuery.noConflict();
 			typingBuffer.pop();
 		}
 
-		// If user uses tab, treat like return, clear and get out
-		if (charCode == KEYCODE_TAB) {
+		// If user uses tab or return, clear and get out
+		if (charCode == KEYCODE_TAB || charCode == KEYCODE_RETURN) {
 			return clearTypingBuffer();
 		}
 	}
