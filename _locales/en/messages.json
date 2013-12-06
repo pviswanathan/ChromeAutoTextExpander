@@ -10,7 +10,7 @@
 	}
 
 	, "PAGE_ACTION_TITLE": {
-		"message": "Auto Text Expander available on this page! Click to view options."
+		"message": "Click to view options for AutoTextExpander"
 		, "description": "Page action default title."
 	}
 
