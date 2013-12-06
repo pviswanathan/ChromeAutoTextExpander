@@ -83,7 +83,7 @@ chrome.runtime.onInstalled.addListener(function(details)
 		chrome.notifications.create("", {
 			type: "basic"
 			, iconUrl: "images/icon128.png"
-			, title: "AutoTextExpander Updated"
+			, title: "AutoTextExpander Updated v" + manifest.version
 			, message: "Hello hello! Please refresh your tabs to use the latest, and have a great day. :o)"
 		}, function(id) {});
 	}
