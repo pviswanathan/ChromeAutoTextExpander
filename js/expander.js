@@ -182,9 +182,9 @@ jQuery.noConflict();
 						if (EVERNOTE_DOMAIN_REGEX.test(domain))
 						{
 							// Get the focused / selected text node
-							var iframeEditor = $('#gwt-debug-noteEditor')
-								.find('iframe').get(0);
-							var node = findFocusedNode(iframeEditor.contentWindow);
+							var iframeWindow = $('#gwt-debug-noteEditor')
+								.find('iframe').get(0).contentWindow;
+							var node = findFocusedNode(iframeWindow);
 							var $textNode = $(node);
 							console.log($textNode);
 
@@ -192,7 +192,8 @@ jQuery.noConflict();
 							$textInput = $(node.parentNode);
 							console.log($textInput);
 
-							// Get and process text
+							// Get and process text, update cursor position
+							cursorPosition = $textInput.getCursorPosition(iframeWindow);
 							text = replaceText($textNode.text(),
 								shortcut, autotext, cursorPosition);
 
@@ -200,11 +201,11 @@ jQuery.noConflict();
 							if (autotext.indexOf('\n') < 0)
 							{
 								// Set text node in element
-								node = document.createTextNode(text);
-								$textNode.replaceWith(node);
+								var newNode = document.createTextNode(text);
+								node.parentNode.replaceChild(newNode, node);
 
 								// Update cursor position
-								setCursorPositionInNode(node,
+								setCursorPositionInNode(newNode,
 									cursorPosition - shortcut.length + autotext.length);
 							}
 							else	// Multiline expanded text
@@ -397,7 +398,7 @@ jQuery.noConflict();
 			var $target = $(e.target);
 			if ($target.is('iframe'))
 			{
-				console.log("Attempting to attach listeners to new iframe");
+//				console.log("Attempting to attach listeners to new iframe");
 				$target.on(EVENT_NAME_LOAD, function(e)		// On load
 				{
 					var $iframe = $(this);
@@ -490,28 +491,30 @@ jQuery.noConflict();
 
 // Cross-browser solution for getting cursor position
 (function($) {
-    $.fn.getCursorPosition = function() {
+    $.fn.getCursorPosition = function(win, doc) {
 		var el = $(this).get(0);
 		var pos = 0, sel;
+		if (!win) { win = window; }
+		if (!doc) { doc = document; }
 		if ($(this).is('input') || $(this).is('textarea')) {
 			if('selectionStart' in el) {
 				pos = el.selectionStart;
-			} else if('selection' in document) {
+			} else if('selection' in doc) {
 				el.focus();
-				sel = document.selection.createRange();
-				var SelLength = document.selection.createRange().text.length;
+				sel = doc.selection.createRange();
+				var SelLength = doc.selection.createRange().text.length;
 				Sel.moveStart('character', -el.value.length);
 				pos = Sel.text.length - SelLength;
 			}
 		} else {	// Other elements
-			if (window.getSelection) {
-				sel = window.getSelection();
+			if (win.getSelection) {
+				sel = win.getSelection();
 				if (sel.rangeCount) {
 					pos = sel.getRangeAt(0).endOffset;
 				}
-			} else if (document.selection && document.selection.createRange) {
-				sel = document.selection.createRange();
-				var tempEl = document.createElement("span");
+			} else if (doc.selection && doc.selection.createRange) {
+				sel = doc.selection.createRange();
+				var tempEl = doc.createElement("span");
 				el.insertBefore(tempEl, el.firstChild);
 				var tempRange = sel.duplicate();
 				tempRange.moveToElementText(tempEl);
