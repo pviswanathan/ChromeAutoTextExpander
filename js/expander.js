@@ -15,11 +15,14 @@ jQuery.noConflict();
 	var DATE_MACRO_CLOSE_TAG = ')';
 	var WHITESPACE_REGEX = /(\s)/;
 	var FACEBOOK_DOMAIN_REGEX = /facebook.com/;
+	var EVERNOTE_DOMAIN_REGEX = /evernote.com/;
 	var EVENT_NAME_KEYPRESS = 'keypress.auto-expander';
 	var EVENT_NAME_KEYUP = 'keyup.auto-expander';
 	var EVENT_NAME_BLUR = 'blur.auto-expander';
 	var EVENT_NAME_LOAD = 'load.auto-expander';
+	var EVENT_NAME_INSERTED = 'DOMNodeInserted';
 	var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
+	var INPUT_SELECTOR = 'div[contenteditable=true],textarea,input';
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
 	var typingTimer;			// Keep track of time between keypresses
@@ -175,6 +178,56 @@ jQuery.noConflict();
 								cursorPosition - shortcut.length + autotext.length);
 						}
 
+						// If evernote.com
+						if (EVERNOTE_DOMAIN_REGEX.test(domain))
+						{
+							// Get the focused / selected text node
+							var iframeEditor = $('#gwt-debug-noteEditor')
+								.find('iframe').get(0);
+							var node = findFocusedNode(iframeEditor.contentWindow);
+							var $textNode = $(node);
+							console.log($textNode);
+
+							// Find focused div instead of what's receiving events
+							$textInput = $(node.parentNode);
+							console.log($textInput);
+
+							// Get and process text
+							text = replaceText($textNode.text(),
+								shortcut, autotext, cursorPosition);
+
+							// If autotext is single line, simple case
+							if (autotext.indexOf('\n') < 0)
+							{
+								// Set text node in element
+								node = document.createTextNode(text);
+								$textNode.replaceWith(node);
+
+								// Update cursor position
+								setCursorPositionInNode(node,
+									cursorPosition - shortcut.length + autotext.length);
+							}
+							else	// Multiline expanded text
+							{
+								// Split text by lines
+								var lines = text.split('\n');
+
+								// For simplicity, join with <br> tag instead
+								$textNode.replaceWith(lines.join('<br>'));
+
+								// Find the last added text node
+								$textNode = findMatchingTextNode($textInput,
+									lines[lines.length - 1]);
+								node = $textNode.get(0);
+								console.log($textNode);
+								console.log(node);
+
+								// Update cursor position
+								setCursorPositionInNode(node,
+									lines[lines.length - 1].length);
+							}
+						}
+
 						// All other elements
 						else	//if ($textInput.is('[contenteditable]'))
 						{
@@ -256,10 +309,17 @@ jQuery.noConflict();
 	}
 
 	// Find node that user is editing right now, for editable divs
-	function findFocusedNode()
+	//  Optional passed window to perform selection find on
+	function findFocusedNode(win)
 	{
-		if (window.getSelection) {
-			var selection = window.getSelection();
+		// Use default window if not given window to search in
+		if (!win) {
+			win = window;
+		}
+
+		// Look for selection
+		if (win.getSelection) {
+			var selection = win.getSelection();
 			if (selection.rangeCount) {
 				return selection.getRangeAt(0).startContainer;
 			}
@@ -327,29 +387,48 @@ jQuery.noConflict();
 		chrome.runtime.sendMessage({request: "showPageAction"});
 
 		// Add to editable divs, textareas, inputs
-		$(document).on(EVENT_NAME_KEYPRESS,
-			'div[contenteditable=true],textarea,input', keyPressHandler);
-		$(document).on(EVENT_NAME_KEYUP,
-			'div[contenteditable=true],textarea,input', keyUpHandler);
-		$(document).on(EVENT_NAME_BLUR,
-			'div[contenteditable=true],textarea,input', clearTypingBuffer);
+		var $document = $(document);
+		$document.on(EVENT_NAME_KEYPRESS, INPUT_SELECTOR, keyPressHandler);
+		$document.on(EVENT_NAME_KEYUP, INPUT_SELECTOR, keyUpHandler);
+		$document.on(EVENT_NAME_BLUR, INPUT_SELECTOR, clearTypingBuffer);
 
 		// Attach to future iframes
-		$(document).on(EVENT_NAME_LOAD, 'iframe', function(e) {
-			$(this).contents().on(EVENT_NAME_KEYPRESS,
-				'div[contenteditable=true],textarea,input', keyPressHandler);
-			$(this).contents().on(EVENT_NAME_KEYUP,
-				'div[contenteditable=true],textarea,input', keyUpHandler);
+		$document.on(EVENT_NAME_INSERTED, function(e) {
+			var $target = $(e.target);
+			if ($target.is('iframe'))
+			{
+				console.log("Attempting to attach listeners to new iframe");
+				$target.on(EVENT_NAME_LOAD, function(e)		// On load
+				{
+					var $iframe = $(this);
+					$iframe.contents().on(EVENT_NAME_KEYPRESS,
+						INPUT_SELECTOR, keyPressHandler);
+					$iframe.contents().on(EVENT_NAME_KEYUP,
+						INPUT_SELECTOR, keyUpHandler);
+
+					// Special case for Evernote
+					var domain = window.location.host;
+					if (EVERNOTE_DOMAIN_REGEX.test(domain))
+					{
+						$iframe.contents().find('body')
+							.on(EVENT_NAME_KEYPRESS, keyPressHandler);
+						$iframe.contents().find('body')
+							.on(EVENT_NAME_KEYUP, keyUpHandler);
+					}
+				});
+			}
 		});
 
 		// Attach to existing iframes as well - this needs to be at the end
 		//  because sometimes this breaks depending on cross-domain policy
-		$(document).find('iframe').each(function(index) {
-			$(this).contents().on(EVENT_NAME_KEYPRESS,
-				'div[contenteditable=true],textarea,input', keyPressHandler);
-			$(this).contents().on(EVENT_NAME_KEYUP,
-				'div[contenteditable=true],textarea,input', keyUpHandler);
-		});
+		try {
+			$document.find('iframe').each(function(index) {
+				$(this).contents().on(EVENT_NAME_KEYPRESS, INPUT_SELECTOR, keyPressHandler);
+				$(this).contents().on(EVENT_NAME_KEYUP, INPUT_SELECTOR, keyUpHandler);
+			});
+		} catch (exception) {
+			console.log(exception);
+		}
 	}
 
 	// Detach listener for keypresses
