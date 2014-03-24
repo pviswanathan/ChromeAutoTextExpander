@@ -159,6 +159,12 @@ jQuery.noConflict();
 					// If input or textarea field, can easily change the val
 					if ($textInput.is("textarea") || $textInput.is("input"))
 					{
+						// Fix for input[type=email] and input[type=number]
+						if (cursorPosition === 0
+							&& $textInput.is('input[type="email"],input[type="number"]')) {
+							cursorPosition = $textInput.val().length;
+						}
+
 						$textInput.val(replaceText(
 							$textInput.val(),
 							shortcut,
@@ -512,13 +518,7 @@ jQuery.noConflict();
 					range.select();
 				}
 			} catch (exception) {
-				if (input.createTextRange) {
-					range = input.createTextRange();
-					range.collapse(true);
-					range.moveEnd('character', pos);
-					range.moveStart('character', pos);
-					range.select();
-				}
+				console.log('setCursorPosition', exception);
 			}
 		} else {	// Other elements
 			var node = input.childNodes[0];	// Need to get text node
@@ -562,13 +562,7 @@ jQuery.noConflict();
 					pos = Sel.text.length - SelLength;
 				}
 			} catch (exception) {
-				if (doc.selection) {
-					el.focus();
-					sel = doc.selection.createRange();
-					var SelLength = doc.selection.createRange().text.length;
-					Sel.moveStart('character', -el.value.length);
-					pos = Sel.text.length - SelLength;
-				}
+				console.log('getCursorPosition:', exception);
 			}
 		} else {	// Other elements
 			if (win.getSelection) {

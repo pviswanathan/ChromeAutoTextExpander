@@ -14,26 +14,45 @@
 					<a id="request" href="https://chrome.google.com/webstore/support/iibninhmiggehlcdolcilmhacighjamp?hl=en-US&gl=US#feature" target="_blank" title="Feature Requests on the Chrome Webstore"><strong>Feature Requests</strong></a>
 				</span>
 			</h1>
-			<p>Edit your database of shortcuts and expansions here! Some
-			<a id="tipsLink" href="#" title="Show usage tips">usage tips</a>.</p>
+			<p>
+				Edit your database of shortcuts and expansions here!
+				<a id="tipsLink" class="error" href="#" title="Show usage tips">Important notes</a>.
+			</p>
 
 			<ul id="tipsList">
-				<li><strong>Shortcuts are case sensitive!</strong> Add or edit your shortcuts
-					on the fly through the <strong>(txt)</strong> icon that shows up in the url bar.</li>
-				<li><strong>Date/time macros are now supported!</strong>
+				<li>
+					<strong>Shortcuts are case sensitive!</strong> Add or edit
+					your shortcuts on the fly through the <strong>(txt)</strong>
+					icon that shows up in the url bar.
+				</li>
+				<li>
+					<strong>Date/time macros are supported!</strong>
 					Wrap your date format with <strong>%d(</strong>dateFormat<strong>)</strong>.
 					Please see <strong><a href="http://momentjs.com/docs/#/displaying/format/" target="_blank" title="Date Formatting Documentation">this</a></strong>
 					for how to format dates in your expanded text. Example: <strong>%d(MMMM Do YYYY)</strong>,
 					and would expand to something like: <strong>September 4rd 2013</strong>.
+
 				</li>
-				<li>Add a space to the end of your shortcut if you want
+				<li>
+					Add a space to the end of your shortcut if you want
 					it to trigger after typing a space. <strong>Line breaks are supported
-					in expanded text now!</strong> HTML can also be inserted into content-editable divs like Gmail.</li>
-				<li>Saving should sync across all Chrome browsers you login and sync with.
-					First-time user? Here's a few examples! Refresh your pages to use them.</li>
-				<li>Note: a few keywords can't be used due to the structure of the JS
+					in expanded text now!</strong> HTML can also be inserted
+					into content-editable divs like Gmail.
+				</li>
+				<li>
+					Saving should sync across all Chrome browsers you login and sync with.
+					First-time user? Here's a few examples! Refresh your pages to use them.
+				</li>
+				<li>
+					A few special keywords can't be used due to the structure of the JS
 					objects used to store the shortcuts. Namely words like
-					"<strong>constructor</strong>" or "<strong>class</strong>".</li>
+					"<strong>constructor</strong>" or "<strong>class</strong>".
+				</li>
+				<li>
+					The new HTML5 input[type=email] field and a few others don't allow for
+					detection and setting of the cursor. Instead the extension will have to
+					assume your cursor is at the end of the text and replace from there.
+				</li>
 			</ul>
 
 			<section>
