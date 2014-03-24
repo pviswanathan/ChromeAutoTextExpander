@@ -128,14 +128,14 @@ jQuery.noConflict();
 
 		// Get shortcuts
 		var shortcut = textBuffer.join('');
-		chrome.storage.sync.get(shortcut, function(data)
+		chrome.storage.sync.get(shortcut, function (data)
 		{
 			// Check for errors
 			if (chrome.runtime.lastError) {
 				console.log(chrome.runtime.lastError);
 			}
 			// Check that data is returned and shortcut library exists
-			else if (data)
+			else if (!$.isEmptyObject(data))
 			{
 				// Check if shortcut exists and should be triggered
 				var autotext = data[shortcut];
@@ -146,7 +146,9 @@ jQuery.noConflict();
 					autotext = processDates(autotext);
 
 					// Add whitespace if was last character
-					autotext += (WHITESPACE_REGEX.test(lastChar) ? lastChar : "");
+					if (WHITESPACE_REGEX.test(lastChar)) {
+						autotext += lastChar;
+					}
 
 					// Setup for processing
 					var domain = window.location.host;
@@ -499,14 +501,24 @@ jQuery.noConflict();
 		var input = $(this).get(0);
 		var sel, range;
 		if ($(this).is('input') || $(this).is('textarea')) {
-			if (input.setSelectionRange) {
-				input.setSelectionRange(pos, pos);
-			} else if (input.createTextRange) {
-				range = input.createTextRange();
-				range.collapse(true);
-				range.moveEnd('character', pos);
-				range.moveStart('character', pos);
-				range.select();
+			try {	// Needed for new input[type=email] failing
+				if (input.setSelectionRange) {
+					input.setSelectionRange(pos, pos);
+				} else if (input.createTextRange) {
+					range = input.createTextRange();
+					range.collapse(true);
+					range.moveEnd('character', pos);
+					range.moveStart('character', pos);
+					range.select();
+				}
+			} catch (exception) {
+				if (input.createTextRange) {
+					range = input.createTextRange();
+					range.collapse(true);
+					range.moveEnd('character', pos);
+					range.moveStart('character', pos);
+					range.select();
+				}
 			}
 		} else {	// Other elements
 			var node = input.childNodes[0];	// Need to get text node
@@ -539,14 +551,24 @@ jQuery.noConflict();
 		if (!win) { win = window; }
 		if (!doc) { doc = document; }
 		if ($(this).is('input') || $(this).is('textarea')) {
-			if('selectionStart' in el) {
-				pos = el.selectionStart;
-			} else if('selection' in doc) {
-				el.focus();
-				sel = doc.selection.createRange();
-				var SelLength = doc.selection.createRange().text.length;
-				Sel.moveStart('character', -el.value.length);
-				pos = Sel.text.length - SelLength;
+			try {	// Needed for new input[type=email] failing
+				if (el.selectionStart) {
+					pos = el.selectionStart;
+				} else if (doc.selection) {
+					el.focus();
+					sel = doc.selection.createRange();
+					var SelLength = doc.selection.createRange().text.length;
+					Sel.moveStart('character', -el.value.length);
+					pos = Sel.text.length - SelLength;
+				}
+			} catch (exception) {
+				if (doc.selection) {
+					el.focus();
+					sel = doc.selection.createRange();
+					var SelLength = doc.selection.createRange().text.length;
+					Sel.moveStart('character', -el.value.length);
+					pos = Sel.text.length - SelLength;
+				}
 			}
 		} else {	// Other elements
 			if (win.getSelection) {
