@@ -24,6 +24,8 @@ jQuery.noConflict();
 		, EVENT_NAME_INSERTED = 'DOMNodeInserted'
 		, OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
 		, INPUT_SELECTOR = 'div[contenteditable=true],textarea,input'
+		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
+		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
 	;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -33,6 +35,13 @@ jQuery.noConflict();
 
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
+
+	// Custome log function
+	function debugLog() {
+		if (DEBUG && console) {
+			console.log.apply(console, arguments);
+		}
+	}
 
 	// When user presses a key
 	function keyPressHandler(event)
@@ -115,7 +124,7 @@ jQuery.noConflict();
 	// Check to see if text in argument corresponds to any shortcuts
 	function checkShortcuts(lastChar, textBuffer, textInput)
 	{
- 		console.log("checkShortcuts:", lastChar, textBuffer);
+ 		debugLog("checkShortcuts:", lastChar, textBuffer);
 
 		// Get shortcuts
 		var shortcut = textBuffer.join('');
@@ -188,11 +197,11 @@ jQuery.noConflict();
 								.find('iframe').get(0).contentWindow;
 							var node = findFocusedNode(iframeWindow);
 							var $textNode = $(node);
-							console.log($textNode);
+							debugLog($textNode);
 
 							// Find focused div instead of what's receiving events
 							$textInput = $(node.parentNode);
-							console.log($textInput);
+							debugLog($textInput);
 
 							// Get and process text, update cursor position
 							cursorPosition = $textInput.getCursorPosition(iframeWindow);
@@ -222,8 +231,8 @@ jQuery.noConflict();
 								$textNode = findMatchingTextNode($textInput,
 									lines[lines.length - 1]);
 								node = $textNode.get(0);
-								console.log($textNode);
-								console.log(node);
+								debugLog($textNode);
+								debugLog(node);
 
 								// Update cursor position
 								setCursorPositionInNode(node,
@@ -268,8 +277,8 @@ jQuery.noConflict();
 								$textNode = findMatchingTextNode($textInput,
 									lines[lines.length - 1]);
 								node = $textNode.get(0);
-//								console.log($textNode);
-//								console.log(node);
+								debugLog($textNode);
+								debugLog(node);
 
 								// Update cursor position
 								setCursorPositionInNode(node,
@@ -290,10 +299,10 @@ jQuery.noConflict();
 	// Replacing shortcut with autotext in text at cursorPosition
 	function replaceText(text, shortcut, autotext, cursorPosition)
 	{
-//		console.log("cursorPosition:", cursorPosition);
-//		console.log("currentText:", text);
-//		console.log("shortcut:", shortcut);
-//		console.log("expandedText:", autotext);
+		debugLog("cursorPosition:", cursorPosition);
+		debugLog("currentText:", text);
+		debugLog("shortcut:", shortcut);
+		debugLog("expandedText:", autotext);
 
 		// Replace shortcut based off cursorPosition
 		return [text.slice(0, cursorPosition - shortcut.length),
@@ -408,7 +417,7 @@ jQuery.noConflict();
 		// Attach to its load event in case it hasn't loaded yet
 		$target.on(EVENT_NAME_LOAD, function(e)		// On load
 		{
-			console.log("Attempting to attach listeners to new iframe");
+			debugLog("Attempting to attach listeners to new iframe");
 			var $iframe = $(this);
 			try {
 				$iframe.contents().on(EVENT_NAME_KEYPRESS,
@@ -418,7 +427,7 @@ jQuery.noConflict();
 
 				// Special case for Evernote
 				var domain = $iframe.contents().get(0).location.host;
-				console.log('iframe location:', domain);
+				debugLog('iframe location:', domain);
 				if (EVERNOTE_DOMAIN_REGEX.test(domain))
 				{
 					$iframe.contents().find('body')

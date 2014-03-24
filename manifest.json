@@ -27,7 +27,7 @@
 	, "content_scripts": [{
 		"matches": [ "<all_urls>" ]
 		, "js": [
-			"js/jquery-2.1.0.js"
+			"js/jquery-2.1.0.min.js"
 			, "js/moment.min.js"
 			, "js/expander.js"
 		]

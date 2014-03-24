@@ -604,9 +604,6 @@ function showPortView(completionBlock)
 						.click(function() {
 							$('.popup').fadeOut(ANIMATION_FAST, function() {
 								$('.popup, .modal').remove();
-								if (completionBlock) {
-									completionBlock(null);
-								}
 							});
 						})
 					)
