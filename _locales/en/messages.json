@@ -29,6 +29,11 @@
 		, "description": "Body text of import / export popup."
 	}
 
+	, "MESSAGE_IMPORT_SUCCESS": {
+		"message": "Import successful! Shortcuts are NOT saved yet, please save them."
+		, "description": "Success message to user when import worked"
+	}
+
 	, "MESSAGE_BACKUP_WARNING": {
 		"message": "This will save your currently defined shortcuts on the screen and then overwrite the old backup."
 		, "description": "Warning message when user is about to attempt backing up his or her shortcuts."
@@ -77,6 +82,11 @@
 	, "ERROR_IMPORT_NOT_OBJECT": {
 		"message": "Import failed! Shortcuts have to be defined in a top level JS object."
 		, "description": "Error message to be displayed when importing with an array at the top level"
+	}
+
+	, "ERROR_IMPORT_ADDING_ROWS": {
+		"message": "Import failed! Errors found while adding shortcuts."
+		, "description": "Error message to be displayed when errors adding rows from import"
 	}
 
 	, "TEMPLATE": {

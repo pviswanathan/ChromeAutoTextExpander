@@ -80,10 +80,11 @@ function refreshShortcuts()
 }
 
 // Setup and populate edit table shortcuts
-function setupShortcuts(data)
+function setupShortcuts(data, completionBlock)
 {
 	console.log("setupShortcuts");
 
+	var errors = false;					// Keep track of errors
 	var reloadStartTime = new Date();	// Keep track of time
 	$('#refresh').find('img').attr('src', 'images/refresh.gif');
 	$('#edit').fadeOut(ANIMATION_FAST, function() {
@@ -99,6 +100,7 @@ function setupShortcuts(data)
 				});
 				$.each(keys, function(index, key) {
 					if (!addRow(key, data[key])) {
+						errors = true;
 						return false;	// Break out if over quota
 					}
 				});
@@ -147,9 +149,14 @@ function setupShortcuts(data)
 				reloadIconRefreshDelay = 0;
 			}
 
-			// Done! Set reloader icon back to default reload
-			setTimeout(function() {
+			// Done! Set reloader icon back and call custom completionBlock
+			setTimeout(function()
+			{
 				$('#refresh').find('img').attr('src', 'images/reload.png');
+
+				if (completionBlock) {
+					completionBlock(!errors);
+				}
 			}, reloadIconRefreshDelay);
 		});
 	});
@@ -472,9 +479,14 @@ function portShortcuts()
 			return;
 		}
 
-		// Go through and try to add them as new shortcuts, should go through
-		// built-in validation for size and such.
-		setupShortcuts(newShortcuts);
+		// Go through and try to set them up as new shortcuts,
+		// should go through built-in validation for item quotas.
+		setupShortcuts(newShortcuts, function(success) {
+			showCrouton((success)
+				? chrome.i18n.getMessage("MESSAGE_IMPORT_SUCCESS")
+				: chrome.i18n.getMessage("ERROR_IMPORT_ADDING_ROWS")
+			, !success);
+		});
 	});
 }
 
