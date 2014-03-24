@@ -31,6 +31,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 			chrome.pageAction.show(sender.tab.id);
 			break;
 
+		case "hidePageAction":
+			chrome.pageAction.hide(sender.tab.id);
+			break;
+
 		default:
 			console.log("Unknown request received:", request);
 			break;

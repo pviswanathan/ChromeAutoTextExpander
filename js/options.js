@@ -58,6 +58,9 @@ $(function()
 		event.preventDefault();
 	});
 
+	// Tips link to show / hide tips
+	$('#tipsLink').click(toggleTips);
+
 	// Refresh and setup shortcuts
 	refreshShortcuts();
 });
@@ -628,5 +631,10 @@ function showPortView(completionBlock)
 			$('#portJSON').autosize();
 		}
 	});
+}
+
+// Toggle to show and hide tips
+function toggleTips(event) {
+	$('#tipsList').slideToggle();
 }
 

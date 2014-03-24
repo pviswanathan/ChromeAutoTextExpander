@@ -31,10 +31,11 @@ p {
 	clear: both;
 }
 
-ul {
+#tipsList {
 	padding-left: 24px;
+	display: none;
 }
-ul li {
+#tipsList li {
 	margin: 8px 0;
 }
 

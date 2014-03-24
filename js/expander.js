@@ -5,29 +5,31 @@ jQuery.noConflict();
 (function($) {
 
 	// Variables & Constants
-	var OK = 0;
-	var KEYCODE_BACKSPACE = 8;
-	var KEYCODE_TAB = 9;
-	var KEYCODE_RETURN = 13;
-	var KEYCODE_SPACEBAR = 32;
-	var DEFAULT_TYPING_TIMEOUT = 750;
-	var DATE_MACRO_REGEX = /%d\(/g;
-	var DATE_MACRO_CLOSE_TAG = ')';
-	var WHITESPACE_REGEX = /(\s)/;
-	var FACEBOOK_DOMAIN_REGEX = /facebook.com/;
-	var EVERNOTE_DOMAIN_REGEX = /evernote.com/;
-	var EVENT_NAME_KEYPRESS = 'keypress.auto-expander';
-	var EVENT_NAME_KEYUP = 'keyup.auto-expander';
-	var EVENT_NAME_BLUR = 'blur.auto-expander';
-	var EVENT_NAME_LOAD = 'load.auto-expander';
-	var EVENT_NAME_INSERTED = 'DOMNodeInserted';
-	var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
-	var INPUT_SELECTOR = 'div[contenteditable=true],textarea,input';
+	var OK = 0
+		, KEYCODE_BACKSPACE = 8
+		, KEYCODE_TAB = 9
+		, KEYCODE_RETURN = 13
+		, KEYCODE_SPACEBAR = 32
+		, TIME_CLEAR_BUFFER_TIMEOUT = 750
+		, TIME_CHECK_EDITABLE_ELEMENTS = 1000 * 30	// Every 30 seconds
+		, DATE_MACRO_REGEX = /%d\(/g
+		, DATE_MACRO_CLOSE_TAG = ')'
+		, WHITESPACE_REGEX = /(\s)/
+		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
+		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
+		, EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
+		, EVENT_NAME_KEYUP = 'keyup.auto-expander'
+		, EVENT_NAME_BLUR = 'blur.auto-expander'
+		, EVENT_NAME_LOAD = 'load.auto-expander'
+		, EVENT_NAME_INSERTED = 'DOMNodeInserted'
+		, OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
+		, INPUT_SELECTOR = 'div[contenteditable=true],textarea,input'
+	;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
 	var typingTimer;			// Keep track of time between keypresses
 	var typingTimeout		 	// Delay before we clear buffer
-		= DEFAULT_TYPING_TIMEOUT;
+		= TIME_CLEAR_BUFFER_TIMEOUT;
 
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
@@ -381,12 +383,58 @@ jQuery.noConflict();
 		return processedText.join('');
 	}
 
+	// Check if page has editable elements - based off PopChrom
+	function hasEditableElements() {
+		return $(document).find(INPUT_SELECTOR).length;
+	}
+
+	// Update page action to show if there are editable elements
+	function updatePageAction() {
+		chrome.runtime.sendMessage({ request:(hasEditableElements()
+			? "showPageAction" : "hidePageAction") });
+	}
+
+	// Add event listeners to iframe - based off PopChrom
+	function addListenersToIframe($target)
+	{
+		// Attach to iframe's contents
+		try {
+			$target.contents().on(EVENT_NAME_KEYPRESS, INPUT_SELECTOR, keyPressHandler);
+			$target.contents().on(EVENT_NAME_KEYUP, INPUT_SELECTOR, keyUpHandler);
+		} catch (exception) {
+			console.log(exception);
+		}
+
+		// Attach to its load event in case it hasn't loaded yet
+		$target.on(EVENT_NAME_LOAD, function(e)		// On load
+		{
+			console.log("Attempting to attach listeners to new iframe");
+			var $iframe = $(this);
+			try {
+				$iframe.contents().on(EVENT_NAME_KEYPRESS,
+					INPUT_SELECTOR, keyPressHandler);
+				$iframe.contents().on(EVENT_NAME_KEYUP,
+					INPUT_SELECTOR, keyUpHandler);
+
+				// Special case for Evernote
+				var domain = $iframe.contents().get(0).location.host;
+				console.log('iframe location:', domain);
+				if (EVERNOTE_DOMAIN_REGEX.test(domain))
+				{
+					$iframe.contents().find('body')
+						.on(EVENT_NAME_KEYPRESS, keyPressHandler);
+					$iframe.contents().find('body')
+						.on(EVENT_NAME_KEYUP, keyUpHandler);
+				}
+			} catch (exception) {
+				console.log(exception);
+			}
+		});
+	}
+
 	// Attach listener to keypresses
 	function addListeners()
 	{
-		// Show page action so users can change settings
-		chrome.runtime.sendMessage({request: "showPageAction"});
-
 		// Add to editable divs, textareas, inputs
 		var $document = $(document);
 		$document.on(EVENT_NAME_KEYPRESS, INPUT_SELECTOR, keyPressHandler);
@@ -396,40 +444,16 @@ jQuery.noConflict();
 		// Attach to future iframes
 		$document.on(EVENT_NAME_INSERTED, function(e) {
 			var $target = $(e.target);
-			if ($target.is('iframe'))
-			{
-//				console.log("Attempting to attach listeners to new iframe");
-				$target.on(EVENT_NAME_LOAD, function(e)		// On load
-				{
-					var $iframe = $(this);
-					$iframe.contents().on(EVENT_NAME_KEYPRESS,
-						INPUT_SELECTOR, keyPressHandler);
-					$iframe.contents().on(EVENT_NAME_KEYUP,
-						INPUT_SELECTOR, keyUpHandler);
-
-					// Special case for Evernote
-					var domain = window.location.host;
-					if (EVERNOTE_DOMAIN_REGEX.test(domain))
-					{
-						$iframe.contents().find('body')
-							.on(EVENT_NAME_KEYPRESS, keyPressHandler);
-						$iframe.contents().find('body')
-							.on(EVENT_NAME_KEYUP, keyUpHandler);
-					}
-				});
+			if ($target.is('iframe')) {
+				addListenersToIframe($target);
 			}
 		});
 
 		// Attach to existing iframes as well - this needs to be at the end
 		//  because sometimes this breaks depending on cross-domain policy
-		try {
-			$document.find('iframe').each(function(index) {
-				$(this).contents().on(EVENT_NAME_KEYPRESS, INPUT_SELECTOR, keyPressHandler);
-				$(this).contents().on(EVENT_NAME_KEYUP, INPUT_SELECTOR, keyUpHandler);
-			});
-		} catch (exception) {
-			console.log(exception);
-		}
+		$document.find('iframe').each(function(index) {
+			addListenersToIframe($(this));
+		});
 	}
 
 	// Detach listener for keypresses
@@ -441,8 +465,17 @@ jQuery.noConflict();
 	}
 
 	// Document ready function
-	$(function() {
-		addListeners();		// Add listener to track when user types
+	$(function()
+	{
+		// Add listener to track when user types
+		addListeners();
+
+		// If has editable elements, show page action, keep polling in case new
+		// elements show up
+		updatePageAction();
+		setInterval(function() {
+			updatePageAction();
+		}, TIME_CHECK_EDITABLE_ELEMENTS);
 	});
 
 })(jQuery);
