@@ -25,7 +25,7 @@
 	}
 
 	, "TEXT_PORT_VIEW_POPUP": {
-		"message": "<strong class='error'>Caution!</strong> <strong>This is in beta:</strong> write your own <a href='http://jsonformatter.curiousconcept.com/' target='_blank' title='JSON format'>JSON</a> to override your current locally saved shortcuts (this does not override your backup). Feel free to copy and paste to save to your own hard drive."
+		"message": "<strong class='error'>Caution!</strong> <strong>This is in beta:</strong> write your own <a href='http://jsonformatter.curiousconcept.com/' target='_blank' title='JSON format'>JSON</a> to override your current locally saved shortcuts (this does not override your backup). You can also find <a href='http://shancarter.github.io/mr-data-converter/' target='_blank' title='CSV or Tab to JSON'>converters</a> for CSV and tab-delimited data to JSON as well. Feel free to copy and paste to save to your own hard drive."
 		, "description": "Body text of import / export popup."
 	}
 

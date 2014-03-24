@@ -14,6 +14,7 @@ jQuery.noConflict();
 		, TIME_CHECK_EDITABLE_ELEMENTS = 1000 * 30	// Every 30 seconds
 		, DATE_MACRO_REGEX = /%d\(/g
 		, DATE_MACRO_CLOSE_TAG = ')'
+		, CLIP_MACRO_REGEX = /%clip%/g
 		, WHITESPACE_REGEX = /(\s)/
 		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
 		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
@@ -35,6 +36,8 @@ jQuery.noConflict();
 
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
+
+	var clipboard;				// Keep track of what's in the clipboard
 
 	// Custome log function
 	function debugLog() {
@@ -142,160 +145,167 @@ jQuery.noConflict();
 
 				if (autotext)	// Shortcut exists! Expand and replace text
 				{
-					// Handle moment.js dates
-					autotext = processDates(autotext);
-
-					// Add whitespace if was last character
-					if (WHITESPACE_REGEX.test(lastChar)) {
-						autotext += lastChar;
-					}
-
-					// Setup for processing
-					var domain = window.location.host;
-					var $textInput = $(textInput);
-					var cursorPosition = $textInput.getCursorPosition()
-					var text;
-
-					// If input or textarea field, can easily change the val
-					if ($textInput.is("textarea") || $textInput.is("input"))
+					// Update / get clipboard text
+					getClipboardData(function()
 					{
-						// Fix for input[type=email] and input[type=number]
-						if (cursorPosition === 0
-							&& $textInput.is('input[type="email"],input[type="number"]')) {
-							cursorPosition = $textInput.val().length;
+						// Handle clipboard pastes
+						autotext = processClips(autotext);
+
+						// Handle moment.js dates
+						autotext = processDates(autotext);
+
+						// Add whitespace if was last character
+						if (WHITESPACE_REGEX.test(lastChar)) {
+							autotext += lastChar;
 						}
 
-						$textInput.val(replaceText(
-							$textInput.val(),
-							shortcut,
-							autotext,
-							cursorPosition
-						));
-						$textInput.setCursorPosition(cursorPosition
-							- shortcut.length + autotext.length);
-					}
-					else	// Trouble... editable divs & special cases
-					{
-						// If on Facebook.com
-						if (FACEBOOK_DOMAIN_REGEX.test(domain))
+						// Setup for processing
+						var domain = window.location.host;
+						var $textInput = $(textInput);
+						var cursorPosition = $textInput.getCursorPosition()
+						var text;
+
+						// If input or textarea field, can easily change the val
+						if ($textInput.is("textarea") || $textInput.is("input"))
 						{
-							if ($textInput.find('span').get().length) {
-								$textInput = $textInput.find('span').first();
+							// Fix for input[type=email] and input[type=number]
+							if (cursorPosition === 0
+								&& $textInput.is('input[type="email"],input[type="number"]')) {
+								cursorPosition = $textInput.val().length;
 							}
 
-							// Get text and replace it
-							text = $textInput.text();
-							$textInput.text(replaceText(
-								text,
+							$textInput.val(replaceText(
+								$textInput.val(),
 								shortcut,
 								autotext,
 								cursorPosition
 							));
-
-							// Set new cursor position
-							$textInput.setCursorPosition(
-								cursorPosition - shortcut.length + autotext.length);
+							$textInput.setCursorPosition(cursorPosition
+								- shortcut.length + autotext.length);
 						}
-
-						// If evernote.com
-						if (EVERNOTE_DOMAIN_REGEX.test(domain))
+						else	// Trouble... editable divs & special cases
 						{
-							// Get the focused / selected text node
-							var iframeWindow = $('#gwt-debug-noteEditor')
-								.find('iframe').get(0).contentWindow;
-							var node = findFocusedNode(iframeWindow);
-							var $textNode = $(node);
-							debugLog($textNode);
-
-							// Find focused div instead of what's receiving events
-							$textInput = $(node.parentNode);
-							debugLog($textInput);
-
-							// Get and process text, update cursor position
-							cursorPosition = $textInput.getCursorPosition(iframeWindow);
-							text = replaceText($textNode.text(),
-								shortcut, autotext, cursorPosition);
-
-							// If autotext is single line, simple case
-							if (autotext.indexOf('\n') < 0)
+							// If on Facebook.com
+							if (FACEBOOK_DOMAIN_REGEX.test(domain))
 							{
-								// Set text node in element
-								var newNode = document.createTextNode(text);
-								node.parentNode.replaceChild(newNode, node);
+								if ($textInput.find('span').get().length) {
+									$textInput = $textInput.find('span').first();
+								}
 
-								// Update cursor position
-								setCursorPositionInNode(newNode,
+								// Get text and replace it
+								text = $textInput.text();
+								$textInput.text(replaceText(
+									text,
+									shortcut,
+									autotext,
+									cursorPosition
+								));
+
+								// Set new cursor position
+								$textInput.setCursorPosition(
 									cursorPosition - shortcut.length + autotext.length);
 							}
-							else	// Multiline expanded text
+
+							// If evernote.com
+							if (EVERNOTE_DOMAIN_REGEX.test(domain))
 							{
-								// Split text by lines
-								var lines = text.split('\n');
-
-								// For simplicity, join with <br> tag instead
-								$textNode.replaceWith(lines.join('<br>'));
-
-								// Find the last added text node
-								$textNode = findMatchingTextNode($textInput,
-									lines[lines.length - 1]);
-								node = $textNode.get(0);
+								// Get the focused / selected text node
+								var iframeWindow = $('#gwt-debug-noteEditor')
+									.find('iframe').get(0).contentWindow;
+								var node = findFocusedNode(iframeWindow);
+								var $textNode = $(node);
 								debugLog($textNode);
-								debugLog(node);
 
-								// Update cursor position
-								setCursorPositionInNode(node,
-									lines[lines.length - 1].length);
+								// Find focused div instead of what's receiving events
+								$textInput = $(node.parentNode);
+								debugLog($textInput);
+
+								// Get and process text, update cursor position
+								cursorPosition = $textInput.getCursorPosition(iframeWindow);
+								text = replaceText($textNode.text(),
+									shortcut, autotext, cursorPosition);
+
+								// If autotext is single line, simple case
+								if (autotext.indexOf('\n') < 0)
+								{
+									// Set text node in element
+									var newNode = document.createTextNode(text);
+									node.parentNode.replaceChild(newNode, node);
+
+									// Update cursor position
+									setCursorPositionInNode(newNode,
+										cursorPosition - shortcut.length + autotext.length);
+								}
+								else	// Multiline expanded text
+								{
+									// Split text by lines
+									var lines = text.split('\n');
+
+									// For simplicity, join with <br> tag instead
+									$textNode.replaceWith(lines.join('<br>'));
+
+									// Find the last added text node
+									$textNode = findMatchingTextNode($textInput,
+										lines[lines.length - 1]);
+									node = $textNode.get(0);
+									debugLog($textNode);
+									debugLog(node);
+
+									// Update cursor position
+									setCursorPositionInNode(node,
+										lines[lines.length - 1].length);
+								}
 							}
-						}
 
-						// All other elements
-						else	//if ($textInput.is('[contenteditable]'))
-						{
-							// Get the focused / selected text node
-							var node = findFocusedNode();
-							var $textNode = $(node);
-
-							// Find focused div instead of what's receiving events
-							$textInput = $(node.parentNode);
-
-							// Get and process text
-							text = replaceText($textNode.text(),
-								shortcut, autotext, cursorPosition);
-
-							// If autotext is single line, simple case
-							if (autotext.indexOf('\n') < 0)
+							// All other elements
+							else	//if ($textInput.is('[contenteditable]'))
 							{
-								// Set text node in element
-								node = document.createTextNode(text);
-								$textNode.replaceWith(node);
+								// Get the focused / selected text node
+								var node = findFocusedNode();
+								var $textNode = $(node);
 
-								// Update cursor position
-								setCursorPositionInNode(node,
-									cursorPosition - shortcut.length + autotext.length);
+								// Find focused div instead of what's receiving events
+								$textInput = $(node.parentNode);
+
+								// Get and process text
+								text = replaceText($textNode.text(),
+									shortcut, autotext, cursorPosition);
+
+								// If autotext is single line, simple case
+								if (autotext.indexOf('\n') < 0)
+								{
+									// Set text node in element
+									node = document.createTextNode(text);
+									$textNode.replaceWith(node);
+
+									// Update cursor position
+									setCursorPositionInNode(node,
+										cursorPosition - shortcut.length + autotext.length);
+								}
+								else	// Multiline expanded text
+								{
+									// Split text by lines
+									var lines = text.split('\n');
+
+									// For simplicity, join with <br> tag instead
+									$textNode.replaceWith(lines.join('<br>'));
+
+									// Find the last added text node
+									$textNode = findMatchingTextNode($textInput,
+										lines[lines.length - 1]);
+									node = $textNode.get(0);
+									debugLog($textNode);
+									debugLog(node);
+
+									// Update cursor position
+									setCursorPositionInNode(node,
+										lines[lines.length - 1].length);
+								}
 							}
-							else	// Multiline expanded text
-							{
-								// Split text by lines
-								var lines = text.split('\n');
-
-								// For simplicity, join with <br> tag instead
-								$textNode.replaceWith(lines.join('<br>'));
-
-								// Find the last added text node
-								$textNode = findMatchingTextNode($textInput,
-									lines[lines.length - 1]);
-								node = $textNode.get(0);
-								debugLog($textNode);
-								debugLog(node);
-
-								// Update cursor position
-								setCursorPositionInNode(node,
-									lines[lines.length - 1].length);
-							}
-						}
-					}
-				}
-			}
+						}	// END - Trouble... editable divs & special case
+					});	// END - getClipboardData()
+				}	// END - if (autotext)
+			}	// END - if (!$.isEmptyObject(data))
 
 			// If last character is a space, clear buffer
 			if (lastChar == " ") {
@@ -366,6 +376,39 @@ jQuery.noConflict();
 		}
 	}
 
+	// Process and replace clip tags with content from clipboard
+	function processClips(text)
+	{
+		debugLog('processClips', text);
+
+		// Find all indices of opening tags
+		var clipTags = [];
+		while (result = CLIP_MACRO_REGEX.exec(text)) {
+			clipTags.push(result.index);
+		}
+
+		// Only continue if we have any tags
+		if (!clipTags.length) {
+			return text;
+		}
+		debugLog('clipTags:', clipTags);
+
+		// Loop through and replace clip tags with clipboard pasted text
+		var processedText = [text.slice(0, clipTags[0])];
+		console.log(processedText);
+		for (var i = 0, len = clipTags.length; i < len; ++i)
+		{
+			processedText.push(clipboard);
+		console.log('pre', processedText);
+			processedText.push(text.slice(clipTags[i] + 6,	// 6 for "%clip%"
+				(i == len - 1) ? undefined : clipTags[i+1]));
+		console.log('post', processedText);
+		}
+
+		// Return processed dates
+		return processedText.join('');
+	}
+
 	// Process and replace date tags and formats with moment.js
 	function processDates(text)
 	{
@@ -376,6 +419,7 @@ jQuery.noConflict();
 			dateOpenTags.push(result.index);
 		}
 
+		// Only continue if we have any tags
 		if (!dateOpenTags.length) {
 			return text;
 		}
@@ -386,13 +430,18 @@ jQuery.noConflict();
 				DATE_MACRO_CLOSE_TAG, dateOpenTags[i] + 1);
 		}
 
+		// Only continue if we have matching tags
+		if (dateOpenTags.length != dateCloseTags.length) {
+			return text;
+		}
+
 		// Loop through and replace date tags with formatted text
 		var processedText = [text.slice(0, dateOpenTags[0])];
 		for (var i = 0, len = dateOpenTags.length; i < len; ++i)
 		{
 			processedText.push(moment().format(text.slice(
-				dateOpenTags[i] + 3, dateCloseTags[i])));
-			processedText.push(text.slice(dateCloseTags[i] + 1,
+				dateOpenTags[i] + 3, dateCloseTags[i])));		// 3 for "%d("
+			processedText.push(text.slice(dateCloseTags[i] + 1,	// 1 for ")"
 				(i == len - 1) ? undefined : dateOpenTags[i+1]));
 		}
 
@@ -409,6 +458,19 @@ jQuery.noConflict();
 	function updatePageAction() {
 		chrome.runtime.sendMessage({ request:(hasEditableElements()
 			? "showPageAction" : "hidePageAction") });
+	}
+
+	// Get what's stored in the clipboard
+	function getClipboardData(completionBlock) {
+		chrome.runtime.sendMessage({
+			request:"getClipboardData"
+		}, function(data) {
+			console.log('getClipboardData:', data);
+			clipboard = data.paste;
+			if (completionBlock) {
+				completionBlock();
+			}
+		});
 	}
 
 	// Add event listeners to iframe - based off PopChrom

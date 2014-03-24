@@ -19,6 +19,21 @@ function injectScript(tab)
     }
 }
 
+// Get paste contents from clipboard
+function pasteFromClipboard()
+{
+	var pasteInto = $('<textarea/>')
+		.attr('id', 'clipboard')
+		.appendTo('body')
+		.select();
+	var result;
+    if (document.execCommand('paste', true)) {
+        result = $('#clipboard').val();
+    }
+	pasteInto.remove();
+    return result;
+}
+
 // Listen for whether or not to show the pageAction icon
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
@@ -33,6 +48,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 
 		case "hidePageAction":
 			chrome.pageAction.hide(sender.tab.id);
+			break;
+
+		case "getClipboardData":
+			sendResponse({ paste:pasteFromClipboard() });
 			break;
 
 		default:

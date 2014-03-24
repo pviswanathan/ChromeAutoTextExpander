@@ -12,7 +12,10 @@
 	, "default_locale": "en"
 
 	, "background": {
-		"scripts": [ "js/background.js" ]
+		"scripts": [
+			"js/jquery-2.1.0.min.js"
+			, "js/background.js"
+		]
 	}
 	, "page_action": {
 		"default_icon": {
@@ -40,5 +43,8 @@
 		, "unlimitedStorage"
 		, "<all_urls>"
 		, "notifications"
+		, "clipboardRead"
+	]
+	, "optional_permissions": [
 	]
 }
