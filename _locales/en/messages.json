@@ -74,6 +74,11 @@
 		, "description": "Error message to be displayed when importing invalid json"
 	}
 
+	, "ERROR_IMPORT_NOT_OBJECT": {
+		"message": "Import failed! Shortcuts have to be defined in a top level JS object."
+		, "description": "Error message to be displayed when importing with an array at the top level"
+	}
+
 	, "TEMPLATE": {
 		"message": "Text"
 		, "description": "Template"

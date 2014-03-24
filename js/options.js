@@ -38,9 +38,12 @@ $(function()
 	$('#backup').click(backupShortcuts);
 	$('#port').click(portShortcuts);
 	$('#edit').on('click', '.remove', removeRow);
-	$('.refreshButton').click(setupShortcuts);
+	$('.refreshButton').click(refreshShortcuts);
 	$('.addButton').click(function(event) {
-		addRow(null, null, $(this).hasClass('append')).find('.shortcut').focus().select();
+		var row = addRow(null, null, $(this).hasClass('append'));
+		if (row) {
+			row.find('.shortcut').focus().select();
+		}
 	});
 	$('.saveButton').click(function(event) {
 		saveShortcuts();
@@ -55,12 +58,29 @@ $(function()
 		event.preventDefault();
 	});
 
-	// Setup shortcuts
-	setupShortcuts();
+	// Refresh and setup shortcuts
+	refreshShortcuts();
 });
 
+// Refresh shortcuts using locally stored shortcuts
+function refreshShortcuts()
+{
+	// Get existing shortcuts
+	chrome.storage.sync.get(null, function(data)
+	{
+		if (chrome.runtime.lastError) {	// Check for errors
+			console.log(chrome.runtime.lastError);
+			showCrouton("Error retrieving shortcuts!", true);
+			return;
+		}
+
+		// Setup shortcuts
+		setupShortcuts(data);
+	});
+}
+
 // Setup and populate edit table shortcuts
-function setupShortcuts()
+function setupShortcuts(data)
 {
 	console.log("setupShortcuts");
 
@@ -69,74 +89,68 @@ function setupShortcuts()
 	$('#edit').fadeOut(ANIMATION_FAST, function() {
 		$(this).html('').fadeIn(ANIMATION_FAST, function()
 		{
-			// Get existing shortcuts
-			chrome.storage.sync.get(null, function(data)
+			if (!$.isEmptyObject(data)) // Check that data is returned
 			{
-				if (chrome.runtime.lastError) {	// Check for errors
-					console.log(chrome.runtime.lastError);
-					showCrouton("Error retrieving shortcuts!", true);
-				}
-				else if (!$.isEmptyObject(data)) // Check that data is returned
-				{
-					// Loop through shortcuts and add to edit table,
-					//  case insensitive sorted by shortcut, sort in reverse
-					var keys = Object.keys(data);
-					keys.sort(function(a, b) {
-						return b.toLowerCase().localeCompare(a.toLowerCase());
-					});
-					$.each(keys, function(index, key) {
-						addRow(key, data[key]);
-					});
+				// Loop through shortcuts and add to edit table,
+				//  case insensitive sorted by shortcut, sort in reverse
+				var keys = Object.keys(data);
+				keys.sort(function(a, b) {
+					return b.toLowerCase().localeCompare(a.toLowerCase());
+				});
+				$.each(keys, function(index, key) {
+					if (!addRow(key, data[key])) {
+						return false;	// Break out if over quota
+					}
+				});
 
-					// Add special class to these rows to indicate saved
-					$('tr').addClass('saved');
-				}
-				else	// No shortcuts? Check if first run on this computer
+				// Add special class to these rows to indicate saved
+				$('tr').addClass('saved');
+			}
+			else	// No shortcuts? Check if first run on this computer
+			{
+				chrome.storage.local.get(FIRST_RUN_KEY, function(firstRun)
 				{
-					chrome.storage.local.get(FIRST_RUN_KEY, function(firstRun)
+					if (chrome.runtime.lastError) {		// Check for errors
+						console.log(chrome.runtime.lastError);
+					}
+					else if (!firstRun[FIRST_RUN_KEY])		// First run
 					{
-						if (chrome.runtime.lastError) {		// Check for errors
-							console.log(chrome.runtime.lastError);
-						}
-						else if (!firstRun[FIRST_RUN_KEY])		// First run
-						{
-							// Flag first run
-							firstRun[FIRST_RUN_KEY] = true;
-							chrome.storage.local.set(firstRun);
+						// Flag first run
+						firstRun[FIRST_RUN_KEY] = true;
+						chrome.storage.local.set(firstRun);
 
-							// Example shortcuts
-							addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
-							addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
-							addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
-							addRow('e@', 'email.me@carlinyuen.com');
-							addRow('brb', 'be right back');
+						// Example shortcuts
+						addRow('printDate', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
+						addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
+						addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
+						addRow('e@', 'email.me@carlinyuen.com');
+						addRow('brb', 'be right back');
 
-							// Save
-							saveShortcuts();
-						}
-					});
-				}
+						// Save
+						saveShortcuts();
+					}
+				});
+			}
 
-				// Set textarea height to fit content and resize as user types
-				$('textarea').autosize();
+			// Set textarea height to fit content and resize as user types
+			$('textarea').autosize();
 
-				// Add extra input field if no existing shortcuts
-				if (!$('tr').get().length) {
-					addRow().find('.shortcut').focus().select();
-				}
+			// Add extra input field if no existing shortcuts
+			if (!$('tr').get().length) {
+				addRow().find('.shortcut').focus().select();
+			}
 
-				// Add some delay so it looks like it's doing some work
-				var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
-				var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
-				if (reloadIconRefreshDelay < 0) {
-					reloadIconRefreshDelay = 0;
-				}
+			// Add some delay so it looks like it's doing some work
+			var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
+			var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
+			if (reloadIconRefreshDelay < 0) {
+				reloadIconRefreshDelay = 0;
+			}
 
-				// Done! Set reloader icon back to default reload
-				setTimeout(function() {
-					$('#refresh').find('img').attr('src', 'images/reload.png');
-				}, reloadIconRefreshDelay);
-			});
+			// Done! Set reloader icon back to default reload
+			setTimeout(function() {
+				$('#refresh').find('img').attr('src', 'images/reload.png');
+			}, reloadIconRefreshDelay);
 		});
 	});
 
@@ -186,7 +200,7 @@ function addRow(shortcut, autotext, append)
 		console.log(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA"));
 		showCrouton(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA")
 			+ " Max # Items: " + chrome.storage.sync.MAX_ITEMS, true);
-		return $(this);
+		return null;
 	}
 
 	var row = $(document.createElement('tr'))
@@ -428,7 +442,7 @@ function restoreShortcuts()
 							}
 							else {	// Show success
 								showCrouton('Shortcuts restored!');
-								setupShortcuts();
+								refreshShortcuts();
 							}
 						});
 					}
@@ -444,13 +458,23 @@ function portShortcuts()
 	{
 		console.log('new shortcuts:', newShortcuts);
 
-		// Check if it's valid json
-		var json;
+		// Check if it's valid json, parse it
 		try {
-			json = JSON.parse(newShortcuts);
+			newShortcuts = JSON.parse(newShortcuts);
 		} catch (exception) {
 			showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_INVALID_JSON"), true);
+			return;
 		}
+
+		// Check if it's an array, has to be an object
+		if ($.isArray(newShortcuts)) {
+			showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_NOT_OBJECT"), true);
+			return;
+		}
+
+		// Go through and try to add them as new shortcuts, should go through
+		// built-in validation for size and such.
+		setupShortcuts(newShortcuts);
 	});
 }
 
