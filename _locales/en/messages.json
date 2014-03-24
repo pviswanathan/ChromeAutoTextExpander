@@ -19,6 +19,16 @@
 		, "description": "Title of warning popup."
 	}
 
+	, "TITLE_PORT_VIEW_POPUP": {
+		"message": "Import / Export Shortcuts"
+		, "description": "Title of import / export popup."
+	}
+
+	, "TEXT_PORT_VIEW_POPUP": {
+		"message": "<strong class='error'>Caution!</strong> <strong>This is in beta:</strong> write your own <a href='http://jsonformatter.curiousconcept.com/' target='_blank' title='JSON format'>JSON</a> to override your current locally saved shortcuts (this does not override your backup). Feel free to copy and paste to save to your own hard drive."
+		, "description": "Body text of import / export popup."
+	}
+
 	, "MESSAGE_BACKUP_WARNING": {
 		"message": "This will save your currently defined shortcuts on the screen and then overwrite the old backup."
 		, "description": "Warning message when user is about to attempt backing up his or her shortcuts."
@@ -57,6 +67,11 @@
 	, "ERROR_DUPLICATE_ITEMS": {
 		"message": "Duplicate shortcuts found!"
 		, "description": "Error message to be displayed when duplicate shortcuts are found"
+	}
+
+	, "ERROR_IMPORT_INVALID_JSON": {
+		"message": "Import failed! Shortcuts were in an invalid JSON format."
+		, "description": "Error message to be displayed when importing invalid json"
 	}
 
 	, "TEMPLATE": {

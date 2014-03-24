@@ -14,7 +14,8 @@
 					<a id="request" href="https://chrome.google.com/webstore/support/iibninhmiggehlcdolcilmhacighjamp?hl=en-US&gl=US#feature" target="_blank" title="Feature Requests on the Chrome Webstore"><strong>Feature Requests</strong></a>
 				</span>
 			</h1>
-			<p>Edit your database of shortcuts and expansions here! Some usage tips:</p>
+			<p>Edit your database of shortcuts and expansions here! Some
+			<a id="tipsLink" href="#" title="Show usage tips">usage tips</a>.</p>
 
 			<ul>
 				<li><strong>Shortcuts are case sensitive!</strong> Add or edit your shortcuts
@@ -30,6 +31,9 @@
 					in expanded text now!</strong> HTML can also be inserted into content-editable divs like Gmail.</li>
 				<li>Saving should sync across all Chrome browsers you login and sync with.
 					First-time user? Here's a few examples! Refresh your pages to use them.</li>
+				<li>Note: a few keywords can't be used due to the structure of the JS
+					objects used to store the shortcuts. Namely words like
+					"<strong>constructor</strong>" or "<strong>class</strong>".</li>
 			</ul>
 
 			<section>
@@ -37,9 +41,11 @@
 					<fieldset>
 						<div class="restoreLabel">Last local backup was<br /><a id="restore" href="#" title="Restore Backup Shortcuts"></a></div>
 						<button type="button" id="backup">Backup</button>
-						<button type="button" id="refresh"><img src="images/reload.png" alt="Reload" /> Refresh</button>
-						<button type="button" id="add">Add</button>
-						<button type="button" id="save">Save</button>
+						<button type="button" id="port">Import / Export</button>
+						<br />
+						<button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
+						<button type="button" class="addButton">Add</button>
+						<button type="button" class="saveButton">Save</button>
 					</fieldset>
 					<table id="edit" border="0" cellpadding="0" cellspacing="0">
 						<tr id="input">
@@ -48,6 +54,11 @@
 							<td><input type="text" class="autotext" value="Expanded Text" /></td>
 						</tr>
 					</table>
+					<fieldset>
+						<button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
+						<button type="button" class="addButton append">Add</button>
+						<button type="button" class="saveButton">Save</button>
+					</fieldset>
 					<p><a class="backToTop" href="#">Back to Top</a></p>
 				</form>
 			</section>

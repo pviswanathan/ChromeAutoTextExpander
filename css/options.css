@@ -28,6 +28,7 @@ h1 img {
 p {
 	margin-top: 0;
 	text-align: center;
+	clear: both;
 }
 
 ul {
@@ -107,11 +108,11 @@ button {
 	color: #444;
 }
 
-#refresh {
+.refreshButton {
 	position: relative;
 	padding-left: 24px;
 }
-#refresh img {
+.refreshButton img {
 	position: absolute;
 	left: 6px;
 	top: 5px;
@@ -158,6 +159,9 @@ button {
 	box-shadow: 0px 4px 12px #444;
 	border-radius: 3px;
 }
+.popup.port {
+	top: 5%;
+}
 .popup h2 {
 	margin: 4px 0 6px;
 }
@@ -165,6 +169,10 @@ button {
 	text-align: left;
 	overflow: auto;
 	width: 100%;
+}
+.popup textarea {
+	margin-bottom: 8px;
+	min-height: 256px;
 }
 .modal {
 	position: fixed;
@@ -175,4 +183,8 @@ button {
 	background-color: #000;
 	z-index: 1;
 	opacity: 0.33;
+}
+
+.error {
+	color: #d22;
 }

@@ -5,10 +5,13 @@ var DEFAULT_SHORTCUT = "Shortcut"
   , KEYCODE_TAB = 9
   , ANIMATION_FAST = 200
   , ANIMATION_NORMAL = 400
-  , ANIMATION_SLOW = 1000;
+  , ANIMATION_SLOW = 1000
+  , TIME_SHOW_CROUTON = 1000 * 2	// Two seconds
+;
 var FIRST_RUN_KEY = 'autoTextExpanderFirstRun';
 var BACKUP_KEY = 'autoTextExpanderBackup'
-  , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp';
+  , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp'
+;
 
 // Document ready
 $(function()
@@ -33,12 +36,13 @@ $(function()
 	// Button handlers
 	$('#restore').click(restoreShortcuts);
 	$('#backup').click(backupShortcuts);
-	$('#refresh').click(setupShortcuts);
+	$('#port').click(portShortcuts);
 	$('#edit').on('click', '.remove', removeRow);
-	$('#add').click(function(event) {
-		addRow().find('.shortcut').focus().select();
+	$('.refreshButton').click(setupShortcuts);
+	$('.addButton').click(function(event) {
+		addRow(null, null, $(this).hasClass('append')).find('.shortcut').focus().select();
 	});
-	$('#save').click(function(event) {
+	$('.saveButton').click(function(event) {
 		saveShortcuts();
 	});
 	$('.backToTop').click(function(event) {
@@ -176,7 +180,7 @@ function removeRow(event) {
 }
 
 // Add new row to shortcuts edit table
-function addRow(shortcut, autotext)
+function addRow(shortcut, autotext, append)
 {
 	if ($('tr').length >= chrome.storage.sync.MAX_ITEMS) {
 		console.log(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA"));
@@ -185,7 +189,7 @@ function addRow(shortcut, autotext)
 		return $(this);
 	}
 
-	return $(document.createElement('tr'))
+	var row = $(document.createElement('tr'))
 		.append($(document.createElement('td'))
 			.attr('width', '16px')
 			.append($(document.createElement('a'))
@@ -212,7 +216,15 @@ function addRow(shortcut, autotext)
 				.text(autotext || DEFAULT_AUTOTEXT)
 			)
 		)
-		.hide().prependTo('#edit').fadeIn(ANIMATION_FAST);
+		.hide();
+
+	// Append or prepend
+	if (append) {
+		row.appendTo('#edit').fadeIn(ANIMATION_FAST);
+	} else {
+		row.prependTo('#edit').fadeIn(ANIMATION_FAST);
+	}
+	return row;
 }
 
 // Validate if row has valid shortcut info
@@ -329,7 +341,7 @@ function saveShortcuts(completionBlock)
 // Save backup of shortcuts
 function backupShortcuts()
 {
-	showModalPopup(chrome.i18n.getMessage("MESSAGE_BACKUP_WARNING") + " Continue?", 
+	showModalPopup(chrome.i18n.getMessage("MESSAGE_BACKUP_WARNING") + " Continue?",
 		function(response) {
 			if (response)
 			{
@@ -395,7 +407,7 @@ function restoreShortcuts()
 	}
 
 	// Confirm restore
-	showModalPopup(chrome.i18n.getMessage("MESSAGE_RESTORE_WARNING") + " Continue?", 
+	showModalPopup(chrome.i18n.getMessage("MESSAGE_RESTORE_WARNING") + " Continue?",
 		function(response) {
 			if (response)
 			{
@@ -425,13 +437,30 @@ function restoreShortcuts()
 		}, true);
 }
 
+// Import / export shortcuts option
+function portShortcuts()
+{
+	showPortView(function(newShortcuts)
+	{
+		console.log('new shortcuts:', newShortcuts);
+
+		// Check if it's valid json
+		var json;
+		try {
+			json = JSON.parse(newShortcuts);
+		} catch (exception) {
+			showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_INVALID_JSON"), true);
+		}
+	});
+}
+
 // Create and show and eventually hide a message crouton
 function showCrouton(message, isError)
 {
 	$('body').append($(document.createElement('div'))
 		.addClass('crouton').addClass((isError ? 'red' : 'green')).text(message)
 		.fadeIn(ANIMATION_FAST, function() {
-			$(this).delay(ANIMATION_SLOW).fadeOut(ANIMATION_FAST, function() {
+			$(this).delay(TIME_SHOW_CROUTON).fadeOut(ANIMATION_FAST, function() {
 				$(this).remove();
 			})
 		})
@@ -486,5 +515,76 @@ function showModalPopup(message, completionBlock, isConfirm)
 		.hide()
 		.appendTo('body')
 		.fadeIn(ANIMATION_FAST);
+}
+
+// Create and show modal with import / export optiopns
+function showPortView(completionBlock)
+{
+	// Get existing shortcuts
+	chrome.storage.sync.get(null, function(data)
+	{
+		if (chrome.runtime.lastError) {	// Check for errors
+			console.log(chrome.runtime.lastError);
+			showCrouton("Error retrieving shortcuts!", true);
+		}
+		else	// Parse json and show
+		{
+			console.log('showPortView', data);
+
+			// Build and show modal
+			$(document.createElement('div'))
+				.addClass('modal')
+				.hide()
+				.appendTo('body')
+				.fadeIn(ANIMATION_FAST);
+			$(document.createElement('div'))
+				.addClass('popup').addClass('port')
+				.append($(document.createElement('h2'))
+					.text(chrome.i18n.getMessage("TITLE_PORT_VIEW_POPUP"))
+				)
+				.append($(document.createElement('p'))
+					.html(chrome.i18n.getMessage("TEXT_PORT_VIEW_POPUP"))
+				)
+				.append($(document.createElement('textarea'))
+					.attr('id', 'portJSON')
+					.val(JSON.stringify(data, undefined, 2))
+				)
+				.append($(document.createElement('span'))
+					.css('float', 'right')
+					.css('text-align', 'right')
+					.append($(document.createElement('button'))
+						.attr('type', 'button')
+						.css('display', 'inline-block')
+						.text('Cancel')
+						.click(function() {
+							$('.popup').fadeOut(ANIMATION_FAST, function() {
+								$('.popup, .modal').remove();
+								if (completionBlock) {
+									completionBlock(null);
+								}
+							});
+						})
+					)
+					.append($(document.createElement('button'))
+						.attr('type', 'button')
+						.text('Save')
+						.click(function() {
+							$('.popup').fadeOut(ANIMATION_FAST, function() {
+								if (completionBlock) {
+									completionBlock($('#portJSON').val());
+								}
+								$('.popup, .modal').remove();
+							});
+						})
+					)
+				)
+				.hide()
+				.appendTo('body')
+				.fadeIn(ANIMATION_FAST);
+
+			// Resize as user types
+			$('#portJSON').autosize();
+		}
+	});
 }
 
