@@ -70,7 +70,7 @@ function refreshShortcuts()
 	{
 		if (chrome.runtime.lastError) {	// Check for errors
 			console.log(chrome.runtime.lastError);
-			showCrouton("Error retrieving shortcuts!", true);
+			showCrouton("Error retrieving shortcuts!", 'red');
 			return;
 		}
 
@@ -206,7 +206,7 @@ function addRow(shortcut, autotext, append)
 	if ($('tr').length >= chrome.storage.sync.MAX_ITEMS) {
 		console.log(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA"));
 		showCrouton(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA")
-			+ " Max # Items: " + chrome.storage.sync.MAX_ITEMS, true);
+			+ " Max # Items: " + chrome.storage.sync.MAX_ITEMS, 'red');
 		return null;
 	}
 
@@ -314,7 +314,7 @@ function saveShortcuts(completionBlock)
 	if (JSON.stringify(shortcuts).length >= chrome.storage.sync.QUOTA_BYTES) {
 		console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
 		showCrouton(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
-			+ " Chrome max capacity: " + chrome.storage.sync.QUOTA_BYTES + " characters", true);
+			+ " Chrome max capacity: " + chrome.storage.sync.QUOTA_BYTES + " characters", 'red');
 		return false;
 	}
 
@@ -331,7 +331,7 @@ function saveShortcuts(completionBlock)
 			{
 				if (chrome.runtime.lastError) {
 					console.log(chrome.runtime.lastError);
-					showCrouton("Error saving shortcuts!", true);
+					showCrouton("Error saving shortcuts!", 'red');
 				}
 				else	// Success! Shortcuts saved
 				{
@@ -371,7 +371,7 @@ function backupShortcuts()
 					{
 						if (chrome.runtime.lastError) {	// Check for errors
 							console.log(chrome.runtime.lastError);
-							showCrouton("Error retrieving shortcuts!", true);
+							showCrouton("Error retrieving shortcuts!", 'red');
 						}
 						else	// Save backup of shortcuts
 						{
@@ -382,7 +382,7 @@ function backupShortcuts()
 							{
 								if (chrome.runtime.lastError) {	// Check for errors
 									console.log(chrome.runtime.lastError);
-									showCrouton(chrome.i18n.getMessage("ERROR_BACKUP_FAILED"), true);
+									showCrouton(chrome.i18n.getMessage("ERROR_BACKUP_FAILED"), 'red');
 								}
 								else {	// Show success
 									showCrouton('Shortcuts backed up locally!');
@@ -424,7 +424,7 @@ function restoreShortcuts()
 {
 	// Only enable if restore is not disabled
 	if ($('#restore').hasClass('disabled')) {
-		return showCrouton("You need to make a backup first!", true);
+		return showCrouton("You need to make a backup first!", 'red');
 	}
 
 	// Confirm restore
@@ -436,7 +436,7 @@ function restoreShortcuts()
 				{
 					if (chrome.runtime.lastError) {	// Check for errors
 						console.log(chrome.runtime.lastError);
-						showCrouton("Error retrieving backup!", true);
+						showCrouton("Error retrieving backup!", 'red');
 					}
 					else	// Restore using backup shortcuts
 					{
@@ -445,7 +445,7 @@ function restoreShortcuts()
 						{
 							if (chrome.runtime.lastError) {	// Check for errors
 								console.log(chrome.runtime.lastError);
-								showCrouton(chrome.i18n.getMessage("ERROR_RESTORE_FAILED"), true);
+								showCrouton(chrome.i18n.getMessage("ERROR_RESTORE_FAILED"), 'red');
 							}
 							else {	// Show success
 								showCrouton('Shortcuts restored!');
@@ -469,32 +469,38 @@ function portShortcuts()
 		try {
 			newShortcuts = JSON.parse(newShortcuts);
 		} catch (exception) {
-			showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_INVALID_JSON"), true);
+			showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_INVALID_JSON"), 'red');
 			return;
 		}
 
 		// Check if it's an array, has to be an object
 		if ($.isArray(newShortcuts)) {
-			showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_NOT_OBJECT"), true);
+			showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_NOT_OBJECT"), 'red');
 			return;
 		}
 
 		// Go through and try to set them up as new shortcuts,
 		// should go through built-in validation for item quotas.
-		setupShortcuts(newShortcuts, function(success) {
-			showCrouton((success)
-				? chrome.i18n.getMessage("MESSAGE_IMPORT_SUCCESS")
-				: chrome.i18n.getMessage("ERROR_IMPORT_ADDING_ROWS")
-			, !success);
+		setupShortcuts(newShortcuts, function(success)
+		{
+			// Show message to user
+			if (success) {
+				showCrouton(chrome.i18n.getMessage("MESSAGE_IMPORT_SUCCESS"), 'orange');
+			} else {
+				showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_ADDING_ROWS"), 'red');
+			}
+
+			// Set rows to unsaved style
+			$('tr').removeClass('saved');
 		});
 	});
 }
 
 // Create and show and eventually hide a message crouton
-function showCrouton(message, isError)
+function showCrouton(message, color)
 {
 	$('body').append($(document.createElement('div'))
-		.addClass('crouton').addClass((isError ? 'red' : 'green')).text(message)
+		.addClass('crouton').addClass(color || 'green').text(message)
 		.fadeIn(ANIMATION_FAST, function() {
 			$(this).delay(TIME_SHOW_CROUTON).fadeOut(ANIMATION_FAST, function() {
 				$(this).remove();
@@ -561,7 +567,7 @@ function showPortView(completionBlock)
 	{
 		if (chrome.runtime.lastError) {	// Check for errors
 			console.log(chrome.runtime.lastError);
-			showCrouton("Error retrieving shortcuts!", true);
+			showCrouton("Error retrieving shortcuts!", 'red');
 		}
 		else	// Parse json and show
 		{

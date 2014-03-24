@@ -144,6 +144,7 @@ button {
 }
 .crouton.red { background-color: #c66; }
 .crouton.green { background-color: #6c6; }
+.crouton.orange { background-color: #e90; }
 
 .popup {
 	z-index: 2;
