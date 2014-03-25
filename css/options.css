@@ -160,6 +160,8 @@ button {
 	background: #fff;
 	box-shadow: 0px 4px 12px #444;
 	border-radius: 3px;
+	overflow: auto;
+	max-height: 80%;
 }
 .popup.port {
 	top: 5%;
