@@ -125,11 +125,12 @@ function setupShortcuts(data, completionBlock)
 						chrome.storage.local.set(firstRun);
 
 						// Example shortcuts
-						addRow('d8', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
-						addRow('MYSIG ', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
+						addRow('d8 ', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
+						addRow('sign@', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
 						addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
 						addRow('e@', 'email.me@carlinyuen.com');
 						addRow('brb', 'be right back');
+						addRow('p@', 'This is your final warning: %clip% ');
 
 						// Save
 						saveShortcuts();
