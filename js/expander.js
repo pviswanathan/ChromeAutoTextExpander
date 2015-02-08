@@ -12,19 +12,27 @@ jQuery.noConflict();
 		, KEYCODE_SPACEBAR = 32
 		, TIME_CLEAR_BUFFER_TIMEOUT = 750
 		, TIME_CHECK_EDITABLE_ELEMENTS = 1000 * 30	// Every 30 seconds
+        , TIME_OUTLOOK_EDITOR_CHECK = 500
 		, DATE_MACRO_REGEX = /%d\(/g
 		, DATE_MACRO_CLOSE_TAG = ')'
 		, CLIP_MACRO_REGEX = /%clip%/g
 		, WHITESPACE_REGEX = /(\s)/
 		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
 		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
+		, GMAIL_DOMAIN_REGEX = /mail.google.com/
+		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
 		, EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
 		, EVENT_NAME_KEYUP = 'keyup.auto-expander'
 		, EVENT_NAME_BLUR = 'blur.auto-expander'
+		, EVENT_NAME_FOCUS = 'focus.auto-expander'
 		, EVENT_NAME_LOAD = 'load.auto-expander'
 		, EVENT_NAME_INSERTED = 'DOMNodeInserted'
+        , SELECTOR_EDITABLE_BODY = 'body[contenteditable=true]'
+		, SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
+        , SELECTOR_GMAIL_EDIT = 'div.aoI'
+        , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'
+        , SELECTOR_EVERNOTE_EDIT = '#gwt-debug-noteEditor'
 		, OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
-		, INPUT_SELECTOR = 'div[contenteditable=true],textarea,input'
 		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
 		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
 	;
@@ -165,6 +173,8 @@ jQuery.noConflict();
 						var cursorPosition = $textInput.getCursorPosition()
 						var text;
 
+                        debugLog("textInput: ", $textInput);
+
 						// If input or textarea field, can easily change the val
 						if ($textInput.is("textarea") || $textInput.is("input"))
 						{
@@ -185,9 +195,11 @@ jQuery.noConflict();
 						}
 						else	// Trouble... editable divs & special cases
 						{
-							// If on Facebook.com
+							// If on Facebook
 							if (FACEBOOK_DOMAIN_REGEX.test(domain))
 							{
+                                debugLog("Domain: Facebook");
+
 								if ($textInput.find('span').get().length) {
 									$textInput = $textInput.find('span').first();
 								}
@@ -206,11 +218,66 @@ jQuery.noConflict();
 									cursorPosition - shortcut.length + autotext.length);
 							}
 
-							// If evernote.com
-							if (EVERNOTE_DOMAIN_REGEX.test(domain))
+                            // If on Outlook
+                            else if (OUTLOOK_DOMAIN_REGEX.test(domain))
 							{
+                                debugLog("Domain: Outlook");
+
 								// Get the focused / selected text node
-								var iframeWindow = $('#gwt-debug-noteEditor')
+								var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
+									.get(0).contentWindow;
+								var node = findFocusedNode(iframeWindow);
+								var $textNode = $(node);
+								debugLog($textNode);
+
+								// Find focused div instead of what's receiving events
+								$textInput = $(node.parentNode);
+								debugLog($textInput);
+
+								// Get and process text, update cursor position
+								cursorPosition = $textInput.getCursorPosition(iframeWindow);
+								text = replaceText($textNode.text(),
+									shortcut, autotext, cursorPosition);
+
+								// If autotext is single line, simple case
+								if (autotext.indexOf('\n') < 0)
+								{
+									// Set text node in element
+									var newNode = document.createTextNode(text);
+									node.parentNode.replaceChild(newNode, node);
+
+									// Update cursor position - TODO: can't get this to work
+									setCursorPositionInNode(newNode,
+										cursorPosition - shortcut.length + autotext.length);
+								}
+								else	// Multiline expanded text
+								{
+									// Split text by lines
+									var lines = text.split('\n');
+
+									// For simplicity, join with <br> tag instead
+									$textNode.replaceWith(lines.join('<br>'));
+
+									// Find the last added text node
+									$textNode = findMatchingTextNode($textInput,
+										lines[lines.length - 1]);
+									node = $textNode.get(0);
+									debugLog($textNode);
+									debugLog(node);
+
+									// Update cursor position - TODO: can't get this to work
+									setCursorPositionInNode(node,
+										lines[lines.length - 1].length);
+								}
+                            }
+
+							// If on Evernote
+                            else if (EVERNOTE_DOMAIN_REGEX.test(domain))
+							{
+                                debugLog("Domain: Evernote");
+
+								// Get the focused / selected text node
+								var iframeWindow = $(SELECTOR_EVERNOTE_EDIT)
 									.find('iframe').get(0).contentWindow;
 								var node = findFocusedNode(iframeWindow);
 								var $textNode = $(node);
@@ -232,7 +299,7 @@ jQuery.noConflict();
 									var newNode = document.createTextNode(text);
 									node.parentNode.replaceChild(newNode, node);
 
-									// Update cursor position
+									// Update cursor position - TODO: can't get this to work
 									setCursorPositionInNode(newNode,
 										cursorPosition - shortcut.length + autotext.length);
 								}
@@ -251,7 +318,7 @@ jQuery.noConflict();
 									debugLog($textNode);
 									debugLog(node);
 
-									// Update cursor position
+									// Update cursor position - TODO: can't get this to work
 									setCursorPositionInNode(node,
 										lines[lines.length - 1].length);
 								}
@@ -260,6 +327,8 @@ jQuery.noConflict();
 							// All other elements
 							else	//if ($textInput.is('[contenteditable]'))
 							{
+                                debugLog("Domain:", domain);
+
 								// Get the focused / selected text node
 								var node = findFocusedNode();
 								var $textNode = $(node);
@@ -360,6 +429,8 @@ jQuery.noConflict();
 	// Sets cursor position for a specific node
 	function setCursorPositionInNode(node, pos)
 	{
+        debugLog('setCursorPositionInNode:', pos);
+
 		var sel, range;
 		if (window.getSelection && document.createRange) {
 			range = document.createRange();
@@ -451,7 +522,7 @@ jQuery.noConflict();
 
 	// Check if page has editable elements - based off PopChrom
 	function hasEditableElements() {
-		return $(document).find(INPUT_SELECTOR).length;
+		return $(document).find(SELECTOR_INPUT).length;
 	}
 
 	// Update page action to show if there are editable elements
@@ -473,39 +544,53 @@ jQuery.noConflict();
 		});
 	}
 
+    // Add event listeners to specific div
+    function refreshListenersOnDiv($target)
+    {
+        debugLog('refreshListeners:', $target);
+        $target.off(EVENT_NAME_KEYPRESS).on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+        $target.off(EVENT_NAME_KEYUP).on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+		$target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
+    }
+
 	// Add event listeners to iframe - based off PopChrom
 	function addListenersToIframe($target)
 	{
 		// Attach to iframe's contents
-		try {
-			$target.contents().on(EVENT_NAME_KEYPRESS, INPUT_SELECTOR, keyPressHandler);
-			$target.contents().on(EVENT_NAME_KEYUP, INPUT_SELECTOR, keyUpHandler);
-		} catch (exception) {
+		try 
+        {
+			$target.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+			$target.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+		} 
+        catch (exception) {
 			console.log(exception);
 		}
 
 		// Attach to its load event in case it hasn't loaded yet
-		$target.on(EVENT_NAME_LOAD, function(e)		// On load
+		$target.on(EVENT_NAME_LOAD, function(event)		// On load
 		{
 			debugLog("Attempting to attach listeners to new iframe");
 			var $iframe = $(this);
-			try {
+			try 
+            {
 				$iframe.contents().on(EVENT_NAME_KEYPRESS,
-					INPUT_SELECTOR, keyPressHandler);
+					SELECTOR_INPUT, keyPressHandler);
 				$iframe.contents().on(EVENT_NAME_KEYUP,
-					INPUT_SELECTOR, keyUpHandler);
+					SELECTOR_INPUT, keyUpHandler);
 
-				// Special case for Evernote
+				// Special cases
 				var domain = $iframe.contents().get(0).location.host;
 				debugLog('iframe location:', domain);
+
 				if (EVERNOTE_DOMAIN_REGEX.test(domain))
 				{
-					$iframe.contents().find('body')
+					$iframe.contents().find(SELECTOR_EDITABLE_BODY)
 						.on(EVENT_NAME_KEYPRESS, keyPressHandler);
-					$iframe.contents().find('body')
+					$iframe.contents().find(SELECTOR_EDITABLE_BODY)
 						.on(EVENT_NAME_KEYUP, keyUpHandler);
 				}
-			} catch (exception) {
+			} 
+            catch (exception) {
 				console.log(exception);
 			}
 		});
@@ -516,14 +601,48 @@ jQuery.noConflict();
 	{
 		// Add to editable divs, textareas, inputs
 		var $document = $(document);
-		$document.on(EVENT_NAME_KEYPRESS, INPUT_SELECTOR, keyPressHandler);
-		$document.on(EVENT_NAME_KEYUP, INPUT_SELECTOR, keyUpHandler);
-		$document.on(EVENT_NAME_BLUR, INPUT_SELECTOR, clearTypingBuffer);
+        var domain = window.location.host;
+
+		$document.on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+		$document.on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+		$document.on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
+
+        // Special case for Gmail.com
+        if (GMAIL_DOMAIN_REGEX.test(domain)) 
+        {
+            debugLog("Domain: Gmail");
+            SELECTOR_INPUT += ',div.editable';
+
+            // Annoying way to do this, but need to check for focus on div.aoI
+            $document.on(EVENT_NAME_FOCUS, SELECTOR_GMAIL_EDIT, function(event) 
+            {
+                debugLog('focused on new message popup');
+                refreshListenersOnDiv($(event.target).parents(SELECTOR_GMAIL_EDIT));
+            });
+        }
+
+        // Special case for Outlook.com
+        if (OUTLOOK_DOMAIN_REGEX.test(domain)) 
+        {
+            debugLog("Domain: Outlook");
+
+            // Super annoying way to do this, need to check for #ComposeRteEditor_surface
+            var editorCheck = setInterval(function() {
+                var $target = $(SELECTOR_OUTLOOK_EDIT);
+                if ($target.length) {
+                    clearInterval(editorCheck);
+                    addListenersToIframe($target);
+                }
+            }, TIME_OUTLOOK_EDITOR_CHECK);
+        }
 
 		// Attach to future iframes
-		$document.on(EVENT_NAME_INSERTED, function(e) {
-			var $target = $(e.target);
-			if ($target.is('iframe')) {
+		$document.on(EVENT_NAME_INSERTED, function(event) 
+        {
+			var $target = $(event.target);
+			if ($target.is('iframe')) 
+            {
+                debugLog('inserted:', $target);
 				addListenersToIframe($target);
 			}
 		});
@@ -536,7 +655,8 @@ jQuery.noConflict();
 	}
 
 	// Detach listener for keypresses
-	function removeListeners() {
+	function removeListeners() 
+    {
 		$(document).off(EVENT_NAME_KEYPRESS);
 		$(document).off(EVENT_NAME_KEYUP);
 		$(document).off(EVENT_NAME_LOAD);
@@ -566,6 +686,7 @@ jQuery.noConflict();
 // Cross-browser solution for setting cursor position
 (function($) {
 	$.fn.setCursorPosition = function(pos) {
+        debugLog('setCursorPosition:', pos);
 		var input = $(this).get(0);
 		var sel, range;
 		if ($(this).is('input') || $(this).is('textarea')) {
