@@ -616,8 +616,11 @@ jQuery.noConflict();
             // Annoying way to do this, but need to check for focus on div.aoI
             $document.on(EVENT_NAME_FOCUS, SELECTOR_GMAIL_EDIT, function(event) 
             {
-                debugLog('focused on new message popup');
-                refreshListenersOnDiv($(event.target).parents(SELECTOR_GMAIL_EDIT));
+                debugLog('focused on message editor');
+                // Check that it is the dialog
+                if ($(event.target).parents('div[role=dialog]').length) {
+                    refreshListenersOnDiv($(event.target).parents(SELECTOR_GMAIL_EDIT));
+                }
             });
         }
 

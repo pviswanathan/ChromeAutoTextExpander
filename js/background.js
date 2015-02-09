@@ -42,7 +42,7 @@ function openOrFocusOptionsPage()
     {
         if (tabs.length) 
         {
-            console.log("options page found:", tab[0].id);
+            console.log("options page found:", tabs[0].id);
             chrome.tabs.update(tabs[0].id, {"selected": true});
         } 
         else {
