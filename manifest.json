@@ -1,8 +1,7 @@
 {
 	"name": "__MSG_EXTENSION_NAME__"
-	, "version": "1.6.0"
+	, "version": "1.6.1"
 	, "manifest_version": 2
-
 	, "description": "__MSG_EXTENSION_DESCRIPTION__"
 	, "icons": {
 		"16": "images/icon16.png"
@@ -10,7 +9,6 @@
 		, "128": "images/icon128.png"
 	}
 	, "default_locale": "en"
-
 	, "background": {
 		"scripts": [
 			"js/jquery-2.1.0.min.js"
@@ -25,7 +23,13 @@
 		, "default_title": "__MSG_PAGE_ACTION_TITLE__"
 		, "default_popup": "options.html"
 	}
-
+    , "browser_action": {
+        "default_icon": {
+			"19": "images/icon16.png"
+			, "38": "images/icon48.png"
+        }
+        , "default_title": "__MSG_BROWSER_ACTION_TITLE__"
+    }
 	, "options_page": "options.html"
 	, "content_scripts": [{
 		"matches": [ "<all_urls>" ]
@@ -36,7 +40,6 @@
 		]
 		, "run_at": "document_start"
 	}]
-
 	, "permissions": [
 		"tabs"
 		, "storage"

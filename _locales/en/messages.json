@@ -10,8 +10,13 @@
 	}
 
 	, "PAGE_ACTION_TITLE": {
-		"message": "Click to view options for AutoTextExpander"
+		"message": "AutoTextExpander should work on this site"
 		, "description": "Page action default title."
+    }
+
+	, "BROWSER_ACTION_TITLE": {
+		"message": "Click to view options for AutoTextExpander"
+		, "description": "Browser action default title."
 	}
 
 	, "TITLE_WARNING_POPUP": {

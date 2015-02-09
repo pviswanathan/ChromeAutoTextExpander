@@ -34,6 +34,23 @@ function pasteFromClipboard()
     return result;
 }
 
+// Opens or focuses on the options page if open
+function openOrFocusOptionsPage()
+{
+    var optionsUrl = chrome.extension.getURL('options.html'); 
+    chrome.tabs.query({ 'url': optionsUrl }, function(tabs) 
+    {
+        if (tabs.length) 
+        {
+            console.log("options page found:", tab[0].id);
+            chrome.tabs.update(tabs[0].id, {"selected": true});
+        } 
+        else {
+            chrome.tabs.create({url: optionsUrl});
+        }
+    });
+}
+
 // Listen for whether or not to show the pageAction icon
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
@@ -112,3 +129,8 @@ chrome.runtime.onInstalled.addListener(function(details)
 	}
 });
 
+// Show options page when browser action is clicked
+//  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
+chrome.browserAction.onClicked.addListener(function(tab) {
+   openOrFocusOptionsPage();
+});
