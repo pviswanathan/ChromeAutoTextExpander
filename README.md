@@ -19,7 +19,6 @@ Technologies Used:
 Feature Requests:
  - Work with Google's Inbox
  - Allow embedding of html into single-line expansions
- - Work with Facebook comments
  - Work with Chatango.com
  - Nested shortcuts
  - Date Arithmetic

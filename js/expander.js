@@ -200,22 +200,65 @@ jQuery.noConflict();
 							{
                                 debugLog("Domain: Facebook");
 
-								if ($textInput.find('span').get().length) {
-									$textInput = $textInput.find('span').first();
-								}
+                                // Check if it is the search bar vs comments
+                                if ($textInput.parents('div.textInput').length) 
+                                {
+                                    debugLog('facebook search bar');
+                                    if ($textInput.find('span').get().length) {
+                                        $textInput = $textInput.find('span').first();
+                                    }
 
-								// Get text and replace it
-								text = $textInput.text();
-								$textInput.text(replaceText(
-									text,
-									shortcut,
-									autotext,
-									cursorPosition
-								));
+                                    // Get text and replace it
+                                    text = $textInput.text();
+                                    $textInput.text(replaceText(
+                                        text,
+                                        shortcut,
+                                        autotext,
+                                        cursorPosition
+                                    ));
 
-								// Set new cursor position
-								$textInput.setCursorPosition(
-									cursorPosition - shortcut.length + autotext.length);
+                                    // Set new cursor position
+                                    $textInput.setCursorPosition(
+                                        cursorPosition - shortcut.length + autotext.length);
+                                } 
+                                else if ($textInput.parents('div.UFICommentContainer').length) {
+                                    debugLog('facebook comments');
+
+                                    // TODO: this doesn't work, probably due to ReactJS framework, doesn't allow expansion to stay
+                                    /*
+                                    // Get spans in the comment container div, and find the right one to replace
+									$textNode = recursiveFindContainingTextNode($textInput, shortcut);
+                                    node = $textNode.get(0);
+									debugLog($textNode);
+									debugLog(node);
+
+                                    // Replace text in node
+                                    var text = replaceText(
+                                        $textNode.text(),
+                                        shortcut,
+                                        autotext,
+                                        cursorPosition
+                                    );
+									node.nodeValue = text;
+
+                                    // Set cursor position?
+                                    */
+                                } 
+                                else 
+                                {
+                                    // Get text and replace it
+                                    text = $textInput.text();
+                                    $textInput.text(replaceText(
+                                        text,
+                                        shortcut,
+                                        autotext,
+                                        cursorPosition
+                                    ));
+
+                                    // Set new cursor position
+                                    $textInput.setCursorPosition(
+                                        cursorPosition - shortcut.length + autotext.length);
+                                }
 							}
 
                             // If on Outlook
@@ -394,6 +437,49 @@ jQuery.noConflict();
 		// Replace shortcut based off cursorPosition
 		return [text.slice(0, cursorPosition - shortcut.length),
 			autotext, text.slice(cursorPosition)].join('');
+	}
+
+    // Recursive search for node containing text
+    function recursiveFindContainingTextNode($div, text)  {
+        var $result = recursiveFindContainingTextNodeHelper($div, text, 0);
+        return ($result.value.get(0).nodeValue.indexOf(text) >= 0) ? $result.value : null;
+    }
+    // Recursive helper for containing search
+    function recursiveFindContainingTextNodeHelper($div, text, level) 
+    {
+        // If it has children, recurse
+        var children = $div.children()
+            , childResults = [];
+        for (var i = 0; i < children.length; ++i) {
+            childResults.push(
+                recursiveFindContainingTextNodeHelper($(children[i]), text, level + 1)
+            );
+        }
+
+        // Get value for existing node
+        var value = findContainingTextNode($div, text);
+
+        // Compare to children, get deepest level
+        var maxDepth = level;
+        for (var i = 0, result; i < childResults.length; ++i) {
+            result = childResults[i];
+            if (result.value && result.level > maxDepth) {
+                maxDepth = result.level;
+                value = result.value;
+            }
+        }
+
+        // Return deepest result
+        return {level: maxDepth, value: value};
+    }
+	// Find node that has text contents that contains text
+	function findContainingTextNode($div, text)
+	{
+		var result = $div.contents().filter(function() {
+				return (this.nodeType == 3)						// Return all text nodes
+					&& (this.nodeValue.indexOf(text) >= 0);	    // containing text
+			}).last();  // Return last (deepest) match
+        return ((result.length == 0) || $.isEmptyObject(result)) ? null : result;
 	}
 
 	// Find node that has text contents that matches text
@@ -689,7 +775,7 @@ jQuery.noConflict();
 // Cross-browser solution for setting cursor position
 (function($) {
 	$.fn.setCursorPosition = function(pos) {
-        debugLog('setCursorPosition:', pos);
+        console.log('setCursorPosition:', pos);
 		var input = $(this).get(0);
 		var sel, range;
 		if ($(this).is('input') || $(this).is('textarea')) {
