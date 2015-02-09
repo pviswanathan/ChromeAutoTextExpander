@@ -18,11 +18,11 @@ Technologies Used:
 
 Feature Requests:
  - Work with Google's Inbox
- - Persistent link to Options page (browser action)
  - Allow embedding of html into single-line expansions
  - Work with Facebook comments
  - Work with Chatango.com
  - Nested shortcuts
+ - Date Arithmetic
  - Adjustable buffer clear timeout
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
