@@ -611,12 +611,6 @@ jQuery.noConflict();
 		return $(document).find(SELECTOR_INPUT).length;
 	}
 
-	// Update page action to show if there are editable elements
-	function updatePageAction() {
-		chrome.runtime.sendMessage({ request:(hasEditableElements()
-			? "showPageAction" : "hidePageAction") });
-	}
-
 	// Get what's stored in the clipboard
 	function getClipboardData(completionBlock) {
 		chrome.runtime.sendMessage({
@@ -753,17 +747,8 @@ jQuery.noConflict();
 	}
 
 	// Document ready function
-	$(function()
-	{
-		// Add listener to track when user types
-		addListeners();
-
-		// If has editable elements, show page action, keep polling in case new
-		// elements show up
-		updatePageAction();
-		setInterval(function() {
-			updatePageAction();
-		}, TIME_CHECK_EDITABLE_ELEMENTS);
+	$(function() {
+		addListeners(); // Add listener to track when user types
 	});
 
 })(jQuery);
