@@ -192,78 +192,24 @@ jQuery.noConflict();
                         debugLog("textInput: ", $textInput);
 
 						// If input or textarea field, can easily change the val
-						if ($textInput.is("textarea") || $textInput.is("input"))
-						{
-							// Fix for input[type=email] and input[type=number]
-							if (cursorPosition === 0
-								&& $textInput.is('input[type="email"],input[type="number"]')) {
-								cursorPosition = $textInput.val().length;
-							}
-
-							$textInput.val(replaceText(
-								$textInput.val(),
-								shortcut,
-								autotext,
-								cursorPosition
-							));
-							$textInput.setCursorPosition(cursorPosition
-								- shortcut.length + autotext.length);
+						if ($textInput.is("textarea") || $textInput.is("input")) {
+                            replaceTextRegular(shortcut, autotext, cursorPosition, $textInput);
 						}
 						else	// Trouble... editable divs & special cases
 						{
 							// If on Facebook
 							if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
-                                replaceTextFacebook(shortcut, autotext, cursorPosition, $textInput);
+                                replaceTextFacebook(shortcut, autotext, 
+                                                    cursorPosition, $textInput);
                             } else if (OUTLOOK_DOMAIN_REGEX.test(domain)) {
                                 replaceTextOutlook(shortcut, autotext);
                             } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
                                 replaceTextEvernote(shortcut, autotext);
-							}
+							} 
                             else    // All other elements
-							{
+                            {
                                 debugLog("Domain:", domain);
-
-								// Get the focused / selected text node
-								var node = findFocusedNode();
-								var $textNode = $(node);
-
-								// Find focused div instead of what's receiving events
-								$textInput = $(node.parentNode);
-
-								// Get and process text
-								text = replaceText($textNode.text(),
-									shortcut, autotext, cursorPosition);
-
-								// If autotext is single line, simple case
-								if (autotext.indexOf('\n') < 0)
-								{
-									// Set text node in element
-									node = document.createTextNode(text);
-									$textNode.replaceWith(node);
-
-									// Update cursor position
-									setCursorPositionInNode(node,
-										cursorPosition - shortcut.length + autotext.length);
-								}
-								else	// Multiline expanded text
-								{
-									// Split text by lines
-									var lines = text.split('\n');
-
-									// For simplicity, join with <br> tag instead
-									$textNode.replaceWith(lines.join('<br>'));
-
-									// Find the last added text node
-									$textNode = findMatchingTextNode($textInput,
-										lines[lines.length - 1]);
-									node = $textNode.get(0);
-									debugLog($textNode);
-									debugLog(node);
-
-									// Update cursor position
-									setCursorPositionInNode(node,
-										lines[lines.length - 1].length);
-								}
+								replaceTextMiscellaneous(shortcut, autotext, cursorPosition);
 							}
 						}	// END - Trouble... editable divs & special case
 					});	// END - getClipboardData()
@@ -276,6 +222,70 @@ jQuery.noConflict();
 			}
 		});
 	}
+
+    // Specific handler for regular textarea and input elements
+    function replaceTextRegular(shortcut, autotext, cursorPosition, $textInput)
+    {
+        // Fix for input[type=email] and input[type=number]
+        if (cursorPosition === 0
+            && $textInput.is('input[type="email"],input[type="number"]')) {
+            cursorPosition = $textInput.val().length;
+        }
+
+        $textInput.val(replaceText(
+            $textInput.val(),
+            shortcut,
+            autotext,
+            cursorPosition
+        ));
+        $textInput.setCursorPosition(cursorPosition
+            - shortcut.length + autotext.length);
+    }
+
+    function replaceTextMiscellaneous(shortcut, autotext, cursorPosition)
+    {
+        // Get the focused / selected text node
+        var node = findFocusedNode();
+        var $textNode = $(node);
+
+        // Find focused div instead of what's receiving events
+        $textInput = $(node.parentNode);
+
+        // Get and process text
+        text = replaceText($textNode.text(),
+            shortcut, autotext, cursorPosition);
+
+        // If autotext is single line, simple case
+        if (autotext.indexOf('\n') < 0)
+        {
+            // Set text node in element
+            node = document.createTextNode(text);
+            $textNode.replaceWith(node);
+
+            // Update cursor position
+            setCursorPositionInNode(node,
+                cursorPosition - shortcut.length + autotext.length);
+        }
+        else	// Multiline expanded text
+        {
+            // Split text by lines
+            var lines = text.split('\n');
+
+            // For simplicity, join with <br> tag instead
+            $textNode.replaceWith(lines.join('<br>'));
+
+            // Find the last added text node
+            $textNode = findMatchingTextNode($textInput,
+                lines[lines.length - 1]);
+            node = $textNode.get(0);
+            debugLog($textNode);
+            debugLog(node);
+
+            // Update cursor position
+            setCursorPositionInNode(node,
+                lines[lines.length - 1].length);
+        }
+    }
 
     // Specific handler for Facebook element replacements
     function replaceTextFacebook(shortcut, autotext, cursorPosition, $textInput)
