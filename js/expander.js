@@ -42,7 +42,6 @@ jQuery.noConflict();
 	var typingTimeout;		 	// Delay before we clear buffer
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
-
 	var clipboard;				// Keep track of what's in the clipboard
 
 	// Custome log function
@@ -213,179 +212,14 @@ jQuery.noConflict();
 						else	// Trouble... editable divs & special cases
 						{
 							// If on Facebook
-							if (FACEBOOK_DOMAIN_REGEX.test(domain))
-							{
-                                debugLog("Domain: Facebook");
-
-                                // Check if it is the search bar vs comments
-                                if ($textInput.parents('div.textInput').length) 
-                                {
-                                    debugLog('facebook search bar');
-                                    if ($textInput.find('span').get().length) {
-                                        $textInput = $textInput.find('span').first();
-                                    }
-
-                                    // Get text and replace it
-                                    text = $textInput.text();
-                                    $textInput.text(replaceText(
-                                        text,
-                                        shortcut,
-                                        autotext,
-                                        cursorPosition
-                                    ));
-
-                                    // Set new cursor position
-                                    $textInput.setCursorPosition(
-                                        cursorPosition - shortcut.length + autotext.length);
-                                } 
-                                else if ($textInput.parents('div.UFICommentContainer').length) {
-                                    debugLog('facebook comments');
-
-                                    // TODO: this doesn't work, probably due to ReactJS framework, doesn't allow expansion to stay
-                                    /*
-                                    // Get spans in the comment container div, and find the right one to replace
-									$textNode = recursiveFindContainingTextNode($textInput, shortcut);
-                                    node = $textNode.get(0);
-									debugLog($textNode);
-									debugLog(node);
-
-                                    // Replace text in node
-                                    var text = replaceText(
-                                        $textNode.text(),
-                                        shortcut,
-                                        autotext,
-                                        cursorPosition
-                                    );
-									node.nodeValue = text;
-
-                                    // Set cursor position?
-                                    */
-                                } 
-                                else 
-                                {
-                                    // Get text and replace it
-                                    text = $textInput.text();
-                                    $textInput.text(replaceText(
-                                        text,
-                                        shortcut,
-                                        autotext,
-                                        cursorPosition
-                                    ));
-
-                                    // Set new cursor position
-                                    $textInput.setCursorPosition(
-                                        cursorPosition - shortcut.length + autotext.length);
-                                }
+							if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
+                                replaceTextFacebook(shortcut, autotext, cursorPosition, $textInput);
+                            } else if (OUTLOOK_DOMAIN_REGEX.test(domain)) {
+                                replaceTextOutlook(shortcut, autotext);
+                            } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
+                                replaceTextEvernote(shortcut, autotext);
 							}
-
-                            // If on Outlook
-                            else if (OUTLOOK_DOMAIN_REGEX.test(domain))
-							{
-                                debugLog("Domain: Outlook");
-
-								// Get the focused / selected text node
-								var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
-									.get(0).contentWindow;
-								var node = findFocusedNode(iframeWindow);
-								var $textNode = $(node);
-								debugLog($textNode);
-
-								// Find focused div instead of what's receiving events
-								$textInput = $(node.parentNode);
-								debugLog($textInput);
-
-								// Get and process text, update cursor position
-								cursorPosition = $textInput.getCursorPosition(iframeWindow);
-								text = replaceText($textNode.text(),
-									shortcut, autotext, cursorPosition);
-
-								// If autotext is single line, simple case
-								if (autotext.indexOf('\n') < 0)
-								{
-									// Set text node in element
-									var newNode = document.createTextNode(text);
-									node.parentNode.replaceChild(newNode, node);
-
-									// Update cursor position - TODO: can't get this to work
-									setCursorPositionInNode(newNode,
-										cursorPosition - shortcut.length + autotext.length);
-								}
-								else	// Multiline expanded text
-								{
-									// Split text by lines
-									var lines = text.split('\n');
-
-									// For simplicity, join with <br> tag instead
-									$textNode.replaceWith(lines.join('<br>'));
-
-									// Find the last added text node
-									$textNode = findMatchingTextNode($textInput,
-										lines[lines.length - 1]);
-									node = $textNode.get(0);
-									debugLog($textNode);
-									debugLog(node);
-
-									// Update cursor position - TODO: can't get this to work
-									setCursorPositionInNode(node,
-										lines[lines.length - 1].length);
-								}
-                            }
-
-							// If on Evernote
-                            else if (EVERNOTE_DOMAIN_REGEX.test(domain))
-							{
-                                debugLog("Domain: Evernote");
-
-								// Get the focused / selected text node
-								var iframeWindow = $(SELECTOR_EVERNOTE_EDIT)
-									.find('iframe').get(0).contentWindow;
-								var node = findFocusedNode(iframeWindow);
-								var $textNode = $(node);
-								debugLog($textNode);
-
-								// Find focused div instead of what's receiving events
-								$textInput = $(node.parentNode);
-								debugLog($textInput);
-
-								// Get and process text, update cursor position
-								cursorPosition = $textInput.getCursorPosition(iframeWindow);
-								text = replaceText($textNode.text(),
-									shortcut, autotext, cursorPosition);
-
-								// If autotext is single line, simple case
-								if (autotext.indexOf('\n') < 0)
-								{
-									// Set text node in element
-									var newNode = document.createTextNode(text);
-									node.parentNode.replaceChild(newNode, node);
-
-									// Update cursor position - TODO: can't get this to work
-									setCursorPositionInNode(newNode,
-										cursorPosition - shortcut.length + autotext.length);
-								}
-								else	// Multiline expanded text
-								{
-									// Split text by lines
-									var lines = text.split('\n');
-
-									// For simplicity, join with <br> tag instead
-									$textNode.replaceWith(lines.join('<br>'));
-
-									// Find the last added text node
-									$textNode = findMatchingTextNode($textInput,
-										lines[lines.length - 1]);
-									node = $textNode.get(0);
-									debugLog($textNode);
-									debugLog(node);
-
-									// Update cursor position - TODO: can't get this to work
-									setCursorPositionInNode(node,
-										lines[lines.length - 1].length);
-								}
-							}
-
-							// All other elements
-							else	//if ($textInput.is('[contenteditable]'))
+                            else    // All other elements
 							{
                                 debugLog("Domain:", domain);
 
@@ -442,6 +276,178 @@ jQuery.noConflict();
 			}
 		});
 	}
+
+    // Specific handler for Facebook element replacements
+    function replaceTextFacebook(shortcut, autotext, cursorPosition, $textInput)
+    {
+        debugLog("Domain: Facebook");
+
+        // Check if it is the search bar vs comments
+        if ($textInput.parents('div.textInput').length) 
+        {
+            debugLog('facebook search bar');
+            if ($textInput.find('span').get().length) {
+                $textInput = $textInput.find('span').first();
+            }
+
+            // Get text and replace it
+            text = $textInput.text();
+            $textInput.text(replaceText(
+                text,
+                shortcut,
+                autotext,
+                cursorPosition
+            ));
+
+            // Set new cursor position
+            $textInput.setCursorPosition(
+                cursorPosition - shortcut.length + autotext.length);
+        } 
+        else if ($textInput.parents('div.UFICommentContainer').length) {
+            debugLog('facebook comments');
+
+            // TODO: this doesn't work, probably due to ReactJS framework, doesn't allow expansion to stay
+            /*
+            // Get spans in the comment container div, and find the right one to replace
+            $textNode = recursiveFindContainingTextNode($textInput, shortcut);
+            node = $textNode.get(0);
+            debugLog($textNode);
+            debugLog(node);
+
+            // Replace text in node
+            var text = replaceText(
+                $textNode.text(),
+                shortcut,
+                autotext,
+                cursorPosition
+            );
+            node.nodeValue = text;
+
+            // Set cursor position?
+            */
+        } 
+        else 
+        {
+            // Get text and replace it
+            text = $textInput.text();
+            $textInput.text(replaceText(
+                text,
+                shortcut,
+                autotext,
+                cursorPosition
+            ));
+
+            // Set new cursor position
+            $textInput.setCursorPosition(
+                cursorPosition - shortcut.length + autotext.length);
+        }
+    }
+
+    // Specific handler for Outlook iframe replacements
+    function replaceTextOutlook(shortcut, autotext)
+    {
+        debugLog("Domain: Outlook");
+
+        // Get the focused / selected text node
+        var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
+            .get(0).contentWindow;
+        var node = findFocusedNode(iframeWindow);
+        var $textNode = $(node);
+        debugLog($textNode);
+
+        // Find focused div instead of what's receiving events
+        $textInput = $(node.parentNode);
+        debugLog($textInput);
+
+        // Get and process text, update cursor position
+        cursorPosition = $textInput.getCursorPosition(iframeWindow);
+        text = replaceText($textNode.text(),
+            shortcut, autotext, cursorPosition);
+
+        // If autotext is single line, simple case
+        if (autotext.indexOf('\n') < 0)
+        {
+            // Set text node in element
+            var newNode = document.createTextNode(text);
+            node.parentNode.replaceChild(newNode, node);
+
+            // Update cursor position - TODO: can't get this to work
+            setCursorPositionInNode(newNode,
+                cursorPosition - shortcut.length + autotext.length);
+        }
+        else	// Multiline expanded text
+        {
+            // Split text by lines
+            var lines = text.split('\n');
+
+            // For simplicity, join with <br> tag instead
+            $textNode.replaceWith(lines.join('<br>'));
+
+            // Find the last added text node
+            $textNode = findMatchingTextNode($textInput,
+                lines[lines.length - 1]);
+            node = $textNode.get(0);
+            debugLog($textNode);
+            debugLog(node);
+
+            // Update cursor position - TODO: can't get this to work
+            setCursorPositionInNode(node,
+                lines[lines.length - 1].length);
+        }
+    }
+
+    // Specific handler for Evernote iframe replacements
+    function replaceTextEvernote(shortcut, autotext)
+    {
+        debugLog("Domain: Evernote");
+
+        // Get the focused / selected text node
+        var iframeWindow = $(SELECTOR_EVERNOTE_EDIT)
+            .find('iframe').get(0).contentWindow;
+        var node = findFocusedNode(iframeWindow);
+        var $textNode = $(node);
+        debugLog($textNode);
+
+        // Find focused div instead of what's receiving events
+        $textInput = $(node.parentNode);
+        debugLog($textInput);
+
+        // Get and process text, update cursor position
+        cursorPosition = $textInput.getCursorPosition(iframeWindow);
+        text = replaceText($textNode.text(),
+            shortcut, autotext, cursorPosition);
+
+        // If autotext is single line, simple case
+        if (autotext.indexOf('\n') < 0)
+        {
+            // Set text node in element
+            var newNode = document.createTextNode(text);
+            node.parentNode.replaceChild(newNode, node);
+
+            // Update cursor position - TODO: can't get this to work
+            setCursorPositionInNode(newNode,
+                cursorPosition - shortcut.length + autotext.length);
+        }
+        else	// Multiline expanded text
+        {
+            // Split text by lines
+            var lines = text.split('\n');
+
+            // For simplicity, join with <br> tag instead
+            $textNode.replaceWith(lines.join('<br>'));
+
+            // Find the last added text node
+            $textNode = findMatchingTextNode($textInput,
+                lines[lines.length - 1]);
+            node = $textNode.get(0);
+            debugLog($textNode);
+            debugLog(node);
+
+            // Update cursor position - TODO: can't get this to work
+            setCursorPositionInNode(node,
+                lines[lines.length - 1].length);
+        }
+    }
 
 	// Replacing shortcut with autotext in text at cursorPosition
 	function replaceText(text, shortcut, autotext, cursorPosition)
@@ -573,10 +579,10 @@ jQuery.noConflict();
 		for (var i = 0, len = clipTags.length; i < len; ++i)
 		{
 			processedText.push(clipboard);
-		console.log('pre', processedText);
+		    console.log('pre', processedText);
 			processedText.push(text.slice(clipTags[i] + 6,	// 6 for "%clip%"
 				(i == len - 1) ? undefined : clipTags[i+1]));
-		console.log('post', processedText);
+		    console.log('post', processedText);
 		}
 
 		// Return processed dates
