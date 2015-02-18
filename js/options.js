@@ -8,16 +8,17 @@ var DEFAULT_SHORTCUT = "Shortcut"
   , ANIMATION_SLOW = 1000
   , TIME_SHOW_CROUTON = 1000 * 2	// Two seconds
 ;
-var FIRST_RUN_KEY = 'autoTextExpanderFirstRun';
-var BACKUP_KEY = 'autoTextExpanderBackup'
+var FIRST_RUN_KEY = 'autoTextExpanderFirstRun'
+  , BACKUP_KEY = 'autoTextExpanderBackup'
   , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp'
+  , SHORTCUT_TIMEOUT_KEY = 'autoTextExpanderShortcutTimeout'
 ;
 
 // Document ready
 $(function()
 {
 	// When user types into input fields
-	$('#edit').on('keydown', 'input, textarea', editRowHandler);
+	$('#edit').on('keydown', 'input[type=text], textarea', editRowHandler);
 
 	// Need to do the onclick clearing here, inline js not allowed
 	$('#edit').on('focus', 'input.shortcut', function(event) {
@@ -32,6 +33,11 @@ $(function()
 	$('#edit').on('blur', 'textarea.autotext', function(event) {
 		if (this.value == '') { this.value = DEFAULT_AUTOTEXT; }
 	});
+
+    // Listen to slider changes
+    $('#timeout').on('change mousemove', function(e) {
+        updateShortcutTimeoutLabel($(this).val());
+    });
 
 	// Button handlers
 	$('#restore').click(restoreShortcuts);
@@ -216,19 +222,7 @@ function addRow(shortcut, autotext, append)
 
 	var row = $(document.createElement('tr'))
 		.append($(document.createElement('td'))
-			.attr('width', '16px')
-			.append($(document.createElement('a'))
-				.attr('href', '#')
-				.addClass('remove')
-				.attr('title', 'Remove Shortcut')
-				.append($(document.createElement('img'))
-					.attr('src', 'images/remove.png')
-					.attr('alt', 'x')
-				)
-			)
-		)
-		.append($(document.createElement('td'))
-			.attr('width', '92px')
+			//.attr('width', '92px')
 			.append($(document.createElement('input'))
 				.attr('type', 'text')
 				.addClass('shortcut')
@@ -239,6 +233,18 @@ function addRow(shortcut, autotext, append)
 			.append($(document.createElement('textarea'))
 				.addClass('autotext')
 				.text(autotext || DEFAULT_AUTOTEXT)
+			)
+		)
+        .append($(document.createElement('td'))
+			//.attr('width', '16px')
+			.append($(document.createElement('a'))
+				.attr('href', '#')
+				.addClass('remove')
+				.attr('title', 'Remove Shortcut')
+				.append($(document.createElement('img'))
+					.attr('src', 'images/remove.png')
+					.attr('alt', 'x')
+				)
 			)
 		)
 		.hide();
@@ -350,7 +356,6 @@ function saveShortcuts(completionBlock)
 						}
 					});
 
-
 					// Run completion block if exists
 					if (completionBlock) {
 						completionBlock();
@@ -417,8 +422,44 @@ function updateBackupTimestamp()
 				$('#restore').text(date).removeClass('disabled');
 			} else {
 				console.log("No last backup date");
-				$('#restore').text("Never").addClass('disabled');
+				$('#restore').text("never").addClass('disabled');
 			}
+		}
+	});
+}
+
+// Updates the shortcut timeout label
+function updateShortcutTimeoutLabel(value) {
+    $('#timeoutValue').text(' [' + value + 'ms]');
+}
+
+// Get custom shortcut timeout value and update the slider
+function updateShortcutTimeout() 
+{
+    chrome.storage.sync.get(SHORTCUT_TIMEOUT_KEY, function(data)
+	{
+		if (chrome.runtime.lastError) {	// Check for errors
+			console.log(chrome.runtime.lastError);
+		}
+		else if (data)	// Set custom shortcut timeout
+		{
+			var timeout = data[SHORTCUT_TIMEOUT_KEY];
+            updateShortcutTimeoutLabel(timeout);
+            $('#timeout').value(timeout);
+		}
+	});
+}
+
+// Save custom shortcut timeout value
+function saveShortcutTimeout(timeout) 
+{
+    chrome.storage.sync.set(SHORTCUT_TIMEOUT_KEY, function()
+	{
+		if (chrome.runtime.lastError) {	// Check for errors
+			console.log(chrome.runtime.lastError);
+		}
+		else
+		{
 		}
 	});
 }
@@ -520,7 +561,16 @@ function showModalPopup(message, completionBlock, isConfirm)
 		.addClass('modal')
 		.hide()
 		.appendTo('body')
-		.fadeIn(ANIMATION_FAST);
+		.fadeIn(ANIMATION_FAST)
+        .click(function() {
+            $('.popup').fadeOut(ANIMATION_FAST, function() 
+            {
+                $('.popup, .modal').remove();
+                if (completionBlock) {
+                    completionBlock(false);
+                }
+            });
+        });
 	$(document.createElement('div'))
 		.addClass('popup')
 		.append($(document.createElement('h2'))
@@ -536,7 +586,8 @@ function showModalPopup(message, completionBlock, isConfirm)
 				.attr('type', 'button')
 				.css('display', (isConfirm ? 'inline-block' : 'none'))
 				.text('Cancel')
-				.click(function() {
+				.click(function() 
+                {
 					$('.popup').fadeOut(ANIMATION_FAST, function() {
 						$('.popup, .modal').remove();
 						if (completionBlock) {
@@ -547,8 +598,10 @@ function showModalPopup(message, completionBlock, isConfirm)
 			)
 			.append($(document.createElement('button'))
 				.attr('type', 'button')
+				.css('margin-left', '4px')
 				.text('Ok')
-				.click(function() {
+				.click(function() 
+                {
 					$('.popup').fadeOut(ANIMATION_FAST, function() {
 						$('.popup, .modal').remove();
 						if (completionBlock) {
@@ -582,7 +635,12 @@ function showPortView(completionBlock)
 				.addClass('modal')
 				.hide()
 				.appendTo('body')
-				.fadeIn(ANIMATION_FAST);
+				.fadeIn(ANIMATION_FAST)
+                .click(function() {
+                    $('.popup').fadeOut(ANIMATION_FAST, function() {
+                        $('.popup, .modal').remove();
+                    });
+                });
 			$(document.createElement('div'))
 				.addClass('popup').addClass('port')
 				.append($(document.createElement('h2'))
@@ -610,9 +668,11 @@ function showPortView(completionBlock)
 					)
 					.append($(document.createElement('button'))
 						.attr('type', 'button')
+						.css('margin-left', '4px')
 						.text('Save')
 						.click(function() {
-							$('.popup').fadeOut(ANIMATION_FAST, function() {
+							$('.popup').fadeOut(ANIMATION_FAST, function() 
+                            {
 								if (completionBlock) {
 									completionBlock($('#portJSON').val());
 								}

@@ -9,11 +9,13 @@
 
 		<div id="content">
 			<h1><img src="images/icon48.png" alt="" /> Auto Text Expander
-				<span>
+				<span class="fR">
 					<a id="feedback" href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" title="Feedback on the Chrome Webstore"><strong>Feedback</strong></a>
 					<a id="request" href="https://chrome.google.com/webstore/support/iibninhmiggehlcdolcilmhacighjamp?hl=en-US&gl=US#feature" target="_blank" title="Feature Requests on the Chrome Webstore"><strong>Feature Requests</strong></a>
 				</span>
 			</h1>
+
+            <section>
 			<p>
 				Edit your database of shortcuts and expansions here!
 				<strong><a id="tipsLink" class="error" href="#" title="Show usage tips">Important notes</a>.</strong>
@@ -67,33 +69,55 @@
 					assume your cursor is at the end of the text and replace from there.
 				</li>
 			</ul>
+            </section>
 
-			<section>
-				<form>
-					<fieldset>
-						<div class="restoreLabel">Last local backup was<br /><a id="restore" href="#" title="Restore Backup Shortcuts"></a></div>
-						<button type="button" id="backup">Backup</button>
-						<button type="button" id="port">Import / Export</button>
-						<br />
-						<button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
-						<button type="button" class="addButton">Add</button>
-						<button type="button" class="saveButton">Save</button>
-					</fieldset>
-					<table id="edit" border="0" cellpadding="0" cellspacing="0">
-						<tr id="input">
-							<td><a href="#" class="remove" title="Remove Shortcut"><img src="images/remove.png" alt="x" /></a></td>
-							<td><input type="text" class="shortcut" value="Shortcut" /></td>
-							<td><input type="text" class="autotext" value="Expanded Text" /></td>
-						</tr>
-					</table>
-					<fieldset>
-						<button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
-						<button type="button" class="addButton append">Add</button>
-						<button type="button" class="saveButton">Save</button>
-					</fieldset>
-					<p><a class="backToTop" href="#">Back to Top</a></p>
-				</form>
-			</section>
+            <form>
+			    <section id="actions">
+                <h2>Actions</h2>
+                <button type="button" id="port">Import / Export</button>
+                <div class="storage label">
+                    <span id="storage">#</span> bytes used out of 
+                    <a id="quota" target="_blank" href="https://developer.chrome.com/extensions/storage#properties" title="Chrome Storage Quotas">#</a>
+                </div>
+                <br />
+
+                <button type="button" id="backup">Backup</button>
+                <div class="restore label">Last local backup was
+                    <a id="restore" href="#" title="Restore Backup Shortcuts"></a>
+                </div>
+                <br />
+                </section>
+
+                <br />
+
+			    <section id="shortcuts">
+                <h2>Shortcuts</h2>
+                <fieldset>
+                    <button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
+                    <button type="button" class="addButton">Add</button>
+                    <button type="button" class="saveButton">Save</button>
+                </fieldset>
+
+                <label for="timeout" class="fL">Shortcut Timeout<span id="timeoutValue"></span></label>
+                <span class="timeout"><input id="timeout" name="timeout" type="range" min="250" max="1250" step="10"></span>
+
+                <table id="edit" border="0" cellpadding="0" cellspacing="0">
+                    <tr id="input">
+                        <td><input type="text" class="shortcut" value="Shortcut" /></td>
+                        <td><input type="text" class="autotext" value="Expanded Text" /></td>
+                        <td><a href="#" class="remove" title="Remove Shortcut"><img src="images/remove.png" alt="x" /></a></td>
+                    </tr>
+                </table>
+
+                <fieldset class="fR tR"> <!-- Saving options -->
+                    <button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
+                    <button type="button" class="addButton append">Add</button>
+                    <button type="button" class="saveButton">Save</button>
+                </fieldset>
+			    </section>
+
+                <p><a class="backToTop" href="#">Back to Top</a></p>
+            </form>
 
 		</div>
 

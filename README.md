@@ -17,12 +17,14 @@ Technologies Used:
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
- - Work with Google's Inbox
+ - Show storage limits
  - Allow embedding of html into single-line expansions
- - Work with Chatango.com
+ - Adjustable buffer clear timeout
  - Nested shortcuts
  - Date Arithmetic
- - Adjustable buffer clear timeout
+ - Work with Google's Inbox
+ - Work with Chatango
+ - Work with Basecamp
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
 

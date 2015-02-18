@@ -39,9 +39,7 @@ jQuery.noConflict();
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
 	var typingTimer;			// Keep track of time between keypresses
-	var typingTimeout		 	// Delay before we clear buffer
-		= TIME_CLEAR_BUFFER_TIMEOUT;
-
+	var typingTimeout;		 	// Delay before we clear buffer
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
 
@@ -111,6 +109,25 @@ jQuery.noConflict();
 			return clearTypingBuffer();
 		}
 	}
+
+    // Updates buffer clear timeout from custom value
+    function updateBufferTimeout()
+    {
+		chrome.storage.sync.get("BUFFERTIMEOUT", function (data)
+		{
+			// Check for errors
+			if (chrome.runtime.lastError) {
+				console.log(chrome.runtime.lastError);
+			}
+			// Check that data is returned and shortcut library exists
+			else if (!$.isEmptyObject(data)) {
+                // TODO: set value
+                // typingTimeout = data['value'];
+            } else {  // Use default value on error / no custom value set
+                typingTimeout = TIME_CLEAR_BUFFER_TIMEOUT;
+            }
+        });
+    }
 
 	// Clears the typing timer
 	function clearTypingTimer()
@@ -747,8 +764,10 @@ jQuery.noConflict();
 	}
 
 	// Document ready function
-	$(function() {
-		addListeners(); // Add listener to track when user types
+	$(function() 
+    {
+        updateBufferTimeout();  // Get custom timeout for clearing typing buffer
+		addListeners();         // Add listener to track when user types
 	});
 
 })(jQuery);

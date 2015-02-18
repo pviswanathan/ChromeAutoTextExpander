@@ -37,15 +37,16 @@ function pasteFromClipboard()
 // Opens or focuses on the options page if open
 function openOrFocusOptionsPage()
 {
+    // Get the url for the extension options page
     var optionsUrl = chrome.extension.getURL('options.html'); 
     chrome.tabs.query({ 'url': optionsUrl }, function(tabs) 
     {
-        if (tabs.length) 
+        if (tabs.length)    // If options tab is already open, focus on it
         {
             console.log("options page found:", tabs[0].id);
             chrome.tabs.update(tabs[0].id, {"selected": true});
         } 
-        else {
+        else {  // Open the options page otherwise
             chrome.tabs.create({url: optionsUrl});
         }
     });
@@ -59,11 +60,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 
 	switch (request.request)
 	{
-		case "showPageAction":
+		case "showPageAction":  // No longer needed
 			chrome.pageAction.show(sender.tab.id);
 			break;
 
-		case "hidePageAction":
+		case "hidePageAction":  // No longer needed
 			chrome.pageAction.hide(sender.tab.id);
 			break;
 

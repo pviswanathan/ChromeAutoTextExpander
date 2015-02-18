@@ -11,7 +11,7 @@ body, html {
 }
 
 #content {
-	width: 480px;
+	width: 500px;
 	margin: 0 auto;
 	padding: 16px;
 }
@@ -23,6 +23,11 @@ h1 {
 }
 h1 img {
 	vertical-align: middle;
+}
+h2 {
+    font: bold 12pt/16px 'Helvetica Neue', Helvetica, Verdana;
+    clear: both;
+    color: #888;
 }
 
 p {
@@ -43,34 +48,51 @@ p {
 /* Forms */
 
 form {
-	margin-top: 24px;
+	margin: 24px 12px 0;
 }
 
 table {
 	width: 100%;
+    counter-reset: rowNumber;
+	font: normal 10pt/16px 'Helvetica Neue', Helvetica, Verdana;
+}
+table tr {
+    counter-increment: rowNumber;
+}
+table tr td:first-child {
+    width: 100px;
+}
+table tr td:last-child {
+    width: 16px;
+}
+table tr td:first-child::before {
+    content: counter(rowNumber);
+    min-width: 1em;
+    margin: 0 6px;
+    color: #bbb;
+    vertical-align: middle;
 }
 
 tr {
-  opacity:			0.66;		/* Good browsers */
+  opacity: 0.66;
 }
 tr.saved {
-  opacity:			1.0;		/* Good browsers */
+  opacity: 1.0;
 }
 
 td {
-	padding: 0 4px 24px 2px;
+	padding: 0 2px 24px 2px;
 	vertical-align: top;
 }
-td:first-child {
-	padding-left: 3px;
-	padding-top: 6px;
+td:first-child input, td:first-child textarea {
+    width: 80%;
 }
 
 input, textarea {
 	font: normal 10pt/auto Verdana;
 	color: #444;
 	padding: 6px;
-	height: 2em;
+	height: 2.45em;
 	width: 100%;
 	background: #f8fbff;
 	overflow: auto;
@@ -83,10 +105,8 @@ input.error, textarea.error {
 }
 
 fieldset {
-	float: right;
-	text-align: right;
 	border: none;
-	margin: 0 0 24px;
+	margin: 0 0 8px;
 	padding: 0;
 }
 .backToTop {
@@ -96,15 +116,15 @@ fieldset {
 
 h1 span {
 	margin: 16px 16px 0 0;
-	float: right;
 }
 h1 span a, h1 span a img {
 	font: normal 9pt/9pt 'Helvetica Neue', Helvetica, Verdana;
 	outline: none;
 }
 
-button {
+label, button {
 	padding: 6px 8px;
+    margin-bottom: 4px;
 	font: bold 10pt/10pt 'Helvetica Neue', Helvetica, Verdana;
 	color: #444;
 }
@@ -119,15 +139,27 @@ button {
 	top: 5px;
 }
 
-.restoreLabel, #restore.disabled {
+.label, #restore.disabled, #storage, #quota {
 	color: #aaa;
-	font: italic 8pt/10pt 'Helvetica Neue', Helvetica, Verdana;
+	font: italic 9pt/10pt 'Helvetica Neue', Helvetica, Verdana;
 	display: inline-block;
-	margin: 0 2px 4px 0;
-	vertical-align: middle;
+	margin: 0 0 4px;
+}
+.label {
+    margin: 0 4px 4px 4px;
 }
 #restore {
 	color: #66f;
+}
+
+.timeout {
+    overflow: hidden;
+    display: block;
+    padding: 0 8px 0 0;
+    margin-bottom: 8px;
+}
+#timeout {
+    width: 100%;
 }
 
 .crouton {
@@ -188,6 +220,12 @@ button {
 	z-index: 1;
 	opacity: 0.33;
 }
+
+.fR { float: right; }
+.fL { float: left; }
+.tR { text-align: right; }
+.tL { text-align: left; }
+.tC { text-align: center; }
 
 .error {
 	color: #d22;
