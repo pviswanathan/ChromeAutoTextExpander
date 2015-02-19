@@ -179,6 +179,8 @@ function processVersionUpgrade(oldVersion)
 // Migration of shortcuts to v1.2.0 format
 function upgradeShortcutsToV120()
 {
+    console.log("upgradeShortcutsToV120");
+
     // If old database still exists, port old shortcuts over to new shortcut syntax
     var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
     chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
@@ -193,14 +195,16 @@ function upgradeShortcutsToV120()
             var oldDataStore = data[OLD_STORAGE_KEY];
             $.each(oldDataStore, function(key, value) {
                 newDataStore[key] = value;
-            }
+            });
 
             // Delete old data, add new data
-            chrome.storage.sync.remove(OLD_STORAGE_KEY, function() {
+            chrome.storage.sync.remove(OLD_STORAGE_KEY, function() 
+            {
                 if (chrome.runtime.lastError) {	// Check for errors
                     console.log(chrome.runtime.lastError);
                 } else {
-                    chrome.storage.sync.set(newDataStore, function() {
+                    chrome.storage.sync.set(newDataStore, function() 
+                    {
                         if (chrome.runtime.lastError) {	// Check for errors
                             console.log(chrome.runtime.lastError);
                         }
@@ -227,6 +231,8 @@ function upgradeShortcutsToV120()
 // Migration of shortcuts to v1.7.0 format
 function upgradeShortcutsToV170()
 {
+    console.log("upgradeShortcutsToV170");
+
     // Add shortcut prefix to shortcuts -- we assume that shortcuts are in 
     //  post-v1.2.0 format and they haven't been upgraded / prefixed yet
     var SHORTCUT_PREFIX = '@'
@@ -243,7 +249,7 @@ function upgradeShortcutsToV170()
             var newDataStore = {};
             $.each(data, function(key, value) {
                 newDataStore[SHORTCUT_PREFIX + key] = value;
-            }
+            });
 
             // Add metadata for shortcut version
             newDataStore[SHORTCUT_VERSION_KEY] = '1.7.0';
