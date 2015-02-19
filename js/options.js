@@ -55,7 +55,8 @@ $(function()
 	$('#edit').on('keyup', 'input[type=text], textarea', editRowKeyupHandler);
 
     // Detect when user types ESC in document to close modal popups
-    $(document).on('keydown', function(event) {
+    $(document).on('keydown', function(event) 
+    {
 		var charCode = event.keyCode || event.which;
         if (charCode == KEYCODE_ESC) {
             $('.popup').fadeOut(ANIMATION_FAST, function() {
@@ -79,8 +80,11 @@ $(function()
 	});
 
     // Listen to slider changes
-    $('#timeout').on('change mousemove', function(e) {
-        updateShortcutTimeoutLabel($(this).val());
+    $('#timeout').on('change mousemove', function(e) 
+    {
+        var timeout = $(this).val();
+        metaData[SHORTCUT_TIMEOUT_KEY] = timeout;
+        updateShortcutTimeoutLabel(timeout);
     });
 
 	// Button handlers
@@ -420,8 +424,10 @@ $(function()
         var duplicates = [];
         var data = {};
 
-        // Add some metadata properties
-        data[SHORTCUT_TIMEOUT_KEY] = $('#timeout').val();
+        // Add metadata properties back in
+        $.each(metaData, function(key, value) {
+            data[key] = value;
+        });
 
         // Collect list of valid shortcuts and check for duplicates
         $('tr').each(function(index)
