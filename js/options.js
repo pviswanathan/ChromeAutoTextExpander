@@ -391,9 +391,16 @@ $(function()
     {
         console.log("saveShortcuts");
 
-        // Collect list of valid shortcuts and check for duplicates
+        // Variable setup
         var duplicates = [];
-        var shortcuts = {};
+        var data = {};
+
+        // Add metadata properties
+        $.each(metaData, function(key, value) {
+            data[key] = value;
+        });
+
+        // Collect list of valid shortcuts and check for duplicates
         $('tr').each(function(index)
         {
             var $row = $(this);
@@ -402,8 +409,8 @@ $(function()
             if (validateRow($row))
             {
                 var shortcut = SHORTCUT_PREFIX + $row.find('.shortcut').val();
-                if (!shortcuts[shortcut]) {
-                    shortcuts[shortcut] = $row.find('.autotext').val();
+                if (!data[shortcut]) {
+                    data[shortcut] = $row.find('.autotext').val();
                 } else {
                     duplicates.push(shortcut);
                 }
@@ -420,14 +427,14 @@ $(function()
         }
 
         // Check storage capacity
-        if (JSON.stringify(shortcuts).length >= storageQuota) 
+        if (JSON.stringify(data).length >= storageQuota) 
         {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             showCrouton(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
                 + " Chrome max capacity: " + storageQuota + " characters", 'red');
             return false;
         }
-        if (Object.keys(shortcuts).length >= countQuota) 
+        if (Object.keys(data).length >= countQuota) 
         {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             showCrouton(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
@@ -435,30 +442,30 @@ $(function()
             return false;
         }
 
-        // Clear old shortcuts
+        // Clear old synced data
         chrome.storage.sync.clear(function()
         {
             if (chrome.runtime.lastError) {
                 console.log(chrome.runtime.lastError);
             }
-            else	// Success! Shortcuts cleared
+            else	// Success! Old data cleared
             {
                 // Save data into storage
-                chrome.storage.sync.set(shortcuts, function()
+                chrome.storage.sync.set(data, function()
                 {
                     if (chrome.runtime.lastError) {
                         console.log(chrome.runtime.lastError);
                         showCrouton("Error saving shortcuts!", 'red');
                     }
-                    else	// Success! Shortcuts saved
+                    else	// Success! Data saved
                     {
-                        console.log("saveShortcuts success:", shortcuts);
+                        console.log("saveShortcuts success:", data);
 
                         // Run through valid shortcuts and set them as saved
                         $('tr').each(function(index)
                         {
                             var $row = $(this);
-                            if (shortcuts[SHORTCUT_PREFIX + $row.find('.shortcut').val()]) {
+                            if (data[SHORTCUT_PREFIX + $row.find('.shortcut').val()]) {
                                 $row.addClass('saved');
                             }
                         });
