@@ -10,22 +10,25 @@
 		<div id="content">
 			<h1><img src="images/icon48.png" alt="" /> Auto Text Expander
 				<span class="fR">
-					<a id="feedback" href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" title="Feedback on the Chrome Webstore"><strong>Feedback</strong></a>
-					<a id="request" href="https://chrome.google.com/webstore/support/iibninhmiggehlcdolcilmhacighjamp?hl=en-US&gl=US#feature" target="_blank" title="Feature Requests on the Chrome Webstore"><strong>Feature Requests</strong></a>
+					<a id="feedback" href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" 
+                        title="Feedback on the Chrome Webstore"><strong>Feedback</strong></a>
+					<a id="request" href="https://chrome.google.com/webstore/support/iibninhmiggehlcdolcilmhacighjamp?hl=en-US&gl=US#feature" target="_blank" 
+                        title="Feature Requests on the Chrome Webstore"><strong>Feature Requests</strong></a>
 				</span>
 			</h1>
 
             <section>
 			<p>
 				Edit your database of shortcuts and expansions here!
-				<strong><a id="tipsLink" class="error" href="#" title="Show usage tips">Important notes</a>.</strong>
+				<strong><a id="tipsLink" class="error" href="#" 
+                    title="Show usage tips">Important notes</a>.</strong>
 			</p>
 
 			<ul id="tipsList">
 				<li>
 					<strong>Shortcuts are case sensitive!</strong> Add or edit
 					your shortcuts on the fly through the <strong>(txt)</strong>
-					icon that shows up in the url bar.
+					icon that shows up next to the url bar.
 				</li>
 				<li>
 					<strong>Clipboard paste macro now supported!</strong>
@@ -35,10 +38,11 @@
 				<li>
 					<strong>Date/time macros are supported!</strong>
 					Wrap your date format with <strong>%d(</strong>dateFormat<strong>)</strong>.
-					Please see <strong><a href="http://momentjs.com/docs/#/displaying/format/" target="_blank" title="Date Formatting Documentation">this</a></strong>
-					for how to format dates in your expanded text. Example: <strong>%d(MMMM Do YYYY)</strong>,
-					and would expand to something like: <strong>September 4rd 2013</strong>.
-
+					Please see <strong><a href="http://momentjs.com/docs/#/displaying/format/" 
+                        target="_blank" title="Date Formatting Documentation">this</a></strong>
+					for how to format dates in your expanded text. Example: 
+                    <strong>%d(MMMM Do YYYY)</strong>, and would expand to 
+                    something like: <strong>September 4rd 2013</strong>.
 				</li>
 				<li>
 					Add a space to the end of your shortcut if you want
@@ -47,26 +51,28 @@
 					into content-editable divs like Gmail.
 				</li>
 				<li>
-                    <strong>Saving should sync across all Chrome browsers you login and sync with.</strong>
-					First-time user? Here's a few examples! Refresh your pages to use them.
-				</li>
-				<li>
-                    Backing up your shortcuts with the "Backup" button only makes an 
-                    extra copy of them in Chrome's local storage quota. This means if
+                    <strong>Backing up your shortcuts with the "Backup" button only makes an 
+                    extra copy of them in Chrome's local storage quota.</strong> This means if
                     Chrome's syncing gets messed up, you can restore from your backup,
-                    but if you sign out of your browser, you will lose your backup.
-                    <strong class="error">Please save a copy of your shortcuts on your computer 
-                    from the Import/Export dialog!</strong>
+                    but if you sign out of your browser or uninstall the extension, 
+                    you will lose your backup. You can get a copy of your shortcuts from
+                    the Import/Export dialog.
 				</li>
 				<li>
-					A few special keywords can't be used due to the structure of the JS
-					objects used to store the shortcuts. Namely words like
-					"<strong>constructor</strong>" or "<strong>class</strong>".
+                    <strong>Chrome has storage quota limits</strong>, so unfortunately 
+                    you can't have unlimited shortcuts of any size. Check the limits 
+                    <a href="https://developer.chrome.com/extensions/storage#properties" 
+                        title="Chrome Storage Quotas">here</a>.
 				</li>
 				<li>
 					The new HTML5 input[type=email] field and a few others don't allow for
 					detection and setting of the cursor. Instead the extension will have to
 					assume your cursor is at the end of the text and replace from there.
+				</li>
+				<li>
+                    <strong>Saving should sync across all Chrome browsers you login 
+                    and sync with.</strong> First-time user? Here's a few examples! 
+                    Refresh your pages to use them.
 				</li>
 			</ul>
             </section>
