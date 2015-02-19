@@ -7,6 +7,7 @@ $(function()
       , DEFAULT_AUTOTEXT = "Expanded Text"
       , KEYCODE_ENTER = 13
       , KEYCODE_TAB = 9
+	  , KEYCODE_ESC = 27
       , ANIMATION_FAST = 200
       , ANIMATION_NORMAL = 400
       , ANIMATION_SLOW = 1000
@@ -30,6 +31,16 @@ $(function()
 
 	// When user types into input fields
 	$('#edit').on('keydown', 'input[type=text], textarea', editRowHandler);
+
+    // Detect when user types ESC in document to close modal popups
+    $(document).on('keydown', function(event) {
+		var charCode = event.keyCode || event.which;
+        if (charCode == KEYCODE_ESC) {
+            $('.popup').fadeOut(ANIMATION_FAST, function() {
+                $('.popup, .modal').remove();
+            });
+        }
+    });
 
 	// Need to do the onclick clearing here, inline js not allowed
 	$('#edit').on('focus', 'input.shortcut', function(event) {
@@ -99,10 +110,10 @@ $(function()
 
             // Update storage quotas
             storageQuota = chrome.storage.sync.QUOTA_BYTES;
-            itemStorageQuota = QUOTA_BYTES_PER_ITEM;
+            itemStorageQuota = chrome.storage.sync.QUOTA_BYTES_PER_ITEM;
             countQuota = chrome.storage.sync.MAX_ITEMS;
             adjustedCountQuota = countQuota - Object.keys(metaData).length;
-            refreshQuotaLabels();
+            refreshQuotaLabels(data);
 
             // Setup shortcuts
             setupShortcuts(data);
@@ -112,12 +123,14 @@ $(function()
     // Refresh labels for storage quotas
     function refreshQuotaLabels(shortcuts)
     {
+        console.log("refreshQuotaLabels");
+
         // Check that data is returned
-        if (!$.isEmptyObject(data)) 
+        if (!$.isEmptyObject(shortcuts)) 
         {
             // Current quotas
-            $('totalStorage').text(JSON.stringify(shortcuts).length);
-            $('countStorage').text(Object.keys(shortcuts).length 
+            $('#totalStorage').text(JSON.stringify(shortcuts).length);
+            $('#countStorage').text(Object.keys(shortcuts).length 
                                     - Object.keys(metaData).length);        
         }
 

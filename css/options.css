@@ -139,14 +139,14 @@ label, button {
 	top: 5px;
 }
 
-.label, #restore.disabled, #storage, #quota {
+.label, #restore.disabled, #totalQuota, #countQuota {
 	color: #aaa;
 	font: italic 9pt/10pt 'Helvetica Neue', Helvetica, Verdana;
 	display: inline-block;
-	margin: 0 0 4px;
+	margin: 0;
 }
 .label {
-    margin: 0 4px 4px 4px;
+    margin: 0 4px;
 }
 #restore {
 	color: #66f;
