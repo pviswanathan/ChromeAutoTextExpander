@@ -16,8 +16,7 @@ $(function()
       , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
       , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
       , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
-      , SHORTCUT_TIMEOUT_KEY = '-ScTo'      // Synced key for shortcut typing timeout
-      , SHORTCUT_MIGRATION_KEY = '!mIg'     // Synced key for shortcuts migrated flag
+      , SHORTCUT_TIMEOUT_KEY = 'scto'       // Synced key for shortcut typing timeout
       , SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
     ;
 
@@ -31,7 +30,6 @@ $(function()
 
     // Setup metaData defaults
     metaData[SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
-    metaData[SHORTCUT_MIGRATION_KEY] = false;
 
     // Set version
     $('#version').text('v' + chrome.runtime.getManifest().version);
@@ -166,12 +164,6 @@ $(function()
             metaData[SHORTCUT_TIMEOUT_KEY] = shortcutTimeout;
         }
         updateShortcutTimeoutLabel(metaData[SHORTCUT_TIMEOUT_KEY]);
-
-        // Check for migration flag
-        var migrationFlag = data[SHORTCUT_MIGRATION_KEY];
-        if (migrationFlag) {    
-            metaData[SHORTCUT_MIGRATION_KEY] = migrationFlag;
-        }
     }
 
     // Setup and populate edit table shortcuts
@@ -193,40 +185,19 @@ $(function()
                     keys.sort(function(a, b) {
                         return b.toLowerCase().localeCompare(a.toLowerCase());
                     });
-
-                    // TODO: remove this eventually
-                    // CHECK MIGRATION FLAG - see if we need to migrate to new format
-                    if (!metaData[SHORTCUT_MIGRATION_KEY])
+                    $.each(keys, function(index, key) 
                     {
-                        // Read in the old style
-                        $.each(keys, function(index, key) 
+                        // Only apply shortcuts
+                        if (key.indexOf(SHORTCUT_PREFIX) === 0) 
                         {
-                            if (!addRow(key, data[key])) 
+                            var shortcut = key.substr(SHORTCUT_PREFIX.length);
+                            if (!addRow(shortcut, data[key])) 
                             {
                                 errors = true;
                                 return false;	// Break out if over quota
                             }
-                        });
-
-                        // Flip flag
-                        metaData[SHORTCUT_MIGRATION_KEY] = true;
-                    }
-                    else 
-                    {
-                        $.each(keys, function(index, key) 
-                        {
-                            // Only apply shortcuts
-                            if (key.indexOf(SHORTCUT_PREFIX) === 0) 
-                            {
-                                var shortcut = key.substr(SHORTCUT_PREFIX.length);
-                                if (!addRow(shortcut, data[key])) 
-                                {
-                                    errors = true;
-                                    return false;	// Break out if over quota
-                                }
-                            }
-                        });
-                    }
+                        }
+                    });
 
                     // Add special class to these rows to indicate saved
                     $('tr').addClass('saved');
@@ -246,7 +217,7 @@ $(function()
 
                             // Example shortcuts
                             addRow('d8 ', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
-                            addRow('sign@', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
+                            addRow('sig@', '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com');
                             addRow('hbd', "Hey! Just wanted to wish you a happy birthday; hope you had a good one!");
                             addRow('e@', 'email.me@carlinyuen.com');
                             addRow('brb', 'be right back');
