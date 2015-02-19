@@ -16,8 +16,8 @@ $(function()
       , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
       , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
       , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
-      , SHORTCUT_TIMEOUT_KEY = 'scto'       // Synced key for shortcut typing timeout
-      , SHORTCUT_MIGRATION_KEY = 'mig'      // Synced key for shortcuts migrated flag
+      , SHORTCUT_TIMEOUT_KEY = '-ScTo'      // Synced key for shortcut typing timeout
+      , SHORTCUT_MIGRATION_KEY = '!mIg'     // Synced key for shortcuts migrated flag
       , SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
     ;
 
@@ -193,12 +193,40 @@ $(function()
                     keys.sort(function(a, b) {
                         return b.toLowerCase().localeCompare(a.toLowerCase());
                     });
-                    $.each(keys, function(index, key) {
-                        if (!addRow(key, data[key])) {
-                            errors = true;
-                            return false;	// Break out if over quota
-                        }
-                    });
+
+                    // TODO: remove this eventually
+                    // CHECK MIGRATION FLAG - see if we need to migrate to new format
+                    if (!metaData[SHORTCUT_MIGRATION_KEY])
+                    {
+                        // Read in the old style
+                        $.each(keys, function(index, key) 
+                        {
+                            if (!addRow(key, data[key])) 
+                            {
+                                errors = true;
+                                return false;	// Break out if over quota
+                            }
+                        });
+
+                        // Flip flag
+                        metaData[SHORTCUT_MIGRATION_KEY] = true;
+                    }
+                    else 
+                    {
+                        $.each(keys, function(index, key) 
+                        {
+                            // Only apply shortcuts
+                            if (key.indexOf(SHORTCUT_PREFIX) === 0) 
+                            {
+                                var shortcut = key.substr(SHORTCUT_PREFIX.length);
+                                if (!addRow(shortcut, data[key])) 
+                                {
+                                    errors = true;
+                                    return false;	// Break out if over quota
+                                }
+                            }
+                        });
+                    }
 
                     // Add special class to these rows to indicate saved
                     $('tr').addClass('saved');
@@ -234,7 +262,7 @@ $(function()
                 $('textarea').autosize();
 
                 // Add extra input field if no existing shortcuts
-                if (!$('tr').get().length) {
+                if (!$('tr').length) {
                     addRow().find('.shortcut').focus().select();
                 }
 
@@ -402,7 +430,7 @@ $(function()
             // If pair is valid, and no duplicates, add to list
             if (validateRow($row))
             {
-                var shortcut = $row.find('.shortcut').val();
+                var shortcut = SHORTCUT_PREFIX + $row.find('.shortcut').val();
                 if (!shortcuts[shortcut]) {
                     shortcuts[shortcut] = $row.find('.autotext').val();
                 } else {
@@ -459,7 +487,7 @@ $(function()
                         $('tr').each(function(index)
                         {
                             var $row = $(this);
-                            if (shortcuts[$row.find('.shortcut').val()]) {
+                            if (shortcuts[SHORTCUT_PREFIX + $row.find('.shortcut').val()]) {
                                 $row.addClass('saved');
                             }
                         });
@@ -539,37 +567,6 @@ $(function()
     // Updates the shortcut timeout label
     function updateShortcutTimeoutLabel(value) {
         $('#timeoutValue').text(' [' + value + 'ms]');
-    }
-
-    // Get custom shortcut timeout value and update the slider
-    function updateShortcutTimeout() 
-    {
-        chrome.storage.sync.get(SHORTCUT_TIMEOUT_KEY, function(data)
-        {
-            if (chrome.runtime.lastError) {	// Check for errors
-                console.log(chrome.runtime.lastError);
-            }
-            else if (data)	// Set custom shortcut timeout
-            {
-                var timeout = data[SHORTCUT_TIMEOUT_KEY];
-                updateShortcutTimeoutLabel(timeout);
-                $('#timeout').value(timeout);
-            }
-        });
-    }
-
-    // Save custom shortcut timeout value
-    function saveShortcutTimeout(timeout) 
-    {
-        chrome.storage.sync.set(SHORTCUT_TIMEOUT_KEY, function()
-        {
-            if (chrome.runtime.lastError) {	// Check for errors
-                console.log(chrome.runtime.lastError);
-            }
-            else
-            {
-            }
-        });
     }
 
     // Restore shortcuts from backup
