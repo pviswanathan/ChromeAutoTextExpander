@@ -167,15 +167,22 @@ $(function()
     // Process any metadata stored with shortcuts
     function processMetaData(data)
     {
+        console.log('processMetaData');
+
         // Check for shortcut timeout
         var shortcutTimeout = data[SHORTCUT_TIMEOUT_KEY];
-        if (shortcutTimeout) {     
+        if (shortcutTimeout) {  // If exists, replace metadata
             metaData[SHORTCUT_TIMEOUT_KEY] = shortcutTimeout;
+        } else {    // Otherwise, use metadata default value
+            shortcutTimeout = metaData[SHORTCUT_TIMEOUT_KEY];
         }
-        updateShortcutTimeoutLabel(metaData[SHORTCUT_TIMEOUT_KEY]);
+        updateShortcutTimeoutLabel(shortcutTimeout);
+        $('#timeout').val(shortcutTimeout);
+        console.log('shortcutTimeout:', shortcutTimeout);
 
         // Check that the shortcut database version matches app version
         var shortcutVersion = data[SHORTCUT_VERSION_KEY];
+        console.log('database version:', shortcutVersion);
         if (shortcutVersion != metaData[SHORTCUT_VERSION_KEY]) 
         {
             // Warn user that their shortcuts aren't synced yet, they should reload

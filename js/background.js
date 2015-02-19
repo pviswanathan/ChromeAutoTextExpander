@@ -193,7 +193,9 @@ function upgradeShortcutsToV120()
             // Loop through and move them to object to store
             var newDataStore = {};
             var oldDataStore = data[OLD_STORAGE_KEY];
-            $.each(oldDataStore, function(key, value) {
+            $.each(oldDataStore, function(key, value) 
+            {
+                console.log('migrating:', key, '=>', value);
                 newDataStore[key] = value;
             });
 
@@ -247,7 +249,9 @@ function upgradeShortcutsToV170()
         {
             // Loop through and apply prefix to all keys
             var newDataStore = {};
-            $.each(data, function(key, value) {
+            $.each(data, function(key, value) 
+            {
+                console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
                 newDataStore[SHORTCUT_PREFIX + key] = value;
             });
 
@@ -287,6 +291,8 @@ function upgradeShortcutsToV170()
 // Updates the shortcut database with the latest version number
 function upgradeShortcutsToLatest()
 {
+    console.log("upgradeShortcutsToLatest");
+
     chrome.storage.sync.get(null, function(data)
     {
         if (chrome.runtime.lastError) {	// Check for errors
@@ -294,6 +300,8 @@ function upgradeShortcutsToLatest()
         }
         else if (!$.isEmptyObject(data)) // Check that data is returned
         {
+            console.log("updating database version to", MANIFEST.version);
+
             // Update metadata for shortcut version to manifest version
             data[SHORTCUT_VERSION_KEY] = MANIFEST.version;
 
