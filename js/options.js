@@ -29,6 +29,9 @@ $(function()
       }
     ;
 
+    // Set version
+    $('#version').text('v' + chrome.runtime.getManifest().version);
+
 	// When user types into input fields
 	$('#edit').on('keydown', 'input[type=text], textarea', editRowHandler);
 

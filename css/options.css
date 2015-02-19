@@ -5,7 +5,7 @@ body, html {
 	width: 100%;
 	background: white;
 	color: #222;
-	font: normal 10pt/16px 'Helvetica Neue', Helvetica, Verdana;
+	font: normal 10pt/16px Verdana;
 	margin: 0;
 	padding: 0;
 }
@@ -17,15 +17,16 @@ body, html {
 }
 
 h1 {
-	font: bold 16pt/16px 'Helvetica Neue', Helvetica, Verdana;
+	font: bold 16pt/16px Arial, Verdana;
 	vertical-align: middle;
 	margin: 0;
 }
 h1 img {
 	vertical-align: middle;
+    margin-top: -8px;
 }
 h2 {
-    font: bold 12pt/16px 'Helvetica Neue', Helvetica, Verdana;
+    font: bold 12pt/16px Arial, Verdana;
     clear: both;
     color: #888;
 }
@@ -54,7 +55,7 @@ form {
 table {
 	width: 100%;
     counter-reset: rowNumber;
-	font: normal 10pt/16px 'Helvetica Neue', Helvetica, Verdana;
+	font: normal 9pt/9px Verdana;
 }
 table tr {
     counter-increment: rowNumber;
@@ -111,21 +112,21 @@ fieldset {
 }
 .backToTop {
 	color: #888;
-	font: normal 9pt/9pt 'Helvetica Neue', Helvetica, Verdana;
+	font: normal 9pt/9pt Verdana;
 }
 
 h1 span {
-	margin: 16px 16px 0 0;
+	margin: 10px 16px 0 0;
 }
 h1 span a, h1 span a img {
-	font: normal 9pt/9pt 'Helvetica Neue', Helvetica, Verdana;
+	font: normal 8pt/8pt Verdana;
 	outline: none;
 }
 
 label, button {
 	padding: 6px 8px;
     margin-bottom: 4px;
-	font: bold 10pt/10pt 'Helvetica Neue', Helvetica, Verdana;
+	font: bold 9pt/9pt Verdana;
 	color: #444;
 }
 
@@ -140,8 +141,8 @@ label, button {
 }
 
 .label, #restore.disabled, #totalQuota, #countQuota {
-	color: #aaa;
-	font: italic 9pt/10pt 'Helvetica Neue', Helvetica, Verdana;
+	color: #999;
+	font: italic 8pt/8pt Verdana;
 	display: inline-block;
 	margin: 0;
 }
@@ -170,7 +171,7 @@ label, button {
 	right: 0;
 	padding: 8px 12px;
 	text-align: center;
-	font: bold 13px/16px 'Helvetica Neue', Helvetica, Verdana;
+	font: bold 13px/16px Verdana;
 	color: #fff;
 	background-color: #bbb;
 	display: none;
@@ -187,7 +188,7 @@ label, button {
 	margin: 36px 0 36px -160px;
 	padding: 16px;
 	width: 320px;
-	font: normal 13px/18px 'Helvetica Neue', Helvetica, Verdana;
+	font: normal 13px/18px Verdana;
 	color: #444;
 	background: #fff;
 	box-shadow: 0px 4px 12px #444;
