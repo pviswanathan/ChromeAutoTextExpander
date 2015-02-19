@@ -83,6 +83,9 @@ function refreshShortcuts()
 			return;
 		}
 
+        // Update storage quotas
+
+
 		// Setup shortcuts
 		setupShortcuts(data);
 	});
@@ -95,7 +98,7 @@ function setupShortcuts(data, completionBlock)
 
 	var errors = false;					// Keep track of errors
 	var reloadStartTime = new Date();	// Keep track of time
-	$('#refresh').find('img').attr('src', 'images/refresh.gif');
+	$('.refreshButton').find('img').attr('src', 'images/refresh.gif');
 	$('#edit').fadeOut(ANIMATION_FAST, function() {
 		$(this).html('').fadeIn(ANIMATION_FAST, function()
 		{
@@ -162,7 +165,7 @@ function setupShortcuts(data, completionBlock)
 			// Done! Set reloader icon back and call custom completionBlock
 			setTimeout(function()
 			{
-				$('#refresh').find('img').attr('src', 'images/reload.png');
+				$('.refreshButton').find('img').attr('src', 'images/reload.png');
 
 				if (completionBlock) {
 					completionBlock(!errors);

@@ -76,8 +76,8 @@
                 <h2>Actions</h2>
                 <button type="button" id="port">Import / Export</button>
                 <div class="storage label">
-                    <span id="storage">#</span> bytes used out of 
-                    <a id="quota" target="_blank" href="https://developer.chrome.com/extensions/storage#properties" title="Chrome Storage Quotas">#</a>
+                    <span id="totalStorage">#</span> bytes used out of 
+                    <a id="totalQuota" target="_blank" href="https://developer.chrome.com/extensions/storage#properties" title="Chrome Storage Quotas">#</a>
                 </div>
                 <br />
 
@@ -96,6 +96,10 @@
                     <button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
                     <button type="button" class="addButton">Add</button>
                     <button type="button" class="saveButton">Save</button>
+                    <div class="storage label">
+                        <span id="countStorage">#</span> shortcuts used out of 
+                        <a id="countQuota" target="_blank" href="https://developer.chrome.com/extensions/storage#properties" title="Chrome Storage Quotas">#</a> 
+                    </div>
                 </fieldset>
 
                 <label for="timeout" class="fL">Shortcut Timeout<span id="timeoutValue"></span></label>

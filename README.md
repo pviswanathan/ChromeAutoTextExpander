@@ -24,7 +24,6 @@ Feature Requests:
  - Date Arithmetic
  - Work with Google's Inbox
  - Work with Chatango
- - Work with Basecamp
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
 
