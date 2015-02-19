@@ -3,21 +3,22 @@
 $(function()
 {
     // Constants
-    var DEFAULT_SHORTCUT = "Shortcut"
-      , DEFAULT_AUTOTEXT = "Expanded Text"
+    var DEFAULT_SHORTCUT_FILLER = "Shortcut"
+      , DEFAULT_AUTOTEXT_FILLER = "Expanded Text"
+      , DEFAULT_CLEAR_BUFFER_TIMEOUT = 750          // Default to 750 ms
       , KEYCODE_ENTER = 13
       , KEYCODE_TAB = 9
 	  , KEYCODE_ESC = 27
       , ANIMATION_FAST = 200
       , ANIMATION_NORMAL = 400
       , ANIMATION_SLOW = 1000
-      , TIME_SHOW_CROUTON = 1000 * 2	            // 2 seconds
-      , TIME_CLEAR_BUFFER_TIMEOUT = 750             // 750 ms
+      , TIME_SHOW_CROUTON = 1000 * 3	            // 3 seconds
       , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
       , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
       , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
-      , SHORTCUT_TIMEOUT_KEY = 'scto'               // Synced key for shortcut typing timeout
-      , SHORTCUT_MIGRATION_KEY = 'mig'              // Synced key for shortcuts migrated flag
+      , SHORTCUT_TIMEOUT_KEY = 'scto'       // Synced key for shortcut typing timeout
+      , SHORTCUT_MIGRATION_KEY = 'mig'      // Synced key for shortcuts migrated flag
+      , SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
     ;
 
     // Variables
@@ -29,7 +30,7 @@ $(function()
     ;
 
     // Setup metaData defaults
-    metaData[SHORTCUT_TIMEOUT_KEY] = TIME_CLEAR_BUFFER_TIMEOUT;
+    metaData[SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
     metaData[SHORTCUT_MIGRATION_KEY] = false;
 
     // Set version
@@ -58,16 +59,16 @@ $(function()
 
 	// Need to do the onclick clearing here, inline js not allowed
 	$('#edit').on('focus', 'input.shortcut', function(event) {
-		if (this.value == DEFAULT_SHORTCUT) { this.value = ''; }
+		if (this.value == DEFAULT_SHORTCUT_FILLER) { this.value = ''; }
 	});
 	$('#edit').on('focus', 'textarea.autotext', function(event) {
-		if (this.value == DEFAULT_AUTOTEXT) { this.value = ''; }
+		if (this.value == DEFAULT_AUTOTEXT_FILLER) { this.value = ''; }
 	});
 	$('#edit').on('blur', 'input.shortcut', function(event) {
-		if (this.value == '') { this.value = DEFAULT_SHORTCUT; }
+		if (this.value == '') { this.value = DEFAULT_SHORTCUT_FILLER; }
 	});
 	$('#edit').on('blur', 'textarea.autotext', function(event) {
-		if (this.value == '') { this.value = DEFAULT_AUTOTEXT; }
+		if (this.value == '') { this.value = DEFAULT_AUTOTEXT_FILLER; }
 	});
 
     // Listen to slider changes
@@ -322,13 +323,13 @@ $(function()
                 .append($(document.createElement('input'))
                     .attr('type', 'text')
                     .addClass('shortcut')
-                    .attr('value', shortcut || DEFAULT_SHORTCUT)
+                    .attr('value', shortcut || DEFAULT_SHORTCUT_FILLER)
                 )
             )
             .append($(document.createElement('td'))
                 .append($(document.createElement('textarea'))
                     .addClass('autotext')
-                    .text(autotext || DEFAULT_AUTOTEXT)
+                    .text(autotext || DEFAULT_AUTOTEXT_FILLER)
                 )
             )
             .append($(document.createElement('td'))
@@ -362,10 +363,10 @@ $(function()
         var autotext = $input.find('.autotext').val();
 
         // Check not empty
-        if (!shortcut || shortcut == DEFAULT_SHORTCUT || !shortcut.length) {
+        if (!shortcut || shortcut == DEFAULT_SHORTCUT_FILLER || !shortcut.length) {
             errors.shortcut = ' - Invalid shortcut text.';
         }
-        if (!autotext || autotext == DEFAULT_AUTOTEXT || !autotext.length) {
+        if (!autotext || autotext == DEFAULT_AUTOTEXT_FILLER || !autotext.length) {
             errors.autotext = ' - Invalid expanded text.';
         }
 

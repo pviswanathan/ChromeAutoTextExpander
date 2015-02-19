@@ -17,7 +17,6 @@ Technologies Used:
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
- - Show storage limits
  - Allow embedding of html into single-line expansions
  - Adjustable buffer clear timeout
  - Nested shortcuts
