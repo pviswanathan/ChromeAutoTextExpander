@@ -499,6 +499,9 @@ $(function()
                             }
                         });
 
+                        // Update quota labels
+                        refreshQuotaLabels(data);
+
                         // Run completion block if exists
                         if (completionBlock) {
                             completionBlock();
