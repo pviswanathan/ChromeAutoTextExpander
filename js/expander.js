@@ -5,38 +5,43 @@ jQuery.noConflict();
 (function($) {
 
 	// Variables & Constants
-	var OK = 0
+    var SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
+        , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
+		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
+		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
+
 		, KEYCODE_BACKSPACE = 8
 		, KEYCODE_TAB = 9
 		, KEYCODE_RETURN = 13
 		, KEYCODE_SPACEBAR = 32
-		, TIME_CLEAR_BUFFER_TIMEOUT = 750
-		, TIME_CHECK_EDITABLE_ELEMENTS = 1000 * 30	// Every 30 seconds
+
+		, DEFAULT_CLEAR_BUFFER_TIMEOUT = 750
         , TIME_OUTLOOK_EDITOR_CHECK = 500
+
 		, DATE_MACRO_REGEX = /%d\(/g
 		, DATE_MACRO_CLOSE_TAG = ')'
 		, CLIP_MACRO_REGEX = /%clip%/g
 		, WHITESPACE_REGEX = /(\s)/
+
 		, BASECAMP_DOMAIN_REGEX = /basecamp.com/
 		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
 		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
 		, GMAIL_DOMAIN_REGEX = /mail.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
+
 		, EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
 		, EVENT_NAME_KEYUP = 'keyup.auto-expander'
 		, EVENT_NAME_BLUR = 'blur.auto-expander'
 		, EVENT_NAME_FOCUS = 'focus.auto-expander'
 		, EVENT_NAME_LOAD = 'load.auto-expander'
 		, EVENT_NAME_INSERTED = 'DOMNodeInserted'
+
         , SELECTOR_EDITABLE_BODY = 'body[contenteditable=true]'
 		, SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
         , SELECTOR_GMAIL_EDIT = 'div.aoI'
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'
         , SELECTOR_EVERNOTE_EDIT = '#gwt-debug-noteEditor'
         , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'
-		, OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
-		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
-		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
 	;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -114,7 +119,7 @@ jQuery.noConflict();
     // Updates buffer clear timeout from custom value
     function updateBufferTimeout()
     {
-		chrome.storage.sync.get("BUFFERTIMEOUT", function (data)
+		chrome.storage.sync.get(SHORTCUT_TIMEOUT_KEY, function (data)
 		{
 			// Check for errors
 			if (chrome.runtime.lastError) {
@@ -122,10 +127,9 @@ jQuery.noConflict();
 			}
 			// Check that data is returned and shortcut library exists
 			else if (!$.isEmptyObject(data)) {
-                // TODO: set value
-                // typingTimeout = data['value'];
+                typingTimeout = data[SHORTCUT_TIMEOUT_KEY];
             } else {  // Use default value on error / no custom value set
-                typingTimeout = TIME_CLEAR_BUFFER_TIMEOUT;
+                typingTimeout = DEFAULT_CLEAR_BUFFER_TIMEOUT;
             }
         });
     }

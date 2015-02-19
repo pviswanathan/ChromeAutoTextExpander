@@ -3,29 +3,36 @@
 $(function()
 {
     // Constants
-    var DEFAULT_SHORTCUT_FILLER = "Shortcut"
-      , DEFAULT_AUTOTEXT_FILLER = "Expanded Text"
-      , DEFAULT_CLEAR_BUFFER_TIMEOUT = 750          // Default to 750 ms
-      , KEYCODE_ENTER = 13
-      , KEYCODE_TAB = 9
-	  , KEYCODE_ESC = 27
-      , ANIMATION_FAST = 200
-      , ANIMATION_NORMAL = 400
-      , ANIMATION_SLOW = 1000
-      , TIME_SHOW_CROUTON = 1000 * 3	            // 3 seconds
-      , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
-      , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
-      , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
-      , SHORTCUT_TIMEOUT_KEY = 'scto'       // Synced key for shortcut typing timeout
-      , SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
+    var SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
+        , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
+		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
+		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
+
+        , DEFAULT_SHORTCUT_FILLER = "Shortcut"
+        , DEFAULT_AUTOTEXT_FILLER = "Expanded Text"
+        , DEFAULT_CLEAR_BUFFER_TIMEOUT = 750          // Default to 750ms
+
+        , KEYCODE_ENTER = 13
+        , KEYCODE_TAB = 9
+        , KEYCODE_ESC = 27
+
+        , ANIMATION_FAST = 200
+        , ANIMATION_NORMAL = 400
+        , ANIMATION_SLOW = 1000
+
+        , TIME_SHOW_CROUTON = 1000 * 3	              // Show croutons for 3s
+
+        , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
+        , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
+        , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
     ;
 
     // Variables
-    var storageQuota        // Total bytes of sync storage allowed
-      , itemStorageQuota    // Max size of a single item in sync storage
-      , countQuota          // Max number of items you can store in sync storage
-      , adjustedCountQuota  // Max number of items you can store minus metadata
-      , metaData = {}       // List of metadata keys we will store / retrieve
+    var storageQuota          // Total bytes of sync storage allowed
+        , itemStorageQuota    // Max size of a single item in sync storage
+        , countQuota          // Max number of items you can store in sync storage
+        , adjustedCountQuota  // Max number of items you can store minus metadata
+        , metaData = {}       // List of metadata keys we will store / retrieve
     ;
 
     // Setup metaData defaults

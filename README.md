@@ -18,7 +18,6 @@ Technologies Used:
 
 Feature Requests:
  - Allow embedding of html into single-line expansions
- - Adjustable buffer clear timeout
  - Nested shortcuts
  - Date Arithmetic
  - Work with Google's Inbox
