@@ -43,7 +43,8 @@ $(function()
     });
 
 	// When user types into input fields
-	$('#edit').on('keydown', 'input[type=text], textarea', editRowHandler);
+	$('#edit').on('keydown', 'input[type=text], textarea', editRowKeydownHandler);
+	$('#edit').on('keyup', 'input[type=text], textarea', editRowKeyupHandler);
 
     // Detect when user types ESC in document to close modal popups
     $(document).on('keydown', function(event) {
@@ -260,7 +261,7 @@ $(function()
     }
 
     // When a row in the edit table gets typed in
-    function editRowHandler(event)
+    function editRowKeyupHandler(event)
     {
         // Check to see if input pair is valid
         var keyCode = event.keyCode || event.which;
@@ -284,7 +285,15 @@ $(function()
                 $autotext.removeClass('error').removeAttr('title');
             }
         });
+    }
 
+    // When a row in the edit table gets typed in
+    function editRowKeydownHandler(event)
+    {
+        // Check to see if input pair is valid
+        var keyCode = event.keyCode || event.which;
+        var $target = $(event.target);
+        
         // If enter pressed on shortcut field, move to autotext
         if (keyCode == KEYCODE_ENTER && $target.hasClass('shortcut'))
         {
