@@ -34,7 +34,9 @@ $(function()
 
     // Warn user before leaving if they haven't saved new rows
     $(window).bind('beforeunload', function(){
-        return ($('tr:not(.saved)').length) ? 'You have unsaved shortcuts!' : false;
+        if ($('tr:not(.saved)').length) {
+            return  'You have unsaved shortcuts!';
+        }
     });
 
 	// When user types into input fields
@@ -101,8 +103,8 @@ $(function()
 	refreshShortcuts();
 
 
-//////////////////////////////////////////////////////////
-// FUNCTIONS
+    //////////////////////////////////////////////////////////
+    // FUNCTIONS
 
     // Refresh shortcuts using locally stored shortcuts
     function refreshShortcuts()
