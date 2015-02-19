@@ -160,7 +160,7 @@ jQuery.noConflict();
  		debugLog("checkShortcuts:", lastChar, textBuffer);
 
 		// Get shortcuts
-		var shortcut = textBuffer.join('');
+		var shortcut = SHORTCUT_PREFIX + textBuffer.join('');
 		chrome.storage.sync.get(shortcut, function (data)
 		{
 			// Check for errors
@@ -222,8 +222,9 @@ jQuery.noConflict();
 				}	// END - if (autotext)
 			}	// END - if (!$.isEmptyObject(data))
 
-			// If last character is a space, clear buffer
-			if (lastChar == " ") {
+			// If last character is whitespace, clear buffer
+			if (WHITESPACE_REGEX.test(lastChar)) {
+			//if (lastChar == " ") {
 				clearTypingBuffer();
 			}
 		});
