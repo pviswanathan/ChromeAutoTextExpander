@@ -32,6 +32,11 @@ $(function()
     // Set version
     $('#version').text('v' + chrome.runtime.getManifest().version);
 
+    // Warn user before leaving if they haven't saved new rows
+    $(window).bind('beforeunload', function(){
+        return ($('tr:not(.saved)').length) ? 'You have unsaved shortcuts!' : false;
+    });
+
 	// When user types into input fields
 	$('#edit').on('keydown', 'input[type=text], textarea', editRowHandler);
 
@@ -267,16 +272,15 @@ $(function()
     // Add new row to shortcuts edit table
     function addRow(shortcut, autotext, append)
     {
-        if ($('tr').length >= chrome.storage.sync.MAX_ITEMS) {
+        if ($('tr').length >= adjustedCountQuota) {
             console.log(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA"));
             showCrouton(chrome.i18n.getMessage("ERROR_OVER_ITEM_QUOTA")
-                + " Max # Items: " + chrome.storage.sync.MAX_ITEMS, 'red');
+                + " Max # Items: " + adjustedCountQuota, 'red');
             return null;
         }
 
         var row = $(document.createElement('tr'))
             .append($(document.createElement('td'))
-                //.attr('width', '92px')
                 .append($(document.createElement('input'))
                     .attr('type', 'text')
                     .addClass('shortcut')
@@ -290,7 +294,6 @@ $(function()
                 )
             )
             .append($(document.createElement('td'))
-                //.attr('width', '16px')
                 .append($(document.createElement('a'))
                     .attr('href', '#')
                     .addClass('remove')
