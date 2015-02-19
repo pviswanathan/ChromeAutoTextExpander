@@ -10,12 +10,22 @@ $(function()
       , ANIMATION_FAST = 200
       , ANIMATION_NORMAL = 400
       , ANIMATION_SLOW = 1000
-      , TIME_SHOW_CROUTON = 1000 * 2	// Two seconds
+      , TIME_SHOW_CROUTON = 1000 * 2	            // 2 seconds
+      , TIME_CLEAR_BUFFER_TIMEOUT = 750             // 750 ms
+      , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
+      , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
+      , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
     ;
-    var FIRST_RUN_KEY = 'autoTextExpanderFirstRun'
-      , BACKUP_KEY = 'autoTextExpanderBackup'
-      , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp'
-      , SHORTCUT_TIMEOUT_KEY = 'autoTextExpanderShortcutTimeout'
+
+    // Variables
+    var storageQuota        // Total bytes of sync storage allowed
+      , itemStorageQuota    // Max size of a single item in sync storage
+      , countQuota          // Max number of items you can store in sync storage
+      , adjustedCountQuota  // Max number of items you can store minus metadata
+      , metaData = {        // List of metadata keys we will store / retrieve
+        "scto": TIME_CLEAR_BUFFER_TIMEOUT,  // default for ShortCut TimeOut
+        "mig": false,                       // migrated shortcuts to new format yet
+      }
     ;
 
 	// When user types into input fields
@@ -88,11 +98,32 @@ $(function()
             }
 
             // Update storage quotas
-
+            storageQuota = chrome.storage.sync.QUOTA_BYTES;
+            itemStorageQuota = QUOTA_BYTES_PER_ITEM;
+            countQuota = chrome.storage.sync.MAX_ITEMS;
+            adjustedCountQuota = countQuota - Object.keys(metaData).length;
+            refreshQuotaLabels();
 
             // Setup shortcuts
             setupShortcuts(data);
         });
+    }
+
+    // Refresh labels for storage quotas
+    function refreshQuotaLabels(shortcuts)
+    {
+        // Check that data is returned
+        if (!$.isEmptyObject(data)) 
+        {
+            // Current quotas
+            $('totalStorage').text(JSON.stringify(shortcuts).length);
+            $('countStorage').text(Object.keys(shortcuts).length 
+                                    - Object.keys(metaData).length);        
+        }
+
+        // Max quotas
+        $('#totalQuota').text(storageQuota);
+        $('#countQuota').text(adjustedCountQuota);
     }
 
     // Setup and populate edit table shortcuts
@@ -283,7 +314,7 @@ $(function()
 
         // Check not over max size
         var itemSize = JSON.stringify({shortcut:autotext}).length;
-        if (itemSize >= chrome.storage.sync.QUOTA_BYTES_PER_ITEM) {
+        if (itemSize >= itemStorageQuota) {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             errors.autotext = " - Over max storage item size. Please reduce shortcut or autotext length.";
         }
@@ -320,7 +351,8 @@ $(function()
         });
 
         // Check duplicates and warn user
-        if (duplicates.length) {
+        if (duplicates.length) 
+        {
             console.log(chrome.i18n.getMessage("ERROR_DUPLICATE_ITEMS"));
             showModalPopup(chrome.i18n.getMessage("ERROR_DUPLICATE_ITEMS")
                 + '\n - ' + duplicates.join('\n - '));
@@ -328,10 +360,18 @@ $(function()
         }
 
         // Check storage capacity
-        if (JSON.stringify(shortcuts).length >= chrome.storage.sync.QUOTA_BYTES) {
+        if (JSON.stringify(shortcuts).length >= storageQuota) 
+        {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             showCrouton(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
-                + " Chrome max capacity: " + chrome.storage.sync.QUOTA_BYTES + " characters", 'red');
+                + " Chrome max capacity: " + storageQuota + " characters", 'red');
+            return false;
+        }
+        if (Object.keys(shortcuts).length >= countQuota) 
+        {
+            console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
+            showCrouton(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
+                + " Chrome max capacity: " + storageQuota + " characters", 'red');
             return false;
         }
 
