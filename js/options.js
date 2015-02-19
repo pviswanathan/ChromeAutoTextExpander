@@ -29,8 +29,8 @@ $(function()
     ;
 
     // Setup metaData defaults
-    metaData[SHORCUT_TIMEOUT_KEY] = TIME_CLEAR_BUFFER_TIMEOUT;
-    metaData[SHORCUT_MIGRATION_KEY] = false;
+    metaData[SHORTCUT_TIMEOUT_KEY] = TIME_CLEAR_BUFFER_TIMEOUT;
+    metaData[SHORTCUT_MIGRATION_KEY] = false;
 
     // Set version
     $('#version').text('v' + chrome.runtime.getManifest().version);
@@ -163,7 +163,7 @@ $(function()
         if (shortcutTimeout) {     
             metaData[SHORTCUT_TIMEOUT_KEY] = shortcutTimeout;
         }
-        updateShortcutTimeoutLabel(shortcutTimeout);
+        updateShortcutTimeoutLabel(metaData[SHORTCUT_TIMEOUT_KEY]);
 
         // Check for migration flag
         var migrationFlag = data[SHORTCUT_MIGRATION_KEY];
@@ -266,18 +266,22 @@ $(function()
         var keyCode = event.keyCode || event.which;
         var $target = $(event.target);
         var $input = $target.parents('tr');
+        var $shortcut = $input.find('.shortcut');
+        var $autotext = $input.find('.autotext');
         validateRow($input, function(errors)
         {
+            // Show / hide error state for shortcut input
             if (errors.shortcut) {
-                $input.find('.shortcut').addClass('error').attr('title', errors.shortcut);
+                $shortcut.addClass('error').attr('title', errors.shortcut);
             } else {
-                $input.find('.shortcut').removeClass('error').removeAttr('title');
+                $shortcut.removeClass('error').removeAttr('title');
             }
 
+            // Show / hide error state for autotext textarea
             if (errors.autotext) {
-                $input.find('.autotext').addClass('error').attr('title', errors.autotext);
+                $autotext.addClass('error').attr('title', errors.autotext);
             } else {
-                $input.find('.autotext').removeClass('error').removeAttr('title');
+                $autotext.removeClass('error').removeAttr('title');
             }
         });
 
@@ -356,9 +360,12 @@ $(function()
             errors.autotext = ' - Invalid expanded text.';
         }
 
-        // Check not over max size
-        var itemSize = JSON.stringify({shortcut:autotext}).length;
-        if (itemSize >= itemStorageQuota) {
+        // Check not over max size when stored
+        var testObject = {};
+        testObject[shortcut] = autotext;
+        var itemSize = JSON.stringify(testObject).length;
+        if (itemSize >= itemStorageQuota) 
+        {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             errors.autotext = " - Over max storage item size. Please reduce shortcut or autotext length.";
         }
