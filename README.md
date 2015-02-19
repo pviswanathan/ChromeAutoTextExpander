@@ -34,6 +34,7 @@ v1.7.0
  - Added custom setting for shortcut recognition timeout
  - Fix for cursor positioning for editable iframes (Outlook, Evernote)
  - Basecamp support
+ - Added better migration error handling of shortcuts database
  - Migration to new storage model for shortcuts (please report any issues)
  - Warning when leaving options page with unsaved shortcuts
  - Lots of refactoring of code

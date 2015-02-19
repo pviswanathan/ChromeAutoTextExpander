@@ -7,6 +7,8 @@ jQuery.noConflict();
 	// Variables & Constants
     var SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
         , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
+        , SHORTCUT_VERSION_KEY = 'v'        // Synced key for shortcut database version
+
 		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
 		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
 
@@ -786,9 +788,27 @@ jQuery.noConflict();
 		$(document).off(EVENT_NAME_BLUR);
 	}
 
+    // Check shortcut database version matches app version
+    function checkShortcutVersion()
+    {
+        chrome.storage.sync.get(SHORTCUT_VERSION_KEY, function (data)
+		{
+			// Check for errors
+			if (chrome.runtime.lastError) {
+				console.log(chrome.runtime.lastError);
+			}
+			else if (!$.isEmptyObject(data)     // If versions don't match up
+                && data[SHORTCUT_VERSION_KEY] != chrome.runtime.getManifest().version) {
+                // Log warning that shortcuts aren't synced yet, they should reload
+                console.log(chrome.i18n.getMessage("WARNING_SHORTCUTS_NOT_SYNCED"));
+            }
+        });
+    }
+
 	// Document ready function
 	$(function() 
     {
+        checkShortcutVersion(); // Check version of shortcuts database
         updateBufferTimeout();  // Get custom timeout for clearing typing buffer
 		addListeners();         // Add listener to track when user types
 	});

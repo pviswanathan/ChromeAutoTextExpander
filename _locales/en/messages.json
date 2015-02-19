@@ -94,6 +94,11 @@
 		, "description": "Error message to be displayed when errors adding rows from import"
 	}
 
+	, "WARNING_SHORTCUTS_NOT_SYNCED": {
+		"message": "Warning! Your shortcuts haven't been fully synced yet. Please try reloading the extension and waiting a minute."
+		, "description": "Warning message to user that their shortcuts are not yet synced with their app version"
+	}
+
 	, "TEMPLATE": {
 		"message": "Text"
 		, "description": "Template"

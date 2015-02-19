@@ -5,6 +5,7 @@ $(function()
     // Constants
     var SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
         , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
+        , SHORTCUT_VERSION_KEY = 'v'        // Synced key for shortcut database version
 		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
 		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
 
@@ -37,6 +38,7 @@ $(function()
 
     // Setup metaData defaults
     metaData[SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
+    metaData[SHORTCUT_VERSION_KEY] = chrome.runtime.getManifest().version;
 
     // Set version
     $('#version').text('v' + chrome.runtime.getManifest().version);
@@ -171,6 +173,15 @@ $(function()
             metaData[SHORTCUT_TIMEOUT_KEY] = shortcutTimeout;
         }
         updateShortcutTimeoutLabel(metaData[SHORTCUT_TIMEOUT_KEY]);
+
+        // Check that the shortcut database version matches app version
+        var shortcutVersion = data[SHORTCUT_VERSION_KEY];
+        if (shortcutVersion != metaData[SHORTCUT_VERSION_KEY]) 
+        {
+            // Warn user that their shortcuts aren't synced yet, they should reload
+            console.log(chrome.i18n.getMessage("WARNING_SHORTCUTS_NOT_SYNCED"));
+            alert(chrome.i18n.getMessage("WARNING_SHORTCUTS_NOT_SYNCED"));
+        }
     }
 
     // Setup and populate edit table shortcuts

@@ -153,7 +153,7 @@ function processVersionUpgrade(oldVersion)
         case '1.0.5':
         case '1.0.3':
         case '1.0.0':
-            migrateShortcutsToV120();
+            upgradeShortcutsToV120();
 
         case '1.6.1':
         case '1.6.0':
@@ -168,20 +168,16 @@ function processVersionUpgrade(oldVersion)
         case '1.2.5':
         case '1.2.2':
         case '1.2.0':
-            migrateShortcutsToV170();
-    }
+            upgradeShortcutsToV170();
 
-    // Fire off notification about upgrade
-    chrome.notifications.create("", {
-        type: "basic"
-        , iconUrl: "images/icon128.png"
-        , title: "AutoTextExpander Updated v" + MANIFEST.version
-        , message: "Hello hello! Please refresh your tabs to use the latest, and have a great day. :o)"
-    }, function(id) {});
+        case '1.7.0':
+        default:
+            upgradeShortcutsToLatest();
+    }
 }
 
 // Migration of shortcuts to v1.2.0 format
-function migrateShortcutsToV120()
+function upgradeShortcutsToV120()
 {
     // If old database still exists, port old shortcuts over to new shortcut syntax
     var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
@@ -192,11 +188,11 @@ function migrateShortcutsToV120()
         }
         else if (data && data[OLD_STORAGE_KEY])
         {
-            // Loop through and them to object to store
+            // Loop through and move them to object to store
             var newDataStore = {};
             var oldDataStore = data[OLD_STORAGE_KEY];
-            for (var key in oldDataStore) {
-                newDataStore[key] = oldDataStore[key];
+            $.each(oldDataStore, function(key, value) {
+                newDataStore[key] = value;
             }
 
             // Delete old data, add new data
@@ -214,7 +210,7 @@ function migrateShortcutsToV120()
                             chrome.notifications.create("", {
                                 type: "basic"
                                 , iconUrl: "images/icon128.png"
-                                , title: "Database Update"
+                                , title: "Database Update v1.2.0"
                                 , message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
                             }, function(id) {});
 
@@ -229,8 +225,96 @@ function migrateShortcutsToV120()
 }
 
 // Migration of shortcuts to v1.7.0 format
-function migrateShortcutsToV170()
+function upgradeShortcutsToV170()
 {
-    var SHORTCUT_PREFIX = '@';
+    // Add shortcut prefix to shortcuts -- we assume that shortcuts are in 
+    //  post-v1.2.0 format and they haven't been upgraded / prefixed yet
+    var SHORTCUT_PREFIX = '@'
+        , SHORTCUT_VERSION_KEY = 'v'
+    ;
+    chrome.storage.sync.get(null, function(data)
+    {
+        if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        }
+        else if (!$.isEmptyObject(data)) // Check that data is returned
+        {
+            // Loop through and apply prefix to all keys
+            var newDataStore = {};
+            $.each(data, function(key, value) {
+                newDataStore[SHORTCUT_PREFIX + key] = value;
+            }
+
+            // Add metadata for shortcut version
+            newDataStore[SHORTCUT_VERSION_KEY] = '1.7.0';
+
+            // Delete old data, replace with new data
+            chrome.storage.sync.clear(function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } else {
+                    chrome.storage.sync.set(newDataStore, function() {
+                        if (chrome.runtime.lastError) {	// Check for errors
+                            console.log(chrome.runtime.lastError);
+                        }
+                        else	// Done with migration
+                        {
+                            // Send notification
+                            chrome.notifications.create("", {
+                                type: "basic"
+                                , iconUrl: "images/icon128.png"
+                                , title: "Database Update v1.7.0"
+                                , message: "Your shortcuts have been migrated to a new storage format! Please check that your shortcuts and expansions are correct."
+                            }, function(id) {});
+
+                            // Open up options page
+                            chrome.tabs.create({url: "options.html"});
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+}
+
+// Updates the shortcut database with the latest version number
+function upgradeShortcutsToLatest()
+{
+    chrome.storage.sync.get(null, function(data)
+    {
+        if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        }
+        else if (!$.isEmptyObject(data)) // Check that data is returned
+        {
+            // Update metadata for shortcut version to manifest version
+            data[SHORTCUT_VERSION_KEY] = MANIFEST.version;
+
+            // Delete old data, replace with new data
+            chrome.storage.sync.clear(function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } else {
+                    chrome.storage.sync.set(data, function() {
+                        if (chrome.runtime.lastError) {	// Check for errors
+                            console.log(chrome.runtime.lastError);
+                        }
+                        else	// Done with migration
+                        {
+                            // Fire off notification about upgrade
+                            chrome.notifications.create("", {
+                                type: "basic"
+                                , iconUrl: "images/icon128.png"
+                                , title: "AutoTextExpander Updated v" + MANIFEST.version
+                                , message: "Hello hello! Please refresh your tabs to use the latest, and have a great day. :o)"
+                            }, function(id) {});
+                        }
+                    });
+                }
+            });
+        }
+    });
+
 
 }
