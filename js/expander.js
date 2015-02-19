@@ -17,8 +17,9 @@ jQuery.noConflict();
 		, DATE_MACRO_CLOSE_TAG = ')'
 		, CLIP_MACRO_REGEX = /%clip%/g
 		, WHITESPACE_REGEX = /(\s)/
-		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
+		, BASECAMP_DOMAIN_REGEX = /basecamp.com/
 		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
+		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
 		, GMAIL_DOMAIN_REGEX = /mail.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
 		, EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
@@ -32,6 +33,7 @@ jQuery.noConflict();
         , SELECTOR_GMAIL_EDIT = 'div.aoI'
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'
         , SELECTOR_EVERNOTE_EDIT = '#gwt-debug-noteEditor'
+        , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'
 		, OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
 		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
 		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
@@ -197,7 +199,7 @@ jQuery.noConflict();
 						}
 						else	// Trouble... editable divs & special cases
 						{
-							// If on Facebook
+                            // Check special domains
 							if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
                                 replaceTextFacebook(shortcut, autotext, 
                                                     cursorPosition, $textInput);
@@ -205,13 +207,13 @@ jQuery.noConflict();
                                 replaceTextOutlook(shortcut, autotext);
                             } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
                                 replaceTextEvernote(shortcut, autotext);
-							} 
-                            else    // All other elements
-                            {
+                            } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
+                                replaceTextBasecamp(shortcut, autotext);
+							} else {
                                 debugLog("Domain:", domain);
-								replaceTextMiscellaneous(shortcut, autotext, cursorPosition);
+								replaceTextEditableDiv(shortcut, autotext, cursorPosition);
 							}
-						}	// END - Trouble... editable divs & special case
+						}
 					});	// END - getClipboardData()
 				}	// END - if (autotext)
 			}	// END - if (!$.isEmptyObject(data))
@@ -242,7 +244,8 @@ jQuery.noConflict();
             - shortcut.length + autotext.length);
     }
 
-    function replaceTextMiscellaneous(shortcut, autotext, cursorPosition)
+    // Handler for replacing text in editable divs
+    function replaceTextEditableDiv(shortcut, autotext, cursorPosition)
     {
         // Get the focused / selected text node
         var node = findFocusedNode();
@@ -353,10 +356,10 @@ jQuery.noConflict();
         }
     }
 
-    // Specific handler for Outlook iframe replacements
-    function replaceTextOutlook(shortcut, autotext)
+    // Specific handler for Basecamp iframe replacements
+    function replaceTextBasecamp(shortcut, autotext)
     {
-        debugLog("Domain: Outlook");
+        debugLog("Domain: Basecamp");
 
         // Get the focused / selected text node
         var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
@@ -365,45 +368,24 @@ jQuery.noConflict();
         var $textNode = $(node);
         debugLog($textNode);
 
-        // Find focused div instead of what's receiving events
-        $textInput = $(node.parentNode);
-        debugLog($textInput);
+        // Pass onto editable iframe text handler
+        replaceTextEditableIframe(shortcut, autotext, node, $textNode);
+    }
 
-        // Get and process text, update cursor position
-        cursorPosition = $textInput.getCursorPosition(iframeWindow);
-        text = replaceText($textNode.text(),
-            shortcut, autotext, cursorPosition);
+    // Specific handler for Outlook iframe replacements
+    function replaceTextOutlook(shortcut, autotext)
+    {
+        debugLog("Domain: Outlook");
 
-        // If autotext is single line, simple case
-        if (autotext.indexOf('\n') < 0)
-        {
-            // Set text node in element
-            var newNode = document.createTextNode(text);
-            node.parentNode.replaceChild(newNode, node);
+        // Get the focused / selected text node
+        var iframeWindow = $(SELECTOR_BASECAMP_EDIT)
+            .get(0).contentWindow;
+        var node = findFocusedNode(iframeWindow);
+        var $textNode = $(node);
+        debugLog($textNode);
 
-            // Update cursor position - TODO: can't get this to work
-            setCursorPositionInNode(newNode,
-                cursorPosition - shortcut.length + autotext.length);
-        }
-        else	// Multiline expanded text
-        {
-            // Split text by lines
-            var lines = text.split('\n');
-
-            // For simplicity, join with <br> tag instead
-            $textNode.replaceWith(lines.join('<br>'));
-
-            // Find the last added text node
-            $textNode = findMatchingTextNode($textInput,
-                lines[lines.length - 1]);
-            node = $textNode.get(0);
-            debugLog($textNode);
-            debugLog(node);
-
-            // Update cursor position - TODO: can't get this to work
-            setCursorPositionInNode(node,
-                lines[lines.length - 1].length);
-        }
+        // Pass onto editable iframe text handler
+        replaceTextEditableIframe(shortcut, autotext, node, $textNode);
     }
 
     // Specific handler for Evernote iframe replacements
@@ -418,6 +400,13 @@ jQuery.noConflict();
         var $textNode = $(node);
         debugLog($textNode);
 
+        // Pass onto editable iframe text handler
+        replaceTextEditableIframe(shortcut, autotext, node, $textNode);
+    }
+
+    // Reusable handler for editable iframe text replacements
+    function replaceTextEditableIframe(shortcut, autotext, node, $textNode)
+    {
         // Find focused div instead of what's receiving events
         $textInput = $(node.parentNode);
         debugLog($textInput);
