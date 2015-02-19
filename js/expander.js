@@ -369,7 +369,7 @@ jQuery.noConflict();
         debugLog($textNode);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, $textNode);
+        replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow);
     }
 
     // Specific handler for Outlook iframe replacements
@@ -385,7 +385,7 @@ jQuery.noConflict();
         debugLog($textNode);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, $textNode);
+        replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow);
     }
 
     // Specific handler for Evernote iframe replacements
@@ -401,11 +401,11 @@ jQuery.noConflict();
         debugLog($textNode);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, $textNode);
+        replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow);
     }
 
     // Reusable handler for editable iframe text replacements
-    function replaceTextEditableIframe(shortcut, autotext, node, $textNode)
+    function replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow)
     {
         // Find focused div instead of what's receiving events
         $textInput = $(node.parentNode);
@@ -425,7 +425,7 @@ jQuery.noConflict();
 
             // Update cursor position - TODO: can't get this to work
             setCursorPositionInNode(newNode,
-                cursorPosition - shortcut.length + autotext.length);
+                cursorPosition - shortcut.length + autotext.length, iframeWindow);
         }
         else	// Multiline expanded text
         {
@@ -444,7 +444,7 @@ jQuery.noConflict();
 
             // Update cursor position - TODO: can't get this to work
             setCursorPositionInNode(node,
-                lines[lines.length - 1].length);
+                lines[lines.length - 1].length, iframeWindow);
         }
     }
 
@@ -534,21 +534,34 @@ jQuery.noConflict();
 		return null;
 	}
 
-	// Sets cursor position for a specific node
-	function setCursorPositionInNode(node, pos)
+	// Sets cursor position for a specific node, and optional
+    //  parameter to set what the window/document should be
+	function setCursorPositionInNode(node, pos, win, doc)
 	{
         debugLog('setCursorPositionInNode:', pos);
 
+        // Setup variables
 		var sel, range;
-		if (window.getSelection && document.createRange) {
-			range = document.createRange();
+        if (!win) {
+            win = window;
+        }
+        if (!doc) {
+            doc = document;
+        }
+
+        // Check for getSelection(), if not available, try createTextRange
+		if (win.getSelection && doc.createRange) 
+        {
+			range = doc.createRange();
  			range.setEnd(node, pos);
 			range.setStart(node, pos);
-			sel = window.getSelection();
+			sel = win.getSelection();
 			sel.removeAllRanges();
 			sel.addRange(range);
-		} else if (document.body.createTextRange) {
-			range = document.body.createTextRange();
+		} 
+        else if (doc.body.createTextRange) 
+        {
+			range = doc.body.createTextRange();
 			range.setEnd(node, pos);
 			range.setStart(node, pos);
 			range.select();
