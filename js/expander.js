@@ -319,7 +319,7 @@ jQuery.noConflict();
         else if ($textInput.parents('div.UFICommentContainer').length) {
             debugLog('facebook comments');
 
-            // TODO: this doesn't work, probably due to ReactJS framework, doesn't allow expansion to stay
+            // this doesn't work, probably due to ReactJS framework, doesn't allow expansion to stay
             /*
             // Get spans in the comment container div, and find the right one to replace
             $textNode = recursiveFindContainingTextNode($textInput, shortcut);
@@ -423,7 +423,7 @@ jQuery.noConflict();
             var newNode = document.createTextNode(text);
             node.parentNode.replaceChild(newNode, node);
 
-            // Update cursor position - TODO: can't get this to work
+            // Update cursor position
             setCursorPositionInNode(newNode,
                 cursorPosition - shortcut.length + autotext.length, iframeWindow);
         }
@@ -442,7 +442,7 @@ jQuery.noConflict();
             debugLog($textNode);
             debugLog(node);
 
-            // Update cursor position - TODO: can't get this to work
+            // Update cursor position
             setCursorPositionInNode(node,
                 lines[lines.length - 1].length, iframeWindow);
         }
