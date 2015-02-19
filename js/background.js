@@ -1,8 +1,11 @@
-// Manifest reference
-var manifest = chrome.runtime.getManifest();
+// Constants
+var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
+    , APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
+    , DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
+;
 
 // Execute our content script into the given tab
-var contentScripts = manifest.content_scripts[0].js;
+var contentScripts = MANIFEST.content_scripts[0].js;
 function injectScript(tab)
 {
 	// Insanity check
@@ -118,15 +121,9 @@ chrome.runtime.onInstalled.addListener(function(details)
 		});
 	}
 
-	// If upgrade and new version number, notify user with little notification
-	if (details.reason == "update" && details.previousVersion != manifest.version)
-	{
-		chrome.notifications.create("", {
-			type: "basic"
-			, iconUrl: "images/icon128.png"
-			, title: "AutoTextExpander Updated v" + manifest.version
-			, message: "Hello hello! Please refresh your tabs to use the latest, and have a great day. :o)"
-		}, function(id) {});
+	// If upgrade and new version number, process upgrade
+	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
+        processVersionUpgrade(details.previousVersion);
 	}
 });
 
@@ -135,3 +132,105 @@ chrome.runtime.onInstalled.addListener(function(details)
 chrome.browserAction.onClicked.addListener(function(tab) {
    openOrFocusOptionsPage();
 });
+
+// Function for anything extra that needs doing related to new version upgrade
+function processVersionUpgrade(oldVersion)
+{
+    console.log('processVersionUpgrade:', oldVersion);
+
+    switch (oldVersion)
+    {
+        case '1.1.6':
+        case '1.1.5':
+        case '1.1.4':
+        case '1.1.3':
+        case '1.1.2':
+        case '1.1.1':
+        case '1.1.0':
+        case '1.0.9':
+        case '1.0.8':
+        case '1.0.6':
+        case '1.0.5':
+        case '1.0.3':
+        case '1.0.0':
+            migrateShortcutsToV120();
+
+        case '1.6.1':
+        case '1.6.0':
+        case '1.5.1':
+        case '1.5.0':
+        case '1.4.0':
+        case '1.3.5':
+        case '1.3.2':
+        case '1.3.1':
+        case '1.3.0':
+        case '1.2.6':
+        case '1.2.5':
+        case '1.2.2':
+        case '1.2.0':
+            migrateShortcutsToV170();
+    }
+
+    // Fire off notification about upgrade
+    chrome.notifications.create("", {
+        type: "basic"
+        , iconUrl: "images/icon128.png"
+        , title: "AutoTextExpander Updated v" + MANIFEST.version
+        , message: "Hello hello! Please refresh your tabs to use the latest, and have a great day. :o)"
+    }, function(id) {});
+}
+
+// Migration of shortcuts to v1.2.0 format
+function migrateShortcutsToV120()
+{
+    // If old database still exists, port old shortcuts over to new shortcut syntax
+    var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
+    chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
+    {
+        if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        }
+        else if (data && data[OLD_STORAGE_KEY])
+        {
+            // Loop through and them to object to store
+            var newDataStore = {};
+            var oldDataStore = data[OLD_STORAGE_KEY];
+            for (var key in oldDataStore) {
+                newDataStore[key] = oldDataStore[key];
+            }
+
+            // Delete old data, add new data
+            chrome.storage.sync.remove(OLD_STORAGE_KEY, function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } else {
+                    chrome.storage.sync.set(newDataStore, function() {
+                        if (chrome.runtime.lastError) {	// Check for errors
+                            console.log(chrome.runtime.lastError);
+                        }
+                        else	// Done with porting
+                        {
+                            // Send notification
+                            chrome.notifications.create("", {
+                                type: "basic"
+                                , iconUrl: "images/icon128.png"
+                                , title: "Database Update"
+                                , message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
+                            }, function(id) {});
+
+                            // Open up options page
+                            chrome.tabs.create({url: "options.html"});
+                        }
+                    });
+                }
+            });
+        }
+    });
+}
+
+// Migration of shortcuts to v1.7.0 format
+function migrateShortcutsToV170()
+{
+    var SHORTCUT_PREFIX = '@';
+
+}
