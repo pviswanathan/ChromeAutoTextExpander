@@ -46,7 +46,7 @@ jQuery.noConflict();
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
 	var clipboard;				// Keep track of what's in the clipboard
 
-	// Custome log function
+	// Custom log function
 	function debugLog() {
 		if (DEBUG && console) {
 			console.log.apply(console, arguments);

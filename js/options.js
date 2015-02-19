@@ -16,6 +16,8 @@ $(function()
       , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
       , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
       , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
+      , SHORTCUT_TIMEOUT_KEY = 'scto'               // Synced key for shortcut typing timeout
+      , SHORTCUT_MIGRATION_KEY = 'mig'              // Synced key for shortcuts migrated flag
     ;
 
     // Variables
@@ -23,11 +25,12 @@ $(function()
       , itemStorageQuota    // Max size of a single item in sync storage
       , countQuota          // Max number of items you can store in sync storage
       , adjustedCountQuota  // Max number of items you can store minus metadata
-      , metaData = {        // List of metadata keys we will store / retrieve
-        "scto": TIME_CLEAR_BUFFER_TIMEOUT,  // default for ShortCut TimeOut
-        "mig": false,                       // migrated shortcuts to new format yet
-      }
+      , metaData = {}       // List of metadata keys we will store / retrieve
     ;
+
+    // Setup metaData defaults
+    metaData[SHORCUT_TIMEOUT_KEY] = TIME_CLEAR_BUFFER_TIMEOUT;
+    metaData[SHORCUT_MIGRATION_KEY] = false;
 
     // Set version
     $('#version').text('v' + chrome.runtime.getManifest().version);
@@ -125,6 +128,9 @@ $(function()
             adjustedCountQuota = countQuota - Object.keys(metaData).length;
             refreshQuotaLabels(data);
 
+            // Retrieve metadata
+            processMetaData(data);
+
             // Setup shortcuts
             setupShortcuts(data);
         });
@@ -147,6 +153,23 @@ $(function()
         // Max quotas
         $('#totalQuota').text(storageQuota);
         $('#countQuota').text(adjustedCountQuota);
+    }
+
+    // Process any metadata stored with shortcuts
+    function processMetaData(data)
+    {
+        // Check for shortcut timeout
+        var shortcutTimeout = data[SHORTCUT_TIMEOUT_KEY];
+        if (shortcutTimeout) {     
+            metaData[SHORTCUT_TIMEOUT_KEY] = shortcutTimeout;
+        }
+        updateShortcutTimeoutLabel(shortcutTimeout);
+
+        // Check for migration flag
+        var migrationFlag = data[SHORTCUT_MIGRATION_KEY];
+        if (migrationFlag) {    
+            metaData[SHORTCUT_MIGRATION_KEY] = migrationFlag;
+        }
     }
 
     // Setup and populate edit table shortcuts
