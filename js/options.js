@@ -420,10 +420,8 @@ $(function()
         var duplicates = [];
         var data = {};
 
-        // Add metadata properties
-        $.each(metaData, function(key, value) {
-            data[key] = value;
-        });
+        // Add some metadata properties
+        data[SHORTCUT_TIMEOUT_KEY] = $('#timeout').val();
 
         // Collect list of valid shortcuts and check for duplicates
         $('tr').each(function(index)
