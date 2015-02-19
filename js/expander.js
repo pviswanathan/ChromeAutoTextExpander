@@ -362,7 +362,7 @@ jQuery.noConflict();
         debugLog("Domain: Basecamp");
 
         // Get the focused / selected text node
-        var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
+        var iframeWindow = $(SELECTOR_BASECAMP_EDIT)
             .get(0).contentWindow;
         var node = findFocusedNode(iframeWindow);
         var $textNode = $(node);
@@ -378,7 +378,7 @@ jQuery.noConflict();
         debugLog("Domain: Outlook");
 
         // Get the focused / selected text node
-        var iframeWindow = $(SELECTOR_BASECAMP_EDIT)
+        var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
             .get(0).contentWindow;
         var node = findFocusedNode(iframeWindow);
         var $textNode = $(node);
