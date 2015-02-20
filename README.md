@@ -38,6 +38,7 @@ v1.7.0
  - Migration to new storage model for shortcuts (please report any issues)
  - Warning when leaving options page with unsaved shortcuts
  - Lots of refactoring of code
+ - Lots of little UI / UX fixes
 
 v1.6.1
  - Moving page action to browser action (persistent options link next to URL bar instead), page action was too inconsistent anyway
