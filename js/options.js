@@ -644,11 +644,11 @@ $(function()
             $.each(newShortcuts, function(key, value) {
                 shortcuts[SHORTCUT_PREFIX + key] = value;
             });
-            shortCuts[SHORTCUT_VERSION_KEY] = metaData[SHORTCUT_VERSION_KEY];
+            shortcuts[SHORTCUT_VERSION_KEY] = metaData[SHORTCUT_VERSION_KEY];
 
             // Go through and try to set them up as new shortcuts,
             // should go through built-in validation for item quotas.
-            setupShortcuts(newShortcuts, function(success)
+            setupShortcuts(shortcuts, function(success)
             {
                 // Show message to user
                 if (success) {
