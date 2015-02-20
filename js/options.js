@@ -639,6 +639,13 @@ $(function()
                 return;
             }
 
+            // Loop through and add prefix to shortcuts and metadata to new store
+            var shortcuts = {};
+            $.each(newShortcuts, function(key, value) {
+                shortcuts[SHORTCUT_PREFIX + key] = value;
+            }):
+            shortCuts[SHORTCUT_VERSION_KEY] = metaData[SHORTCUT_VERSION_KEY];
+
             // Go through and try to set them up as new shortcuts,
             // should go through built-in validation for item quotas.
             setupShortcuts(newShortcuts, function(success)
@@ -745,6 +752,14 @@ $(function()
             {
                 console.log('showPortView', data);
 
+                // Collect just the shortcuts, minus the prefix
+                var shortcuts = {};
+                $.each(data, function(key, value) {
+                    if (key.indexOf(SHORTCUT_PREFIX) === 0) {
+                        shortcuts[key.substr(SHORTCUT_PREFIX.length)] = value;
+                    }
+                });
+
                 // Build and show modal
                 $(document.createElement('div'))
                     .addClass('modal')
@@ -766,7 +781,7 @@ $(function()
                     )
                     .append($(document.createElement('textarea'))
                         .attr('id', 'portJSON')
-                        .val(JSON.stringify(data, undefined, 2))
+                        .val(JSON.stringify(shortcuts, undefined, 2))
                     )
                     .append($(document.createElement('span'))
                         .css('float', 'right')
