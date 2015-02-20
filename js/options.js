@@ -187,7 +187,7 @@ $(function()
         // Check that the shortcut database version matches app version
         var shortcutVersion = data[SHORTCUT_VERSION_KEY];
         console.log('database version:', shortcutVersion);
-        if (shortcutVersion != metaData[SHORTCUT_VERSION_KEY]) 
+        if (shortcutVersion && shortcutVersion != metaData[SHORTCUT_VERSION_KEY]) 
         {
             // Warn user that their shortcuts aren't synced yet, they should reload
             console.log(chrome.i18n.getMessage("WARNING_SHORTCUTS_NOT_SYNCED"));
