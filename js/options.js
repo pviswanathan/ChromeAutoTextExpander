@@ -230,6 +230,14 @@ $(function()
 
                     // Add special class to these rows to indicate saved
                     $('tr').addClass('saved');
+
+                    // Set textarea height to fit content and resize as user types
+                    $('textarea').autosize();
+
+                    // Add extra input field if no existing shortcuts
+                    if (!$('tr').length) {
+                        addRow().find('.shortcut').focus().select();
+                    }
                 }
                 else	// No shortcuts? Check if first run on this computer
                 {
@@ -254,16 +262,11 @@ $(function()
 
                             // Save
                             saveShortcuts();
+
+                            // Set textarea height to fit content and resize as user types
+                            $('textarea').autosize();
                         }
                     });
-                }
-
-                // Set textarea height to fit content and resize as user types
-                $('textarea').autosize();
-
-                // Add extra input field if no existing shortcuts
-                if (!$('tr').length) {
-                    addRow().find('.shortcut').focus().select();
                 }
 
                 // Add some delay so it looks like it's doing some work
