@@ -233,6 +233,14 @@ function upgradeShortcutsToV120(completionBlocks)
                 }
             });
         }
+        else    // Call first completion block, and pass the rest on
+        {
+            if (completionBlocks && completionBlocks.length)
+            {
+                var block = completionBlocks.shift();
+                block(completionBlocks);
+            }
+        }
     });
 }
 
@@ -251,49 +259,47 @@ function upgradeShortcutsToV170(completionBlocks)
         if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
         }
-        else if (!$.isEmptyObject(data)) // Check that data is returned
+            
+        // Loop through and apply prefix to all keys
+        var newDataStore = {};
+        $.each(data, function(key, value) 
         {
-            // Loop through and apply prefix to all keys
-            var newDataStore = {};
-            $.each(data, function(key, value) 
-            {
-                console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
-                newDataStore[SHORTCUT_PREFIX + key] = value;
-            });
+            console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
+            newDataStore[SHORTCUT_PREFIX + key] = value;
+        });
 
-            // Add metadata for shortcut version
-            newDataStore[SHORTCUT_VERSION_KEY] = '1.7.0';
+        // Add metadata for shortcut version
+        newDataStore[SHORTCUT_VERSION_KEY] = '1.7.0';
 
-            // Delete old data, replace with new data
-            chrome.storage.sync.clear(function() {
-                if (chrome.runtime.lastError) {	// Check for errors
-                    console.log(chrome.runtime.lastError);
-                } else {
-                    chrome.storage.sync.set(newDataStore, function() {
-                        if (chrome.runtime.lastError) {	// Check for errors
-                            console.log(chrome.runtime.lastError);
-                        }
-                        else	// Done with migration
+        // Delete old data, replace with new data
+        chrome.storage.sync.clear(function() {
+            if (chrome.runtime.lastError) {	// Check for errors
+                console.log(chrome.runtime.lastError);
+            } else {
+                chrome.storage.sync.set(newDataStore, function() {
+                    if (chrome.runtime.lastError) {	// Check for errors
+                        console.log(chrome.runtime.lastError);
+                    }
+                    else	// Done with migration
+                    {
+                        // Send notification
+                        chrome.notifications.create("", {
+                            type: "basic"
+                            , iconUrl: "images/icon128.png"
+                            , title: "Database Update v1.7.0"
+                            , message: "Your shortcuts have been migrated to a new storage format! Please check that your shortcuts and expansions are correct."
+                        }, function(id) {});
+
+                        // Call first completion block, and pass the rest on
+                        if (completionBlocks && completionBlocks.length)
                         {
-                            // Send notification
-                            chrome.notifications.create("", {
-                                type: "basic"
-                                , iconUrl: "images/icon128.png"
-                                , title: "Database Update v1.7.0"
-                                , message: "Your shortcuts have been migrated to a new storage format! Please check that your shortcuts and expansions are correct."
-                            }, function(id) {});
-
-                            // Call first completion block, and pass the rest on
-                            if (completionBlocks && completionBlocks.length)
-                            {
-                                var block = completionBlocks.shift();
-                                block(completionBlocks);
-                            }
+                            var block = completionBlocks.shift();
+                            block(completionBlocks);
                         }
-                    });
-                }
-            });
-        }
+                    }
+                });
+            }
+        });
     });
 
 }
@@ -303,6 +309,8 @@ function upgradeShortcutsToLatest(completionBlocks)
 {
     console.log("upgradeShortcutsToLatest");
 
+    // Upgrade shortcut database version
+    var SHORTCUT_VERSION_KEY = 'v';
     chrome.storage.sync.get(null, function(data)
     {
         if (chrome.runtime.lastError) {	// Check for errors
@@ -326,6 +334,8 @@ function upgradeShortcutsToLatest(completionBlocks)
                         }
                         else	// Done with migration
                         {
+                            console.log("upgrade complete!");
+
                             // Fire off notification about upgrade
                             chrome.notifications.create("", {
                                 type: "basic"

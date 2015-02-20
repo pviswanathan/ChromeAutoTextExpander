@@ -56,6 +56,7 @@ table {
 	width: 100%;
     counter-reset: rowNumber;
 	font: normal 9pt/9px Verdana;
+    margin-left: 12px;
 }
 table tr {
     counter-increment: rowNumber;
@@ -67,6 +68,7 @@ table tr.saved {
 table tr td {
 	padding: 0 2px 24px 2px;
 	vertical-align: top;
+    position: relative;
 }
 table tr td:first-child {   /* Shortcut field */
     width: 100px;
@@ -77,12 +79,12 @@ table tr td:last-child {    /* Delete "X" button */
 table tr td:first-child::before { /* Row numbering */
     content: counter(rowNumber);
     min-width: 1em;
-    margin: 0 6px;
+    margin: 0;
+    padding: 9px 0;
     color: #bbb;
-    vertical-align: middle;
-}
-table tr td:first-child input {
-    width: 80%;
+    position: absolute;
+    right: 108px;
+    text-align: right;
 }
 
 input, textarea {
