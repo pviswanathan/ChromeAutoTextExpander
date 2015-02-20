@@ -643,7 +643,7 @@ $(function()
             var shortcuts = {};
             $.each(newShortcuts, function(key, value) {
                 shortcuts[SHORTCUT_PREFIX + key] = value;
-            }):
+            });
             shortCuts[SHORTCUT_VERSION_KEY] = metaData[SHORTCUT_VERSION_KEY];
 
             // Go through and try to set them up as new shortcuts,
