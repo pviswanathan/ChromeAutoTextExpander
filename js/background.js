@@ -153,7 +153,8 @@ function processVersionUpgrade(oldVersion)
         case '1.0.5':
         case '1.0.3':
         case '1.0.0':
-            upgradeShortcutsToV120();
+            upgradeShortcutsToV120([upgradeShortcutsToV170, upgradeShortcutsToLatest]);
+            break;
 
         case '1.6.1':
         case '1.6.0':
@@ -168,7 +169,8 @@ function processVersionUpgrade(oldVersion)
         case '1.2.5':
         case '1.2.2':
         case '1.2.0':
-            upgradeShortcutsToV170();
+            upgradeShortcutsToV170([upgradeShortcutsToLatest]);
+            break;
 
         case '1.7.0':
         default:
@@ -177,7 +179,7 @@ function processVersionUpgrade(oldVersion)
 }
 
 // Migration of shortcuts to v1.2.0 format
-function upgradeShortcutsToV120()
+function upgradeShortcutsToV120(completionBlocks)
 {
     console.log("upgradeShortcutsToV120");
 
@@ -220,8 +222,12 @@ function upgradeShortcutsToV120()
                                 , message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
                             }, function(id) {});
 
-                            // Open up options page
-                            chrome.tabs.create({url: "options.html"});
+                            // Call first completion block, and pass the rest on
+                            if (completionBlocks && completionBlocks.length)
+                            {
+                                var block = completionBlocks.shift();
+                                block(completionBlocks);
+                            }
                         }
                     });
                 }
@@ -231,7 +237,7 @@ function upgradeShortcutsToV120()
 }
 
 // Migration of shortcuts to v1.7.0 format
-function upgradeShortcutsToV170()
+function upgradeShortcutsToV170(completionBlocks)
 {
     console.log("upgradeShortcutsToV170");
 
@@ -277,8 +283,12 @@ function upgradeShortcutsToV170()
                                 , message: "Your shortcuts have been migrated to a new storage format! Please check that your shortcuts and expansions are correct."
                             }, function(id) {});
 
-                            // Open up options page
-                            chrome.tabs.create({url: "options.html"});
+                            // Call first completion block, and pass the rest on
+                            if (completionBlocks && completionBlocks.length)
+                            {
+                                var block = completionBlocks.shift();
+                                block(completionBlocks);
+                            }
                         }
                     });
                 }
@@ -289,7 +299,7 @@ function upgradeShortcutsToV170()
 }
 
 // Updates the shortcut database with the latest version number
-function upgradeShortcutsToLatest()
+function upgradeShortcutsToLatest(completionBlocks)
 {
     console.log("upgradeShortcutsToLatest");
 
@@ -323,6 +333,13 @@ function upgradeShortcutsToLatest()
                                 , title: "AutoTextExpander Updated v" + MANIFEST.version
                                 , message: "Hello hello! Please refresh your tabs to use the latest, and have a great day. :o)"
                             }, function(id) {});
+
+                            // Call first completion block, and pass the rest on
+                            if (completionBlocks && completionBlocks.length)
+                            {
+                                var block = completionBlocks.shift();
+                                block(completionBlocks);
+                            }
                         }
                     });
                 }
