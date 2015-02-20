@@ -162,8 +162,9 @@ jQuery.noConflict();
  		debugLog("checkShortcuts:", lastChar, textBuffer);
 
 		// Get shortcuts
-		var shortcut = SHORTCUT_PREFIX + textBuffer.join('');
-		chrome.storage.sync.get(shortcut, function (data)
+		var shortcut = textBuffer.join('');
+		var shortcutKey = SHORTCUT_PREFIX + shortcut;   // Key for fetching
+		chrome.storage.sync.get(shortcutKey, function (data)
 		{
 			// Check for errors
 			if (chrome.runtime.lastError) {
@@ -173,7 +174,7 @@ jQuery.noConflict();
 			else if (!$.isEmptyObject(data))
 			{
 				// Check if shortcut exists and should be triggered
-				var autotext = data[shortcut];
+				var autotext = data[shortcutKey];
 
 				if (autotext)	// Shortcut exists! Expand and replace text
 				{
