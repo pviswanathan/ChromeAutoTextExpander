@@ -374,8 +374,7 @@ jQuery.noConflict();
         debugLog("Domain: Basecamp");
 
         // Get the focused / selected text node
-        var iframeWindow = document.querySelector(SELECTOR_BASECAMP_EDIT)
-            .contentWindow;
+        var iframeWindow = document.querySelector(SELECTOR_BASECAMP_EDIT).contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog(node);
 
@@ -389,8 +388,7 @@ jQuery.noConflict();
         debugLog("Domain: Outlook");
 
         // Get the focused / selected text node
-        var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
-            .get(0).contentWindow;
+        var iframeWindow = document.querySelector(SELECTOR_OUTLOOK_EDIT).contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog(node);
 
@@ -404,8 +402,8 @@ jQuery.noConflict();
         debugLog("Domain: Evernote");
 
         // Get the focused / selected text node
-        var iframeWindow = $(SELECTOR_EVERNOTE_EDIT)
-            .find('iframe').get(0).contentWindow;
+        var iframeWindow = document.querySelectorAll(SELECTOR_EVERNOTE_EDIT)
+            .querySelector('iframe').contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog(node);
 
