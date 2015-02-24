@@ -9,6 +9,24 @@ var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
 //////////////////////////////////////////////////////////
 // TESTING
 
+// Test shortcut database loss
+function testDataLoss(completionBlock)
+{
+    console.log('testDataLoss');
+
+    chrome.storage.sync.clear(function() 
+    {
+	    if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        } else {
+            console.log('test setup complete');
+            if (completionBlock) {
+                completionBlock();
+            }
+        }
+    });
+}
+
 // Test pre-v1.2.0 database migration
 function testV120Migration(completionBlock)
 {
