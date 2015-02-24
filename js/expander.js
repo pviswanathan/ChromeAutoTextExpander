@@ -197,21 +197,21 @@ jQuery.noConflict();
 						// Setup for processing
 						var domain = window.location.host;
 						var $textInput = $(textInput);
-						var cursorPosition = getCursorPosition($textInput);
+						var cursorPosition = getCursorPosition(textInput);
 						var text;
 
                         debugLog("textInput: ", $textInput);
 
 						// If input or textarea field, can easily change the val
 						if ($textInput.is("textarea") || $textInput.is("input")) {
-                            replaceTextRegular(shortcut, autotext, cursorPosition, $textInput);
+                            replaceTextRegular(shortcut, autotext, cursorPosition, textInput);
 						}
 						else	// Trouble... editable divs & special cases
 						{
                             // Check special domains
 							if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
                                 replaceTextFacebook(shortcut, autotext, 
-                                                    cursorPosition, $textInput);
+                                                    cursorPosition, textInput);
                             } else if (OUTLOOK_DOMAIN_REGEX.test(domain)) {
                                 replaceTextOutlook(shortcut, autotext);
                             } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
@@ -236,21 +236,21 @@ jQuery.noConflict();
 	}
 
     // Specific handler for regular textarea and input elements
-    function replaceTextRegular(shortcut, autotext, cursorPosition, $textInput)
+    function replaceTextRegular(shortcut, autotext, cursorPosition, textInput)
     {
         // Fix for input[type=email] and input[type=number]
         if (cursorPosition === 0
-            && $textInput.is('input[type="email"],input[type="number"]')) {
+            && $(textInput).is('input[type="email"],input[type="number"]')) {
             cursorPosition = $textInput.val().length;
         }
 
-        $textInput.val(replaceText(
-            $textInput.val(),
+        textInput.value = replaceText(
+            textInput.value,
             shortcut,
             autotext,
             cursorPosition
-        ));
-        setCursorPosition($textInput, cursorPosition
+        );
+        setCursorPosition(textInput, cursorPosition
             - shortcut.length + autotext.length);
     }
 
@@ -301,11 +301,12 @@ jQuery.noConflict();
     }
 
     // Specific handler for Facebook element replacements
-    function replaceTextFacebook(shortcut, autotext, cursorPosition, $textInput)
+    function replaceTextFacebook(shortcut, autotext, cursorPosition, textInput)
     {
         debugLog("Domain: Facebook");
 
         // Check if it is the search bar vs comments
+        var $textInput = $(textInput);
         if ($textInput.parents('div.textInput').length) 
         {
             debugLog('facebook search bar');
@@ -323,7 +324,7 @@ jQuery.noConflict();
             ));
 
             // Set new cursor position
-            setCursorPosition($textInput, 
+            setCursorPosition(textInput, 
                 cursorPosition - shortcut.length + autotext.length);
         } 
         else if ($textInput.parents('div.UFICommentContainer').length) {
@@ -361,7 +362,7 @@ jQuery.noConflict();
             ));
 
             // Set new cursor position
-            setCursorPosition($textInput, 
+            setCursorPosition(textInput, 
                 cursorPosition - shortcut.length + autotext.length);
         }
     }
@@ -422,7 +423,7 @@ jQuery.noConflict();
         debugLog($textInput);
 
         // Get and process text, update cursor position
-        cursorPosition = getCursorPosition($textInput, iframeWindow);
+        cursorPosition = getCursorPosition(node.parentNode, iframeWindow);
         text = replaceText($textNode.text(),
             shortcut, autotext, cursorPosition);
 
