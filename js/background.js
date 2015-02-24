@@ -251,7 +251,7 @@ chrome.storage.sync.get(null, function(data)
         // If no shortcuts exist, show options page (should show emergency backup restore)
 		chrome.tabs.create({url: "options.html"});
 	} else if (data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
-        // If version is off, initiate upgrade
+        // If version is off, try to initiate upgrade
         processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
     }
 });

@@ -104,6 +104,11 @@
 		, "description": "Warning message to user that their shortcuts are not yet synced with their app version"
 	}
 
+	, "WARNING_SHORTCUT_DISABLED": {
+		"message": "Your AutoTextExpander shortcuts have been disabled to prevent unexpected behavior."
+		, "description": "Warning message to user that their shortcuts are disabled when in unreliable states."
+	}
+
 	, "TEMPLATE": {
 		"message": "Text"
 		, "description": "Template"

@@ -45,6 +45,7 @@ jQuery.noConflict();
 	var keyPressEvent;			// Keep track of keypress event to prevent re-firing
 	var keyUpEvent;				// Keep track of keyup event to prevent re-firing
 	var clipboard;				// Keep track of what's in the clipboard
+    var disableShortcuts;       // Flag to disable shortcuts in case of unreliable state
 
 	// Custom log function
 	function debugLog() {
@@ -171,6 +172,15 @@ jQuery.noConflict();
 
 				if (autotext)	// Shortcut exists! Expand and replace text
 				{
+                    // Check for version changes
+                    checkShortcutVersion();
+
+                    // If disabled, abort early
+                    if (disableShortcuts) {
+                        console.log(chrome.i18n.getMessage("WARNING_SHORTCUT_DISABLED"));
+                        return;
+                    }
+
 					// Update / get clipboard text
 					getClipboardData(function()
 					{
@@ -792,9 +802,19 @@ jQuery.noConflict();
 				console.log(chrome.runtime.lastError);
 			}
 			else if (!$.isEmptyObject(data)     // If versions don't match up
-                && data[SHORTCUT_VERSION_KEY] != chrome.runtime.getManifest().version) {
-                // Log warning that shortcuts aren't synced yet, they should reload
-                console.log(chrome.i18n.getMessage("WARNING_SHORTCUTS_NOT_SYNCED"));
+                && data[SHORTCUT_VERSION_KEY] != APP_VERSION) 
+            {
+                // Alert users that shortcuts aren't synced yet, they should reload
+                var warning = chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH")
+                    + '\n\n' + chrome.i18n.getMessage("WARNING_SHORTCUT_DISABLED");
+                console.log(warning);
+                alert(warning);
+                
+                // Flag shortcuts disabled
+                disableShortcuts = true;
+            }
+            else {    // All is well, set disableShortcuts flag to false
+                disableShortcuts = false;
             }
         });
     }
