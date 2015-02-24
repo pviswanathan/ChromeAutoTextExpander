@@ -456,11 +456,13 @@ function upgradeShortcutsToV120(completionBlocks)
             // Loop through and move them to object to store
             var newDataStore = {};
             var oldDataStore = data[OLD_STORAGE_KEY];
-            $.each(oldDataStore, function(key, value) 
-            {
-                console.log('migrating:', key, '=>', value);
-                newDataStore[key] = value;
-            });
+            for (var key in oldDataStore) {
+                if (oldDataStore.hasOwnProperty(key)) {
+                    var value = oldDataStore[key];
+                    console.log('migrating:', key, '=>', value);
+                    newDataStore[key] = value;
+                }
+            }
 
             // Delete old data, add new data
             chrome.storage.sync.remove(OLD_STORAGE_KEY, function() 
@@ -525,11 +527,12 @@ function upgradeShortcutsToV170(completionBlocks)
             
         // Loop through and apply prefix to all keys
         var newDataStore = {};
-        $.each(data, function(key, value) 
-        {
-            console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
-            newDataStore[SHORTCUT_PREFIX + key] = value;
-        });
+        for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+                console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
+                newDataStore[SHORTCUT_PREFIX + key] = data[key];
+            }
+        }
 
         // Add metadata for shortcut version (using new key actually)
         newDataStore[SHORTCUT_VERSION_KEY] = '1.7.0';
@@ -580,7 +583,7 @@ function upgradeShortcutsToV171(completionBlocks)
         if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
         }
-        else if (!$.isEmptyObject(data)) // Check that data is returned
+        else if (data && Object.keys(data).length) // Check that data is returned
         {
             console.log("updating database version to", MANIFEST.version);
 
@@ -627,7 +630,7 @@ function upgradeShortcutsToLatest(completionBlocks)
         if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
         }
-        else if (!$.isEmptyObject(data)) // Check that data is returned
+        else if (data && Object.keys(data).length) // Check that data is returned
         {
             console.log("updating database version to", MANIFEST.version);
 
