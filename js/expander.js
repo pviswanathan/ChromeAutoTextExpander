@@ -228,7 +228,6 @@ jQuery.noConflict();
 
 			// If last character is whitespace, clear buffer
 			if (WHITESPACE_REGEX.test(lastChar)) {
-			//if (lastChar == " ") {
 				clearTypingBuffer();
 			}
 		});
@@ -238,9 +237,12 @@ jQuery.noConflict();
     function replaceTextRegular(shortcut, autotext, cursorPosition, textInput)
     {
         // Fix for input[type=email] and input[type=number]
-        if (cursorPosition === 0
-            && $(textInput).is('input[type="email"],input[type="number"]')) {
-            cursorPosition = textInput.value.length;
+        if (cursorPosition === 0 && textInput.nodeName == "INPUT") 
+        {
+            var type = textInput.getAttribute('type').toUpperCase();
+            if (type == 'email' || type == 'number') {
+                cursorPosition = textInput.value.length;
+            }
         }
 
         textInput.value = replaceText(
@@ -261,10 +263,10 @@ jQuery.noConflict();
         var $textNode = $(node);
 
         // Find focused div instead of what's receiving events
-        $textInput = $(node.parentNode);
+        textInput = node.parentNode;
 
         // Get and process text
-        text = replaceText($textNode.text(),
+        text = replaceText(node.textContent,
             shortcut, autotext, cursorPosition);
 
         // If autotext is single line, simple case
@@ -287,7 +289,7 @@ jQuery.noConflict();
             $textNode.replaceWith(lines.join('<br>'));
 
             // Find the last added text node
-            $textNode = findMatchingTextNode($textInput,
+            $textNode = findMatchingTextNode(textInput,
                 lines[lines.length - 1]);
             node = $textNode.get(0);
             debugLog($textNode);
@@ -375,11 +377,10 @@ jQuery.noConflict();
         var iframeWindow = document.querySelector(SELECTOR_BASECAMP_EDIT)
             .contentWindow;
         var node = findFocusedNode(iframeWindow);
-        var $textNode = $(node);
-        debugLog($textNode);
+        debugLog(node);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow);
+        replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
     }
 
     // Specific handler for Outlook iframe replacements
@@ -391,11 +392,10 @@ jQuery.noConflict();
         var iframeWindow = $(SELECTOR_OUTLOOK_EDIT)
             .get(0).contentWindow;
         var node = findFocusedNode(iframeWindow);
-        var $textNode = $(node);
-        debugLog($textNode);
+        debugLog(node);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow);
+        replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
     }
 
     // Specific handler for Evernote iframe replacements
@@ -407,19 +407,18 @@ jQuery.noConflict();
         var iframeWindow = $(SELECTOR_EVERNOTE_EDIT)
             .find('iframe').get(0).contentWindow;
         var node = findFocusedNode(iframeWindow);
-        var $textNode = $(node);
-        debugLog($textNode);
+        debugLog(node);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow);
+        replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
     }
 
     // Reusable handler for editable iframe text replacements
     function replaceTextEditableIframe(shortcut, autotext, node, iframeWindow)
     {
         // Find focused div instead of what's receiving events
-        $textInput = $(node.parentNode);
-        debugLog($textInput);
+        textInput = node.parentNode;
+        debugLog(textInput);
 
         // Get and process text, update cursor position
         cursorPosition = getCursorPosition(node.parentNode, iframeWindow);
@@ -443,10 +442,11 @@ jQuery.noConflict();
             var lines = text.split('\n');
 
             // For simplicity, join with <br> tag instead
+            var $textNode = $(node);
             $textNode.replaceWith(lines.join('<br>'));
 
             // Find the last added text node
-            $textNode = findMatchingTextNode($textInput,
+            $textNode = findMatchingTextNode(textInput,
                 lines[lines.length - 1]);
             node = $textNode.get(0);
             debugLog($textNode);
@@ -516,9 +516,9 @@ jQuery.noConflict();
 	}
 
 	// Find node that has text contents that matches text
-	function findMatchingTextNode($div, text)
+	function findMatchingTextNode(div, text)
 	{
-		return $div.contents().filter(function() {
+		return $(div).contents().filter(function() {
 				return (this.nodeType == 3)						// Return all text nodes
 					&& (this.nodeValue.length == text.length);	// with same text length
 			}).filter(function() {
