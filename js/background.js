@@ -2,6 +2,10 @@
 var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
     , APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
     , DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
+    , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
+    , SHORTCUT_PREFIX = '@'
+    , SHORTCUT_VERSION_KEY_OLD = 'v'
+    , SHORTCUT_VERSION_KEY = 'v#'
 ;
 
 // Execute our content script into the given tab
@@ -102,10 +106,12 @@ chrome.runtime.onInstalled.addListener(function(details)
 	switch (details.reason)
 	{
 		case "install":
-		case "update":
 			executeFunction = injectScript;		// Inject content script
 			break;
-		default: break;
+
+		case "update":  // Don't reinject script, sometimes doesn't work and have two copies
+		default: 
+            break;
 	}
 
 	// Only act on if was fresh install or upgrade
@@ -173,6 +179,10 @@ function processVersionUpgrade(oldVersion)
             break;
 
         case '1.7.0':
+            upgradeShortcutsToV171([upgradeShortcutsToLatest]);
+            break;
+
+        case '1.7.1':
         default:
             upgradeShortcutsToLatest();
     }
@@ -184,7 +194,6 @@ function upgradeShortcutsToV120(completionBlocks)
     console.log("upgradeShortcutsToV120");
 
     // If old database still exists, port old shortcuts over to new shortcut syntax
-    var OLD_STORAGE_KEY = 'autoTextExpanderShortcuts';
     chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
     {
         if (chrome.runtime.lastError) {	// Check for errors
@@ -251,9 +260,6 @@ function upgradeShortcutsToV170(completionBlocks)
 
     // Add shortcut prefix to shortcuts -- we assume that shortcuts are in 
     //  post-v1.2.0 format and they haven't been upgraded / prefixed yet
-    var SHORTCUT_PREFIX = '@'
-        , SHORTCUT_VERSION_KEY = 'v'
-    ;
     chrome.storage.sync.get(null, function(data)
     {
         if (chrome.runtime.lastError) {	// Check for errors
@@ -304,13 +310,58 @@ function upgradeShortcutsToV170(completionBlocks)
 
 }
 
+// Moves version shortcut to new format to avoid accientally tripping it
+function upgradeShortcutsToV171(completionBlocks)
+{
+    console.log("upgradeShortcutsToLatest");
+
+    // Upgrade shortcut database version
+    chrome.storage.sync.get(null, function(data)
+    {
+        if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        }
+        else if (!$.isEmptyObject(data)) // Check that data is returned
+        {
+            console.log("updating database version to", MANIFEST.version);
+
+            // Update metadata for shortcut version to manifest version
+            delete data[SHORTCUT_VERSION_KEY_OLD];
+            data[SHORTCUT_VERSION_KEY] = MANIFEST.version;
+
+            // Delete old data, replace with new data
+            chrome.storage.sync.clear(function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } else {
+                    chrome.storage.sync.set(data, function() {
+                        if (chrome.runtime.lastError) {	// Check for errors
+                            console.log(chrome.runtime.lastError);
+                        }
+                        else	// Done with migration
+                        {
+                            // Call first completion block, and pass the rest on
+                            if (completionBlocks && completionBlocks.length)
+                            {
+                                var block = completionBlocks.shift();
+                                block(completionBlocks);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    });
+}
+
+
+
 // Updates the shortcut database with the latest version number
 function upgradeShortcutsToLatest(completionBlocks)
 {
     console.log("upgradeShortcutsToLatest");
 
     // Upgrade shortcut database version
-    var SHORTCUT_VERSION_KEY = 'v';
     chrome.storage.sync.get(null, function(data)
     {
         if (chrome.runtime.lastError) {	// Check for errors
@@ -356,6 +407,6 @@ function upgradeShortcutsToLatest(completionBlocks)
             });
         }
     });
-
-
 }
+
+

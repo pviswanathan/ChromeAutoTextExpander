@@ -21,6 +21,11 @@ Feature Requests:
  - Date Arithmetic
  - Work with Google's Inbox
  - Work with Chatango
+ - Localization
+ - Work with Google Translate (http://translate.google.com/toolkit)
+ - Opera extension version
+ - Work with Outlook Meeting Request Body?
+ - Work with Microsoft Forums (http://trainingsupport.microsoft.com/en-us/tcmva/forum)
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
 
@@ -28,6 +33,9 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 . Carlin
 
 ## Version History
+v1.7.1
+ - Added checks into expander code to prevent expansion and warn user to refresh browser if shortcut database version is different.
+ 
 v1.7.0
  - Revamped options page!
  - Showing storage quotas
