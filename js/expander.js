@@ -122,7 +122,7 @@ jQuery.noConflict();
 				console.log(chrome.runtime.lastError);
 			}
 			// Check that data is returned and shortcut library exists
-			else if (!$.isEmptyObject(data)) {
+			else if (data && Object.keys(data).length) {
                 typingTimeout = data[SHORTCUT_TIMEOUT_KEY];
             } else {  // Use default value on error / no custom value set
                 typingTimeout = DEFAULT_CLEAR_BUFFER_TIMEOUT;
@@ -165,7 +165,7 @@ jQuery.noConflict();
 				console.log(chrome.runtime.lastError);
 			}
 			// Check that data is returned and shortcut library exists
-			else if (!$.isEmptyObject(data))
+			else if (data && Object.keys(data).length)
 			{
 				// Check if shortcut exists and should be triggered
 				var autotext = data[shortcutKey];
@@ -197,7 +197,7 @@ jQuery.noConflict();
 						// Setup for processing
 						var domain = window.location.host;
 						var $textInput = $(textInput);
-						var cursorPosition = $textInput.getCursorPosition()
+						var cursorPosition = getCursorPosition($textInput);
 						var text;
 
                         debugLog("textInput: ", $textInput);
@@ -225,7 +225,7 @@ jQuery.noConflict();
 						}
 					});	// END - getClipboardData()
 				}	// END - if (autotext)
-			}	// END - if (!$.isEmptyObject(data))
+			}
 
 			// If last character is whitespace, clear buffer
 			if (WHITESPACE_REGEX.test(lastChar)) {
@@ -250,7 +250,7 @@ jQuery.noConflict();
             autotext,
             cursorPosition
         ));
-        $textInput.setCursorPosition(cursorPosition
+        setCursorPosition($textInput, cursorPosition
             - shortcut.length + autotext.length);
     }
 
@@ -323,7 +323,7 @@ jQuery.noConflict();
             ));
 
             // Set new cursor position
-            $textInput.setCursorPosition(
+            setCursorPosition($textInput, 
                 cursorPosition - shortcut.length + autotext.length);
         } 
         else if ($textInput.parents('div.UFICommentContainer').length) {
@@ -361,7 +361,7 @@ jQuery.noConflict();
             ));
 
             // Set new cursor position
-            $textInput.setCursorPosition(
+            setCursorPosition($textInput, 
                 cursorPosition - shortcut.length + autotext.length);
         }
     }
@@ -422,7 +422,7 @@ jQuery.noConflict();
         debugLog($textInput);
 
         // Get and process text, update cursor position
-        cursorPosition = $textInput.getCursorPosition(iframeWindow);
+        cursorPosition = getCursorPosition($textInput, iframeWindow);
         text = replaceText($textNode.text(),
             shortcut, autotext, cursorPosition);
 
@@ -511,7 +511,8 @@ jQuery.noConflict();
 				return (this.nodeType == 3)						// Return all text nodes
 					&& (this.nodeValue.indexOf(text) >= 0);	    // containing text
 			}).last();  // Return last (deepest) match
-        return ((result.length == 0) || $.isEmptyObject(result)) ? null : result;
+        return (!result || (Object.keys(result).length === 0) || (result.length === 0)) 
+            ? null : result;
 	}
 
 	// Find node that has text contents that matches text
@@ -542,6 +543,87 @@ jQuery.noConflict();
 			}
 		}
 		return null;
+	}
+
+    // Cross-browser solution for getting cursor position
+    function getCursorPosition(el, win, doc) 
+    {
+		var pos = 0, sel;
+		if (!win) { win = window; }
+		if (!doc) { doc = document; }
+		if (el.nodeName == 'INPUT' || el.nodeName = 'TEXTAREA') {
+			try {	// Needed for new input[type=email] failing
+				if (el.selectionStart) {
+					pos = el.selectionStart;
+				} else if (doc.selection) {
+					el.focus();
+					sel = doc.selection.createRange();
+					var SelLength = doc.selection.createRange().text.length;
+					Sel.moveStart('character', -el.value.length);
+					pos = Sel.text.length - SelLength;
+				}
+			} catch (exception) {
+				console.log('getCursorPosition:', exception);
+			}
+		} else {	// Other elements
+			if (win.getSelection) {
+				sel = win.getSelection();
+				if (sel.rangeCount) {
+					pos = sel.getRangeAt(0).endOffset;
+				}
+			} else if (doc.selection && doc.selection.createRange) {
+				sel = doc.selection.createRange();
+				var tempEl = doc.createElement("span");
+				el.insertBefore(tempEl, el.firstChild);
+				var tempRange = sel.duplicate();
+				tempRange.moveToElementText(tempEl);
+				tempRange.setEndPoint("EndToEnd", sel);
+				pos = tempRange.text.length;
+			}
+		}
+		return pos;
+    }
+
+
+    // Cross-browser solution for setting cursor position
+    function setCursorPosition(el, pos) 
+    {
+        console.log('setCursorPosition:', pos);
+		var sel, range;
+		if (el.nodeName = 'INPUT' || el.nodeName = 'TEXTAREA') {
+			try {	// Needed for new input[type=email] failing
+				if (el.setSelectionRange) {
+					el.setSelectionRange(pos, pos);
+				} else if (el.createTextRange) {
+					range = el.createTextRange();
+					range.collapse(true);
+					range.moveEnd('character', pos);
+					range.moveStart('character', pos);
+					range.select();
+				}
+			} catch (exception) {
+				console.log('setCursorPosition', exception);
+			}
+		} else {	// Other elements
+			var node = el.childNodes[0];	// Need to get text node
+			if (window.getSelection && document.createRange) {
+				range = document.createRange();
+				range.selectNodeContents(el);
+				range.collapse(true);
+				range.setEnd(node, pos);
+				range.setStart(node, pos);
+				sel = window.getSelection();
+				sel.removeAllRanges();
+				sel.addRange(range);
+			} else if (document.body.createTextRange) {
+				range = document.body.createTextRange();
+				range.moveToElementText(el);
+				range.collapse(true);
+				range.setEnd(node, pos);
+				range.setStart(node, pos);
+				range.select();
+			}
+		}
 	}
 
 	// Sets cursor position for a specific node, and optional
@@ -804,8 +886,8 @@ jQuery.noConflict();
 			if (chrome.runtime.lastError) {
 				console.log(chrome.runtime.lastError);
 			}
-			else if (!$.isEmptyObject(data)     // If versions don't match up
-                && data[SHORTCUT_VERSION_KEY] != APP_VERSION) 
+			else if ((data && Object.keys(data).length)         
+                && data[SHORTCUT_VERSION_KEY] != APP_VERSION)   // If versions don't match up
             {
                 // Alert users that shortcuts aren't synced yet, they should reload
                 var warning = chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH")
@@ -832,93 +914,5 @@ jQuery.noConflict();
 		addListeners();         // Add listener to track when user types
 	});
 
-})(jQuery);
-
-
-/////////////////////////////////////////////////////////////////////////////////
-// Utility Functions
-
-// Cross-browser solution for setting cursor position
-(function($) {
-	$.fn.setCursorPosition = function(pos) {
-        console.log('setCursorPosition:', pos);
-		var input = $(this).get(0);
-		var sel, range;
-		if ($(this).is('input') || $(this).is('textarea')) {
-			try {	// Needed for new input[type=email] failing
-				if (input.setSelectionRange) {
-					input.setSelectionRange(pos, pos);
-				} else if (input.createTextRange) {
-					range = input.createTextRange();
-					range.collapse(true);
-					range.moveEnd('character', pos);
-					range.moveStart('character', pos);
-					range.select();
-				}
-			} catch (exception) {
-				console.log('setCursorPosition', exception);
-			}
-		} else {	// Other elements
-			var node = input.childNodes[0];	// Need to get text node
-			if (window.getSelection && document.createRange) {
-				range = document.createRange();
-				range.selectNodeContents(input);
-				range.collapse(true);
-				range.setEnd(node, pos);
-				range.setStart(node, pos);
-				sel = window.getSelection();
-				sel.removeAllRanges();
-				sel.addRange(range);
-			} else if (document.body.createTextRange) {
-				range = document.body.createTextRange();
-				range.moveToElementText(input);
-				range.collapse(true);
-				range.setEnd(node, pos);
-				range.setStart(node, pos);
-				range.select();
-			}
-		}
-	}
-})(jQuery);
-
-// Cross-browser solution for getting cursor position
-(function($) {
-    $.fn.getCursorPosition = function(win, doc) {
-		var el = $(this).get(0);
-		var pos = 0, sel;
-		if (!win) { win = window; }
-		if (!doc) { doc = document; }
-		if ($(this).is('input') || $(this).is('textarea')) {
-			try {	// Needed for new input[type=email] failing
-				if (el.selectionStart) {
-					pos = el.selectionStart;
-				} else if (doc.selection) {
-					el.focus();
-					sel = doc.selection.createRange();
-					var SelLength = doc.selection.createRange().text.length;
-					Sel.moveStart('character', -el.value.length);
-					pos = Sel.text.length - SelLength;
-				}
-			} catch (exception) {
-				console.log('getCursorPosition:', exception);
-			}
-		} else {	// Other elements
-			if (win.getSelection) {
-				sel = win.getSelection();
-				if (sel.rangeCount) {
-					pos = sel.getRangeAt(0).endOffset;
-				}
-			} else if (doc.selection && doc.selection.createRange) {
-				sel = doc.selection.createRange();
-				var tempEl = doc.createElement("span");
-				el.insertBefore(tempEl, el.firstChild);
-				var tempRange = sel.duplicate();
-				tempRange.moveToElementText(tempEl);
-				tempRange.setEndPoint("EndToEnd", sel);
-				pos = tempRange.text.length;
-			}
-		}
-		return pos;
-    }
 })(jQuery);
 
