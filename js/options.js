@@ -179,8 +179,8 @@ $(function()
         if (shortcutVersion && shortcutVersion != metaData[SHORTCUT_VERSION_KEY]) 
         {
             // Warn user that their shortcuts aren't synced yet, they should reload
-            console.log(chrome.i18n.getMessage("WARNING_SHORTCUTS_NOT_SYNCED"));
-            alert(chrome.i18n.getMessage("WARNING_SHORTCUTS_NOT_SYNCED"));
+            console.log(chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH"));
+            alert(chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH"));
         }
     }
 

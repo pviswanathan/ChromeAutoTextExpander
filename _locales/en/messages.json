@@ -99,8 +99,8 @@
 		, "description": "Error message to be displayed when errors adding rows from import"
 	}
 
-	, "WARNING_SHORTCUTS_NOT_SYNCED": {
-		"message": "Warning! Your shortcuts haven't been fully synced yet. Please try reloading the extension and waiting a minute."
+	, "WARNING_SHORTCUT_VERSION_MISMATCH": {
+		"message": "Warning! Your shortcuts database version doesn't match your extension version. This may be because they haven't been fully synced yet. Please try reloading the extension or restarting the browser to avoid corrupting your data!"
 		, "description": "Warning message to user that their shortcuts are not yet synced with their app version"
 	}
 
