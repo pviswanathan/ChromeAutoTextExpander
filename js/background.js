@@ -39,7 +39,6 @@ function testVersionMismatch(completionBlock)
             });
         }
     });
-
 }
 
 // Test shortcut database loss
@@ -254,6 +253,8 @@ chrome.storage.sync.get(null, function(data)
         // If version is off, try to initiate upgrade
         processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
     }
+
+    testVersionMismatch();
 });
 
 

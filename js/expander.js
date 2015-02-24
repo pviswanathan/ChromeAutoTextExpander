@@ -175,9 +175,8 @@ jQuery.noConflict();
                     // Check for version changes
                     checkShortcutVersion();
 
-                    // If disabled, abort early
+                    // If shortcuts are disabled, abort early
                     if (disableShortcuts) {
-                        console.log(chrome.i18n.getMessage("WARNING_SHORTCUT_DISABLED"));
                         return;
                     }
 
@@ -808,7 +807,9 @@ jQuery.noConflict();
                 var warning = chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH")
                     + '\n\n' + chrome.i18n.getMessage("WARNING_SHORTCUT_DISABLED");
                 console.log(warning);
-                alert(warning);
+                if (!disableShortcuts) {
+                    alert(warning);
+                }
                 
                 // Flag shortcuts disabled
                 disableShortcuts = true;
