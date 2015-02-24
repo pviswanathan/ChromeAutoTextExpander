@@ -18,12 +18,12 @@ Technologies Used:
 Feature Requests:
  - Allow embedding of html into single-line expansions
  - Nested shortcuts
+ - Localization for dates
  - Date Arithmetic
+ - Opera extension version
  - Work with Google's Inbox
  - Work with Chatango
- - Localization
  - Work with Google Translate (http://translate.google.com/toolkit)
- - Opera extension version
  - Work with Outlook Meeting Request Body?
  - Work with Microsoft Forums (http://trainingsupport.microsoft.com/en-us/tcmva/forum)
 

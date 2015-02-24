@@ -637,11 +637,15 @@ jQuery.noConflict();
 			return text;
 		}
 
+        // Set moment.js locale
+        var mo = moment();
+        mo.locale(chrome.i18n.getMessage('@@ui_locale'));
+
 		// Loop through and replace date tags with formatted text
 		var processedText = [text.slice(0, dateOpenTags[0])];
 		for (var i = 0, len = dateOpenTags.length; i < len; ++i)
 		{
-			processedText.push(moment().format(text.slice(
+			processedText.push(mo.format(text.slice(
 				dateOpenTags[i] + 3, dateCloseTags[i])));		// 3 for "%d("
 			processedText.push(text.slice(dateCloseTags[i] + 1,	// 1 for ")"
 				(i == len - 1) ? undefined : dateOpenTags[i+1]));

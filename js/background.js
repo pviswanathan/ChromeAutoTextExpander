@@ -4,7 +4,7 @@ var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
     , OLD_SHORTCUT_VERSION_KEY = 'v'
     , TEST_OLD_APP_VERSION
 ;
-console.log('Initializing ATE v' + MANIFEST.version);
+console.log('Initializing ATE v' + MANIFEST.version, chrome.i18n.getMessage('@@ui_locale'));
 
 // Custom log function
 function debugLog() {
