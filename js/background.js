@@ -6,6 +6,13 @@ var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
 ;
 console.log('Initializing ATE v' + MANIFEST.version);
 
+// Custom log function
+function debugLog() {
+    if (DEBUG && console) {
+        console.log.apply(console, arguments);
+    }
+}
+
 
 //////////////////////////////////////////////////////////
 // ACTIONS
@@ -13,8 +20,8 @@ console.log('Initializing ATE v' + MANIFEST.version);
 // Listen for whether or not to show the pageAction icon
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-	console.log(request);
-	console.log(sender);
+	debugLog(request);
+	debugLog(sender);
 
 	switch (request.request)
 	{
@@ -320,7 +327,7 @@ function openOrFocusOptionsPage()
     {
         if (tabs.length)    // If options tab is already open, focus on it
         {
-            console.log("options page found:", tabs[0].id);
+            debugLog("options page found:", tabs[0].id);
             chrome.tabs.update(tabs[0].id, {"selected": true});
         } 
         else {  // Open the options page otherwise
