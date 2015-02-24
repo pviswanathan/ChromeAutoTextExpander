@@ -196,14 +196,13 @@ jQuery.noConflict();
 
 						// Setup for processing
 						var domain = window.location.host;
-						var $textInput = $(textInput);
 						var cursorPosition = getCursorPosition(textInput);
 						var text;
 
-                        debugLog("textInput: ", $textInput);
+                        debugLog("textInput: ", textInput);
 
 						// If input or textarea field, can easily change the val
-						if ($textInput.is("textarea") || $textInput.is("input")) {
+						if (textInput.nodeName == "TEXTAREA" || textInput.nodeName == "INPUT") {
                             replaceTextRegular(shortcut, autotext, cursorPosition, textInput);
 						}
 						else	// Trouble... editable divs & special cases
@@ -241,7 +240,7 @@ jQuery.noConflict();
         // Fix for input[type=email] and input[type=number]
         if (cursorPosition === 0
             && $(textInput).is('input[type="email"],input[type="number"]')) {
-            cursorPosition = $textInput.val().length;
+            cursorPosition = textInput.value.length;
         }
 
         textInput.value = replaceText(
@@ -315,13 +314,13 @@ jQuery.noConflict();
             }
 
             // Get text and replace it
-            text = $textInput.text();
-            $textInput.text(replaceText(
+            text = textInput.textContent;
+            textInput.textContent = replaceText(
                 text,
                 shortcut,
                 autotext,
                 cursorPosition
-            ));
+            );
 
             // Set new cursor position
             setCursorPosition(textInput, 
@@ -353,13 +352,13 @@ jQuery.noConflict();
         else 
         {
             // Get text and replace it
-            text = $textInput.text();
-            $textInput.text(replaceText(
+            text = textInput.textContent;
+            textInput.textContent = replaceText(
                 text,
                 shortcut,
                 autotext,
                 cursorPosition
-            ));
+            );
 
             // Set new cursor position
             setCursorPosition(textInput, 
@@ -373,8 +372,8 @@ jQuery.noConflict();
         debugLog("Domain: Basecamp");
 
         // Get the focused / selected text node
-        var iframeWindow = $(SELECTOR_BASECAMP_EDIT)
-            .get(0).contentWindow;
+        var iframeWindow = document.querySelector(SELECTOR_BASECAMP_EDIT)
+            .contentWindow;
         var node = findFocusedNode(iframeWindow);
         var $textNode = $(node);
         debugLog($textNode);
@@ -416,7 +415,7 @@ jQuery.noConflict();
     }
 
     // Reusable handler for editable iframe text replacements
-    function replaceTextEditableIframe(shortcut, autotext, node, $textNode, iframeWindow)
+    function replaceTextEditableIframe(shortcut, autotext, node, iframeWindow)
     {
         // Find focused div instead of what's receiving events
         $textInput = $(node.parentNode);
@@ -424,7 +423,7 @@ jQuery.noConflict();
 
         // Get and process text, update cursor position
         cursorPosition = getCursorPosition(node.parentNode, iframeWindow);
-        text = replaceText($textNode.text(),
+        text = replaceText(node.textContent,
             shortcut, autotext, cursorPosition);
 
         // If autotext is single line, simple case
@@ -736,11 +735,6 @@ jQuery.noConflict();
 
 		// Return processed dates
 		return processedText.join('');
-	}
-
-	// Check if page has editable elements - based off PopChrom
-	function hasEditableElements() {
-		return $(document).find(SELECTOR_INPUT).length;
 	}
 
 	// Get what's stored in the clipboard
