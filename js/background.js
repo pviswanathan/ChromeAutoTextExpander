@@ -51,10 +51,17 @@ function testDataLoss(completionBlock)
 	    if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
         } else {
-            console.log('test setup complete');
-            if (completionBlock) {
-                completionBlock();
-            }
+            chrome.storage.local.remove([APP_BACKUP_KEY, APP_BACKUP_TIMESTAMP_KEY], function() 
+            {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } else {
+                    console.log('test setup complete');
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            });
         }
     });
 }
@@ -256,12 +263,13 @@ chrome.storage.sync.get(null, function(data)
     }
 });
 
-// Testing
+/* Testing
 testV170Migration(function() {
     processVersionUpgrade(TEST_OLD_APP_VERSION);
 });
-//testDataLoss();
-
+*/
+testDataLoss();
+// */
 
 //////////////////////////////////////////////////////////
 // FUNCTIONS
