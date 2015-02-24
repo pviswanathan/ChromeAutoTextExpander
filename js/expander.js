@@ -551,7 +551,7 @@ jQuery.noConflict();
 		var pos = 0, sel;
 		if (!win) { win = window; }
 		if (!doc) { doc = document; }
-		if (el.nodeName == 'INPUT' || el.nodeName = 'TEXTAREA') {
+		if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
 			try {	// Needed for new input[type=email] failing
 				if (el.selectionStart) {
 					pos = el.selectionStart;
@@ -590,7 +590,7 @@ jQuery.noConflict();
     {
         console.log('setCursorPosition:', pos);
 		var sel, range;
-		if (el.nodeName = 'INPUT' || el.nodeName = 'TEXTAREA') {
+		if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
 			try {	// Needed for new input[type=email] failing
 				if (el.setSelectionRange) {
 					el.setSelectionRange(pos, pos);
