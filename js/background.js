@@ -4,6 +4,167 @@ var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
     , SHORTCUT_VERSION_KEY_OLD = 'v'
 ;
 
+
+//////////////////////////////////////////////////////////
+// TESTING
+
+// Test pre-v1.2.0 database migration
+function testV120Migration(completionBlock)
+{
+    console.log('testV120Migration');
+
+    var shortcuts = {};
+    shortcuts[OLD_STORAGE_KEY] = {
+        "e@" : "email.me@carlinyuen.com",
+        "brb " : "be right back",
+        "hbd" : "Just wanted to wish you a very merry happy birthday!",
+    };
+
+    chrome.storage.sync.clear(function() 
+    {
+	    if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        } else {
+            chrome.storage.sync.set(shortcuts, function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } 
+                else 
+                {
+                    console.log('test setup complete');
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Test pre-v1.7.0 database migration
+function testV170Migration()
+{
+    console.log('testV170Migration');
+
+    var shortcuts = {
+        'd8 ' : 'it is %d(MMMM Do YYYY, h:mm:ss a) right now',
+        'sig@': '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com',
+        'hbd': "Hey! Just wanted to wish you a happy birthday; hope you had a good one!",
+        'e@': 'email.me@carlinyuen.com',
+        'brb': 'be right back',
+        'p@': 'This is your final warning: %clip% ',
+    };
+
+    chrome.storage.sync.clear(function() 
+    {
+	    if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        } else {
+            chrome.storage.sync.set(shortcuts, function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } 
+                else 
+                {
+                    console.log('test setup complete');
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            });
+        }
+    });
+}
+
+
+//////////////////////////////////////////////////////////
+// ACTIONS
+
+// Listen for whether or not to show the pageAction icon
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
+{
+	console.log(request);
+	console.log(sender);
+
+	switch (request.request)
+	{
+		case "showPageAction":  // No longer needed
+			chrome.pageAction.show(sender.tab.id);
+			break;
+
+		case "hidePageAction":  // No longer needed
+			chrome.pageAction.hide(sender.tab.id);
+			break;
+
+		case "getClipboardData":
+			sendResponse({ paste:pasteFromClipboard() });
+			break;
+
+		default:
+			console.log("Unknown request received:", request);
+			break;
+	}
+});
+
+// On first install or upgrade, make sure to inject into all tabs
+chrome.runtime.onInstalled.addListener(function(details)
+{
+	console.log("onInstalled: " + details.reason);
+
+	// Action to take depending on reason
+	var executeFunction;
+	switch (details.reason)
+	{
+		case "install":
+			executeFunction = injectScript;		// Inject content script
+			break;
+
+		case "update":  // Don't reinject script, sometimes doesn't work and have two copies
+		default: 
+            break;
+	}
+
+	// Only act on if was fresh install
+	if (executeFunction)
+	{
+		// Execute on all open tabs
+		chrome.tabs.query({}, function(tabs)
+		{
+			console.log("Executing on tabs: ", tabs);
+			for (var i = 0, l = tabs.length; i < l; ++i) {
+				executeFunction(tabs[i]);
+			}
+		});
+	}
+
+	// If upgrade and new version number, process upgrade
+	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
+        processVersionUpgrade(details.previousVersion);
+	}
+});
+
+// Show options page when browser action is clicked
+//  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
+chrome.browserAction.onClicked.addListener(function(tab) {
+   openOrFocusOptionsPage();
+});
+
+// If no shortcuts exist, show options page (should show emergency backup restore)
+chrome.storage.sync.get(null, function(data)
+{
+	if (chrome.runtime.lastError) {	// Check for errors
+		console.log(chrome.runtime.lastError);
+	}
+	else if (!data || Object.keys(data).length == 0) {
+		chrome.tabs.create({url: "options.html"});
+	}
+});
+
+
+
+//////////////////////////////////////////////////////////
+// FUNCTIONS
+
 // Execute our content script into the given tab
 function injectScript(tab)
 {
@@ -54,86 +215,6 @@ function openOrFocusOptionsPage()
         }
     });
 }
-
-// Listen for whether or not to show the pageAction icon
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
-{
-	console.log(request);
-	console.log(sender);
-
-	switch (request.request)
-	{
-		case "showPageAction":  // No longer needed
-			chrome.pageAction.show(sender.tab.id);
-			break;
-
-		case "hidePageAction":  // No longer needed
-			chrome.pageAction.hide(sender.tab.id);
-			break;
-
-		case "getClipboardData":
-			sendResponse({ paste:pasteFromClipboard() });
-			break;
-
-		default:
-			console.log("Unknown request received:", request);
-			break;
-	}
-});
-
-// If no shortcuts exist, show options page (should show emergency backup restore)
-chrome.storage.sync.get(null, function(data)
-{
-	if (chrome.runtime.lastError) {	// Check for errors
-		console.log(chrome.runtime.lastError);
-	}
-	else if (!data || Object.keys(data).length == 0) {
-		chrome.tabs.create({url: "options.html"});
-	}
-});
-
-// On first install or upgrade, make sure to inject into all tabs
-chrome.runtime.onInstalled.addListener(function(details)
-{
-	console.log("onInstalled: " + details.reason);
-
-	// Action to take depending on reason
-	var executeFunction;
-	switch (details.reason)
-	{
-		case "install":
-			executeFunction = injectScript;		// Inject content script
-			break;
-
-		case "update":  // Don't reinject script, sometimes doesn't work and have two copies
-		default: 
-            break;
-	}
-
-	// Only act on if was fresh install
-	if (executeFunction)
-	{
-		// Execute on all open tabs
-		chrome.tabs.query({}, function(tabs)
-		{
-			console.log("Executing on tabs: ", tabs);
-			for (var i = 0, l = tabs.length; i < l; ++i) {
-				executeFunction(tabs[i]);
-			}
-		});
-	}
-
-	// If upgrade and new version number, process upgrade
-	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
-        processVersionUpgrade(details.previousVersion);
-	}
-});
-
-// Show options page when browser action is clicked
-//  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
-chrome.browserAction.onClicked.addListener(function(tab) {
-   openOrFocusOptionsPage();
-});
 
 // Function for anything extra that needs doing related to new version upgrade
 function processVersionUpgrade(oldVersion)
@@ -221,26 +302,26 @@ function makeEmergencyBackup(completionBlock)
 }
 
 // Restore synced data from emergency backup
-function restoreEmergencyBackup()
+function restoreEmergencyBackup(completionBlock)
 {
     chrome.storage.local.get(APP_EMERGENCY_BACKUP_KEY, function(data)
     {
         if (chrome.runtime.lastError) 	 // Check for errors
         {
-            console.log("SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE");
+            console.log("SERIOUS ERROR: COULD NOT GET EMERGENCY BACKUP");
             console.log(chrome.runtime.lastError);
         }
         else   // Restore backup to synced storage
         {
-            chrome.storage.sync.set(data, function() {
+            chrome.storage.sync.set(data[APP_EMERGENCY_BACKUP_KEY], function() {
                 if (chrome.runtime.lastError) 	// Check for errors
                 {
-                    console.log("SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE");
+                    console.log("SERIOUS ERROR: COULD NOT RESTORE EMERGENCY BACKUP");
                     console.log(chrome.runtime.lastError);
                 }
-                else 	// Backup success
+                else 	// Restore success
                 {
-                    console.log("Emergency backup before migration created.");
+                    console.log("Emergency backup restored.");
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -346,12 +427,9 @@ function upgradeShortcutsToV170(completionBlocks)
 
         // Delete old data, replace with new data
         chrome.storage.sync.clear(function() {
-            if (chrome.runtime.lastError) 	// Check for errors
-            {
+            if (chrome.runtime.lastError) { 	// Check for errors
                 console.log(chrome.runtime.lastError);
-                restoreEmergencyBackup();
-            } 
-            else {
+            } else {
                 chrome.storage.sync.set(newDataStore, function() {
                     if (chrome.runtime.lastError) 	// Check for errors
                     {
@@ -403,12 +481,9 @@ function upgradeShortcutsToV171(completionBlocks)
 
             // Delete old data, replace with new data
             chrome.storage.sync.clear(function() {
-                if (chrome.runtime.lastError) 	// Check for errors
-                {
+                if (chrome.runtime.lastError) { 	// Check for errors
                     console.log(chrome.runtime.lastError);
-                    restoreEmergencyBackup();
-                } 
-                else {
+                } else {
                     chrome.storage.sync.set(data, function() {
                         if (chrome.runtime.lastError) 	// Check for errors
                         {
@@ -452,12 +527,9 @@ function upgradeShortcutsToLatest(completionBlocks)
 
             // Delete old data, replace with new data
             chrome.storage.sync.clear(function() {
-                if (chrome.runtime.lastError) 	// Check for errors
-                {
+                if (chrome.runtime.lastError) { 	// Check for errors
                     console.log(chrome.runtime.lastError);
-                    restoreEmergencyBackup();
-                } 
-                else {
+                } else {
                     chrome.storage.sync.set(data, function() {
                         if (chrome.runtime.lastError) 	// Check for errors
                         {
