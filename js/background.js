@@ -8,7 +8,103 @@ console.log('Initializing ATE v' + MANIFEST.version);
 
 
 //////////////////////////////////////////////////////////
+// ACTIONS
+
+// Listen for whether or not to show the pageAction icon
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
+{
+	console.log(request);
+	console.log(sender);
+
+	switch (request.request)
+	{
+		case "showPageAction":  // No longer needed
+			chrome.pageAction.show(sender.tab.id);
+			break;
+
+		case "hidePageAction":  // No longer needed
+			chrome.pageAction.hide(sender.tab.id);
+			break;
+
+		case "getClipboardData":
+			sendResponse({ paste:pasteFromClipboard() });
+			break;
+
+		default:
+			console.log("Unknown request received:", request);
+			break;
+	}
+});
+
+// On first install or upgrade, make sure to inject into all tabs
+chrome.runtime.onInstalled.addListener(function(details)
+{
+	console.log("onInstalled: " + details.reason);
+
+	// Action to take depending on reason
+	var executeFunction;
+	switch (details.reason)
+	{
+		case "install":
+			executeFunction = injectScript;		// Inject content script
+			break;
+
+		case "update":  // Don't reinject script, sometimes doesn't work and have two copies
+		default: 
+            break;
+	}
+
+	// Only act on if was fresh install
+	if (executeFunction)
+	{
+		// Execute on all open tabs
+		chrome.tabs.query({}, function(tabs)
+		{
+			console.log("Executing on tabs: ", tabs);
+			for (var i = 0, l = tabs.length; i < l; ++i) {
+				executeFunction(tabs[i]);
+			}
+		});
+	}
+
+	// If upgrade and new version number, process upgrade
+	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
+        processVersionUpgrade(details.previousVersion);
+	}
+});
+
+// Show options page when browser action is clicked
+//  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
+chrome.browserAction.onClicked.addListener(function(tab) {
+   openOrFocusOptionsPage();
+});
+
+// Check synced shortcuts
+chrome.storage.sync.get(null, function(data)
+{
+    console.log('checking shortcuts...');
+
+	if (chrome.runtime.lastError) {	// Check for errors
+		console.log(chrome.runtime.lastError);
+	} else if (!data || Object.keys(data).length == 0) {
+        // If no shortcuts exist, show options page (should show emergency backup restore)
+		chrome.tabs.create({url: "options.html"});
+	} else if (data[SHORTCUT_VERSION_KEY] && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
+        // If version is off, try to initiate upgrade
+        processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
+    }
+});
+
+
+//////////////////////////////////////////////////////////
 // TESTING
+
+/* TESTING
+testV170Migration(function() {
+    processVersionUpgrade(TEST_OLD_APP_VERSION);
+});
+testDataLoss();
+// */
 
 // Test shortcut database version mismatch
 function testVersionMismatch(completionBlock)
@@ -174,102 +270,6 @@ function testV171Migration(completionBlock)
     });
 }
 
-
-//////////////////////////////////////////////////////////
-// ACTIONS
-
-// Listen for whether or not to show the pageAction icon
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
-{
-	console.log(request);
-	console.log(sender);
-
-	switch (request.request)
-	{
-		case "showPageAction":  // No longer needed
-			chrome.pageAction.show(sender.tab.id);
-			break;
-
-		case "hidePageAction":  // No longer needed
-			chrome.pageAction.hide(sender.tab.id);
-			break;
-
-		case "getClipboardData":
-			sendResponse({ paste:pasteFromClipboard() });
-			break;
-
-		default:
-			console.log("Unknown request received:", request);
-			break;
-	}
-});
-
-// On first install or upgrade, make sure to inject into all tabs
-chrome.runtime.onInstalled.addListener(function(details)
-{
-	console.log("onInstalled: " + details.reason);
-
-	// Action to take depending on reason
-	var executeFunction;
-	switch (details.reason)
-	{
-		case "install":
-			executeFunction = injectScript;		// Inject content script
-			break;
-
-		case "update":  // Don't reinject script, sometimes doesn't work and have two copies
-		default: 
-            break;
-	}
-
-	// Only act on if was fresh install
-	if (executeFunction)
-	{
-		// Execute on all open tabs
-		chrome.tabs.query({}, function(tabs)
-		{
-			console.log("Executing on tabs: ", tabs);
-			for (var i = 0, l = tabs.length; i < l; ++i) {
-				executeFunction(tabs[i]);
-			}
-		});
-	}
-
-	// If upgrade and new version number, process upgrade
-	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
-        processVersionUpgrade(details.previousVersion);
-	}
-});
-
-// Show options page when browser action is clicked
-//  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
-chrome.browserAction.onClicked.addListener(function(tab) {
-   openOrFocusOptionsPage();
-});
-
-// Check synced shortcuts
-chrome.storage.sync.get(null, function(data)
-{
-    console.log('checking shortcuts...');
-
-	if (chrome.runtime.lastError) {	// Check for errors
-		console.log(chrome.runtime.lastError);
-	} else if (!data || Object.keys(data).length == 0) {
-        // If no shortcuts exist, show options page (should show emergency backup restore)
-		chrome.tabs.create({url: "options.html"});
-	} else if (data[SHORTCUT_VERSION_KEY] && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
-        // If version is off, try to initiate upgrade
-        processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
-    }
-});
-
-/* Testing
-testV170Migration(function() {
-    processVersionUpgrade(TEST_OLD_APP_VERSION);
-});
-*/
-testDataLoss();
-// */
 
 //////////////////////////////////////////////////////////
 // FUNCTIONS

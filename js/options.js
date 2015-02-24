@@ -625,7 +625,8 @@ $(function()
                 {
                     getEmergencyBackup(function(data)	// Restore using emergency backup
                     {
-                        console.log("Restoring shortcuts: ", data[APP_EMERGENCY_BACKUP_KEY]);
+                        console.log("Restoring emergency backup shortcuts: ", 
+                            data[APP_EMERGENCY_BACKUP_KEY]);
                         chrome.storage.sync.set(data[APP_EMERGENCY_BACKUP_KEY], function()
                         {
                             if (chrome.runtime.lastError) 	// Check for errors
