@@ -229,9 +229,8 @@ chrome.runtime.onInstalled.addListener(function(details)
 	}
 
 	// If upgrade and new version number, process upgrade
-    var oldVersion = TEST_OLD_APP_VERSION || details.previousVersion;
-	if (details.reason == "update" && oldVersion != MANIFEST.version) {
-        processVersionUpgrade(oldVersion);
+	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
+        processVersionUpgrade(details.previousVersion);
 	}
 });
 
@@ -244,19 +243,24 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // Check synced shortcuts
 chrome.storage.sync.get(null, function(data)
 {
+    console.log('checking shortcuts...');
+
 	if (chrome.runtime.lastError) {	// Check for errors
 		console.log(chrome.runtime.lastError);
 	} else if (!data || Object.keys(data).length == 0) {
         // If no shortcuts exist, show options page (should show emergency backup restore)
 		chrome.tabs.create({url: "options.html"});
-	} else if (data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
+	} else if (data[SHORTCUT_VERSION_KEY] && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
         // If version is off, try to initiate upgrade
         processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
     }
-
-    testVersionMismatch();
 });
 
+// Testing
+testV120Migration(function() {
+    processVersionUpgrade(TEST_OLD_APP_VERSION);
+});
+//testDataLoss();
 
 
 //////////////////////////////////////////////////////////
