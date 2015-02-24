@@ -94,7 +94,7 @@ function testV120Migration(completionBlock)
 }
 
 // Test pre-v1.7.0 database migration
-function testV170Migration()
+function testV170Migration(completionBlock)
 {
     console.log('testV170Migration');
     TEST_OLD_APP_VERSION = '1.6.0';
@@ -130,7 +130,7 @@ function testV170Migration()
 }
 
 // Test v1.7.0 to v1.7.1 database migration
-function testV171Migration()
+function testV171Migration(completionBlock)
 {
     console.log('testV171Migration');
     TEST_OLD_APP_VERSION = '1.7.0';
@@ -257,7 +257,7 @@ chrome.storage.sync.get(null, function(data)
 });
 
 // Testing
-testV120Migration(function() {
+testV170Migration(function() {
     processVersionUpgrade(TEST_OLD_APP_VERSION);
 });
 //testDataLoss();
