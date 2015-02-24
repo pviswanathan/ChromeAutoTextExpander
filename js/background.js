@@ -4,10 +4,43 @@ var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
     , OLD_SHORTCUT_VERSION_KEY = 'v'
     , TEST_OLD_APP_VERSION
 ;
+console.log('Initializing ATE v' + MANIFEST.version);
 
 
 //////////////////////////////////////////////////////////
 // TESTING
+
+// Test shortcut database version mismatch
+function testVersionMismatch(completionBlock)
+{
+    console.log('testVersionMismatch');
+
+    chrome.storage.sync.get(null, function(data) 
+    {
+	    if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        } 
+        else 
+        {
+            // Set an older shortcut version and store it back
+            data[SHORTCUT_VERSION_KEY] = '1.7.0';
+
+            chrome.storage.sync.set(data, function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } 
+                else 
+                {
+                    console.log('test setup complete');
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            });
+        }
+    });
+
+}
 
 // Test shortcut database loss
 function testDataLoss(completionBlock)
@@ -209,15 +242,18 @@ chrome.browserAction.onClicked.addListener(function(tab) {
    openOrFocusOptionsPage();
 });
 
-// If no shortcuts exist, show options page (should show emergency backup restore)
+// Check synced shortcuts
 chrome.storage.sync.get(null, function(data)
 {
 	if (chrome.runtime.lastError) {	// Check for errors
 		console.log(chrome.runtime.lastError);
-	}
-	else if (!data || Object.keys(data).length == 0) {
+	} else if (!data || Object.keys(data).length == 0) {
+        // If no shortcuts exist, show options page (should show emergency backup restore)
 		chrome.tabs.create({url: "options.html"});
-	}
+	} else if (data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
+        // If version is off, initiate upgrade
+        processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
+    }
 });
 
 
