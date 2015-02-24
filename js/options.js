@@ -3,14 +3,7 @@
 $(function()
 {
     // Constants
-    var SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
-        , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
-        , SHORTCUT_VERSION_KEY = 'v'        // Synced key for shortcut database version
-        , APP_VERSION = '1.7.1'             // App version to check against shortcut database
-		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
-		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
-
-        , DEFAULT_SHORTCUT_FILLER = "Shortcut"
+    var DEFAULT_SHORTCUT_FILLER = "Shortcut"
         , DEFAULT_AUTOTEXT_FILLER = "Expanded Text"
         , DEFAULT_CLEAR_BUFFER_TIMEOUT = 750          // Default to 750ms
 
@@ -21,12 +14,7 @@ $(function()
         , ANIMATION_FAST = 200
         , ANIMATION_NORMAL = 400
         , ANIMATION_SLOW = 1000
-
         , TIME_SHOW_CROUTON = 1000 * 3	              // Show croutons for 3s
-
-        , FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
-        , BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
-        , BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local key backup timestamp
     ;
 
     // Variables
@@ -39,10 +27,10 @@ $(function()
 
     // Setup metaData defaults
     metaData[SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
-    metaData[SHORTCUT_VERSION_KEY] = chrome.runtime.getManifest().version;
+    metaData[SHORTCUT_VERSION_KEY] = APP_VERSION;
 
     // Set version
-    $('#version').text('v' + chrome.runtime.getManifest().version);
+    $('#version').text('v' + APP_VERSION);
 
     // Warn user before leaving if they haven't saved new rows
     $(window).bind('beforeunload', function(){
@@ -242,15 +230,15 @@ $(function()
                 }
                 else	// No shortcuts? Check if first run on this computer
                 {
-                    chrome.storage.local.get(FIRST_RUN_KEY, function(firstRun)
+                    chrome.storage.local.get(APP_FIRST_RUN_KEY, function(firstRun)
                     {
                         if (chrome.runtime.lastError) {		// Check for errors
                             console.log(chrome.runtime.lastError);
                         }
-                        else if (!firstRun[FIRST_RUN_KEY])		// First run
+                        else if (!firstRun[APP_FIRST_RUN_KEY])		// First run
                         {
                             // Flag first run
-                            firstRun[FIRST_RUN_KEY] = true;
+                            firstRun[APP_FIRST_RUN_KEY] = true;
                             chrome.storage.local.set(firstRun);
 
                             // Example shortcuts
@@ -535,8 +523,8 @@ $(function()
                             else	// Save backup of shortcuts
                             {
                                 var backup = {};
-                                backup[BACKUP_KEY] = data;
-                                backup[BACKUP_TIMESTAMP_KEY] = new Date().getTime();
+                                backup[APP_BACKUP_KEY] = data;
+                                backup[APP_BACKUP_TIMESTAMP_KEY] = new Date().getTime();
                                 chrome.storage.local.set(backup, function()
                                 {
                                     if (chrome.runtime.lastError) {	// Check for errors
@@ -558,14 +546,14 @@ $(function()
     // Update backup timestamp time
     function updateBackupTimestamp()
     {
-        chrome.storage.local.get(BACKUP_TIMESTAMP_KEY, function(data)
+        chrome.storage.local.get(APP_BACKUP_TIMESTAMP_KEY, function(data)
         {
             if (chrome.runtime.lastError) {	// Check for errors
                 console.log(chrome.runtime.lastError);
             }
             else if (data)	// Set date
             {
-                var timestamp = data[BACKUP_TIMESTAMP_KEY];
+                var timestamp = data[APP_BACKUP_TIMESTAMP_KEY];
                 if (timestamp) {
                     var date = new Date(timestamp).toLocaleString();
                     console.log("Last local backup date: " + date);
@@ -596,7 +584,7 @@ $(function()
             function(response) {
                 if (response)
                 {
-                    chrome.storage.local.get(BACKUP_KEY, function(data)
+                    chrome.storage.local.get(APP_BACKUP_KEY, function(data)
                     {
                         if (chrome.runtime.lastError) {	// Check for errors
                             console.log(chrome.runtime.lastError);
@@ -604,8 +592,8 @@ $(function()
                         }
                         else	// Restore using backup shortcuts
                         {
-                            console.log("Restoring shortcuts: ", data[BACKUP_KEY]);
-                            chrome.storage.sync.set(data[BACKUP_KEY], function()
+                            console.log("Restoring shortcuts: ", data[APP_BACKUP_KEY]);
+                            chrome.storage.sync.set(data[APP_BACKUP_KEY], function()
                             {
                                 if (chrome.runtime.lastError) {	// Check for errors
                                     console.log(chrome.runtime.lastError);

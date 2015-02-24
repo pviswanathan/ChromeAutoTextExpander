@@ -12,6 +12,7 @@
 	, "background": {
 		"scripts": [
 			"js/jquery-2.1.0.min.js"
+            , "js/constants.js"
 			, "js/background.js"
 		]
 	}
@@ -28,6 +29,7 @@
 		, "js": [
 			"js/jquery-2.1.0.min.js"
 			, "js/moment.min.js"
+            , "js/constants.js"
 			, "js/expander.js"
 		]
 		, "run_at": "document_start"

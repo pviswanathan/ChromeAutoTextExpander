@@ -1,15 +1,10 @@
 // Constants
 var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
-    , APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
-    , DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
     , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
-    , SHORTCUT_PREFIX = '@'
     , SHORTCUT_VERSION_KEY_OLD = 'v'
-    , SHORTCUT_VERSION_KEY = 'v#'
 ;
 
 // Execute our content script into the given tab
-var contentScripts = MANIFEST.content_scripts[0].js;
 function injectScript(tab)
 {
 	// Insanity check
@@ -19,6 +14,7 @@ function injectScript(tab)
 	}
 
 	// Loop through content scripts and execute in order
+    var contentScripts = MANIFEST.content_scripts[0].js;
     for (var i = 0, l = contentScripts.length; i < l; ++i) {
         chrome.tabs.executeScript(tab.id, {
             file: contentScripts[i]
@@ -85,7 +81,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 	}
 });
 
-// If no shortcuts exist, show options page
+// If no shortcuts exist, show options page (should show emergency backup restore)
 chrome.storage.sync.get(null, function(data)
 {
 	if (chrome.runtime.lastError) {	// Check for errors
@@ -114,7 +110,7 @@ chrome.runtime.onInstalled.addListener(function(details)
             break;
 	}
 
-	// Only act on if was fresh install or upgrade
+	// Only act on if was fresh install
 	if (executeFunction)
 	{
 		// Execute on all open tabs
@@ -144,48 +140,114 @@ function processVersionUpgrade(oldVersion)
 {
     console.log('processVersionUpgrade:', oldVersion);
 
-    switch (oldVersion)
+    // Make backup of synced data before proceeding
+    makeEmergencyBackup(function() {
+        switch (oldVersion)
+        {
+            case '1.1.6':
+            case '1.1.5':
+            case '1.1.4':
+            case '1.1.3':
+            case '1.1.2':
+            case '1.1.1':
+            case '1.1.0':
+            case '1.0.9':
+            case '1.0.8':
+            case '1.0.6':
+            case '1.0.5':
+            case '1.0.3':
+            case '1.0.0':
+                upgradeShortcutsToV120([upgradeShortcutsToV170, upgradeShortcutsToLatest]);
+                break;
+
+            case '1.6.1':
+            case '1.6.0':
+            case '1.5.1':
+            case '1.5.0':
+            case '1.4.0':
+            case '1.3.5':
+            case '1.3.2':
+            case '1.3.1':
+            case '1.3.0':
+            case '1.2.6':
+            case '1.2.5':
+            case '1.2.2':
+            case '1.2.0':
+                upgradeShortcutsToV170([upgradeShortcutsToLatest]);
+                break;
+
+            case '1.7.0':
+                upgradeShortcutsToV171([upgradeShortcutsToLatest]);
+                break;
+
+            case '1.7.1':
+            default:
+                upgradeShortcutsToLatest();
+        }
+    });
+}
+
+// Make backup of all saved synced data
+function makeEmergencyBackup(completionBlock)
+{
+    chrome.storage.sync.get(null, function(data)
     {
-        case '1.1.6':
-        case '1.1.5':
-        case '1.1.4':
-        case '1.1.3':
-        case '1.1.2':
-        case '1.1.1':
-        case '1.1.0':
-        case '1.0.9':
-        case '1.0.8':
-        case '1.0.6':
-        case '1.0.5':
-        case '1.0.3':
-        case '1.0.0':
-            upgradeShortcutsToV120([upgradeShortcutsToV170, upgradeShortcutsToLatest]);
-            break;
+        if (chrome.runtime.lastError) 	 // Check for errors
+        {
+            console.log("SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE");
+            console.log(chrome.runtime.lastError);
+        }
+        else   // Store backup into emergency local storage
+        {
+            // Setup backup
+            var backup = {};
+            backup[APP_EMERGENCY_BACKUP_KEY] = data;
+            chrome.storage.local.set(backup, function() {
+                if (chrome.runtime.lastError) 	// Check for errors
+                {
+                    console.log("SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE");
+                    console.log(chrome.runtime.lastError);
+                }
+                else 	// Backup success
+                {
+                    console.log("Emergency backup before migration created.");
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            });
+        }
+    });
+}
 
-        case '1.6.1':
-        case '1.6.0':
-        case '1.5.1':
-        case '1.5.0':
-        case '1.4.0':
-        case '1.3.5':
-        case '1.3.2':
-        case '1.3.1':
-        case '1.3.0':
-        case '1.2.6':
-        case '1.2.5':
-        case '1.2.2':
-        case '1.2.0':
-            upgradeShortcutsToV170([upgradeShortcutsToLatest]);
-            break;
-
-        case '1.7.0':
-            upgradeShortcutsToV171([upgradeShortcutsToLatest]);
-            break;
-
-        case '1.7.1':
-        default:
-            upgradeShortcutsToLatest();
-    }
+// Restore synced data from emergency backup
+function restoreEmergencyBackup()
+{
+    chrome.storage.local.get(APP_EMERGENCY_BACKUP_KEY, function(data)
+    {
+        if (chrome.runtime.lastError) 	 // Check for errors
+        {
+            console.log("SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE");
+            console.log(chrome.runtime.lastError);
+        }
+        else   // Restore backup to synced storage
+        {
+            chrome.storage.sync.set(data, function() {
+                if (chrome.runtime.lastError) 	// Check for errors
+                {
+                    console.log("SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE");
+                    console.log(chrome.runtime.lastError);
+                }
+                else 	// Backup success
+                {
+                    console.log("Emergency backup before migration created.");
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            });
+        }
+    });
 }
 
 // Migration of shortcuts to v1.2.0 format
@@ -213,13 +275,18 @@ function upgradeShortcutsToV120(completionBlocks)
             // Delete old data, add new data
             chrome.storage.sync.remove(OLD_STORAGE_KEY, function() 
             {
-                if (chrome.runtime.lastError) {	// Check for errors
+                if (chrome.runtime.lastError) 	// Check for errors
+                {
                     console.log(chrome.runtime.lastError);
-                } else {
+                    restoreEmergencyBackup();
+                } 
+                else {
                     chrome.storage.sync.set(newDataStore, function() 
                     {
-                        if (chrome.runtime.lastError) {	// Check for errors
+                        if (chrome.runtime.lastError) 	// Check for errors
+                        {
                             console.log(chrome.runtime.lastError);
+                            restoreEmergencyBackup();
                         }
                         else	// Done with porting
                         {
@@ -274,17 +341,22 @@ function upgradeShortcutsToV170(completionBlocks)
             newDataStore[SHORTCUT_PREFIX + key] = value;
         });
 
-        // Add metadata for shortcut version
+        // Add metadata for shortcut version (using new key actually)
         newDataStore[SHORTCUT_VERSION_KEY] = '1.7.0';
 
         // Delete old data, replace with new data
         chrome.storage.sync.clear(function() {
-            if (chrome.runtime.lastError) {	// Check for errors
+            if (chrome.runtime.lastError) 	// Check for errors
+            {
                 console.log(chrome.runtime.lastError);
-            } else {
+                restoreEmergencyBackup();
+            } 
+            else {
                 chrome.storage.sync.set(newDataStore, function() {
-                    if (chrome.runtime.lastError) {	// Check for errors
+                    if (chrome.runtime.lastError) 	// Check for errors
+                    {
                         console.log(chrome.runtime.lastError);
+                        restoreEmergencyBackup();
                     }
                     else	// Done with migration
                     {
@@ -331,12 +403,17 @@ function upgradeShortcutsToV171(completionBlocks)
 
             // Delete old data, replace with new data
             chrome.storage.sync.clear(function() {
-                if (chrome.runtime.lastError) {	// Check for errors
+                if (chrome.runtime.lastError) 	// Check for errors
+                {
                     console.log(chrome.runtime.lastError);
-                } else {
+                    restoreEmergencyBackup();
+                } 
+                else {
                     chrome.storage.sync.set(data, function() {
-                        if (chrome.runtime.lastError) {	// Check for errors
+                        if (chrome.runtime.lastError) 	// Check for errors
+                        {
                             console.log(chrome.runtime.lastError);
+                            restoreEmergencyBackup();
                         }
                         else	// Done with migration
                         {
@@ -353,7 +430,6 @@ function upgradeShortcutsToV171(completionBlocks)
         }
     });
 }
-
 
 
 // Updates the shortcut database with the latest version number
@@ -376,12 +452,17 @@ function upgradeShortcutsToLatest(completionBlocks)
 
             // Delete old data, replace with new data
             chrome.storage.sync.clear(function() {
-                if (chrome.runtime.lastError) {	// Check for errors
+                if (chrome.runtime.lastError) 	// Check for errors
+                {
                     console.log(chrome.runtime.lastError);
-                } else {
+                    restoreEmergencyBackup();
+                } 
+                else {
                     chrome.storage.sync.set(data, function() {
-                        if (chrome.runtime.lastError) {	// Check for errors
+                        if (chrome.runtime.lastError) 	// Check for errors
+                        {
                             console.log(chrome.runtime.lastError);
+                            restoreEmergencyBackup();
                         }
                         else	// Done with migration
                         {

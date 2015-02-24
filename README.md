@@ -34,7 +34,9 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 ## Version History
 v1.7.1
+ - Removing jQuery to reduce js dependencies and speed things up
  - Added checks into expander code to prevent expansion and warn user to refresh browser if shortcut database version is different.
+ - Added shortcut recovery in case of shortcuts disappearing for some reason
  
 v1.7.0
  - Revamped options page!

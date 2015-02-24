@@ -5,14 +5,7 @@ jQuery.noConflict();
 (function($) {
 
 	// Variables & Constants
-    var SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs metadata
-        , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
-        , SHORTCUT_VERSION_KEY = 'v'        // Synced key for shortcut database version
-
-		, APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
-		, DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
-
-		, KEYCODE_BACKSPACE = 8
+    var KEYCODE_BACKSPACE = 8
 		, KEYCODE_TAB = 9
 		, KEYCODE_RETURN = 13
 		, KEYCODE_SPACEBAR = 32
