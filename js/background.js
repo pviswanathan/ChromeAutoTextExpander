@@ -295,15 +295,19 @@ function injectScript(tab)
 // Get paste contents from clipboard
 function pasteFromClipboard()
 {
-	var pasteInto = $('<textarea/>')
-		.attr('id', 'clipboard')
-		.appendTo('body')
-		.select();
+    // Create element to paste content into
+	document.querySelector('body').innerHTML += '<textarea id="clipboard"></textarea>';
+	var clipboard = document.getElementById('clipboard');
+    clipboard.select();
+
+    // Execute paste
 	var result;
     if (document.execCommand('paste', true)) {
-        result = $('#clipboard').val();
+        result = clipboard.value;
     }
-	pasteInto.remove();
+
+    // Cleanup and return value
+	clipboard.parentNode.removeChild(clipboard);
     return result;
 }
 
