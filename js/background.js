@@ -1,7 +1,8 @@
 // Constants
 var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
     , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts'
-    , SHORTCUT_VERSION_KEY_OLD = 'v'
+    , OLD_SHORTCUT_VERSION_KEY = 'v'
+    , TEST_OLD_APP_VERSION
 ;
 
 
@@ -12,6 +13,7 @@ var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
 function testV120Migration(completionBlock)
 {
     console.log('testV120Migration');
+    TEST_OLD_APP_VERSION = '1.1.0';
 
     var shortcuts = {};
     shortcuts[OLD_STORAGE_KEY] = {
@@ -45,14 +47,53 @@ function testV120Migration(completionBlock)
 function testV170Migration()
 {
     console.log('testV170Migration');
+    TEST_OLD_APP_VERSION = '1.6.0';
 
     var shortcuts = {
         'd8 ' : 'it is %d(MMMM Do YYYY, h:mm:ss a) right now',
-        'sig@': '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com',
-        'hbd': "Hey! Just wanted to wish you a happy birthday; hope you had a good one!",
-        'e@': 'email.me@carlinyuen.com',
-        'brb': 'be right back',
-        'p@': 'This is your final warning: %clip% ',
+        'sig@' : '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com',
+        'hbd' : "Hey! Just wanted to wish you a happy birthday; hope you had a good one!",
+        'e@' : 'email.me@carlinyuen.com',
+        'brb' : 'be right back',
+        'p@' : 'This is your final warning: %clip% ',
+    };
+
+    chrome.storage.sync.clear(function() 
+    {
+	    if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        } else {
+            chrome.storage.sync.set(shortcuts, function() {
+                if (chrome.runtime.lastError) {	// Check for errors
+                    console.log(chrome.runtime.lastError);
+                } 
+                else 
+                {
+                    console.log('test setup complete');
+                    if (completionBlock) {
+                        completionBlock();
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Test v1.7.0 to v1.7.1 database migration
+function testV171Migration()
+{
+    console.log('testV171Migration');
+    TEST_OLD_APP_VERSION = '1.7.0';
+
+    var shortcuts = {
+        '@d8 ' : 'it is %d(MMMM Do YYYY, h:mm:ss a) right now',
+        '@sig@' : '<strong>. Carlin</strong>\nChrome Extension Developer\nemail.me@carlinyuen.com',
+        '@hbd' : "Hey! Just wanted to wish you a happy birthday; hope you had a good one!",
+        '@e@' : 'email.me@carlinyuen.com',
+        '@brb' : 'be right back',
+        '@p@' : 'This is your final warning: %clip% ',
+        'scto' : 1000,
+        'v' : '1.7.0',
     };
 
     chrome.storage.sync.clear(function() 
@@ -138,8 +179,9 @@ chrome.runtime.onInstalled.addListener(function(details)
 	}
 
 	// If upgrade and new version number, process upgrade
-	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
-        processVersionUpgrade(details.previousVersion);
+    var oldVersion = TEST_OLD_APP_VERSION || details.previousVersion;
+	if (details.reason == "update" && oldVersion != MANIFEST.version) {
+        processVersionUpgrade(oldVersion);
 	}
 });
 
@@ -476,7 +518,7 @@ function upgradeShortcutsToV171(completionBlocks)
             console.log("updating database version to", MANIFEST.version);
 
             // Update metadata for shortcut version to manifest version
-            delete data[SHORTCUT_VERSION_KEY_OLD];
+            delete data[OLD_SHORTCUT_VERSION_KEY];
             data[SHORTCUT_VERSION_KEY] = MANIFEST.version;
 
             // Delete old data, replace with new data
