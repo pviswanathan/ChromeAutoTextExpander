@@ -49,6 +49,11 @@
 		, "description": "Warning message when user is about to attempt restoring his or her shortcuts from their last backup."
 	}
 
+	, "MESSAGE_EMERGENCY_RESTORE_WARNING": {
+		"message": "We've detected that your shortcut data may have been corrupted in the version upgrade due to Chrome sync issues. We have stored an emergency backup of your sync data just in case. Would you like to restore to this backup?"
+		, "description": "Warning message to show user when we detect that they may want to restore to an emergency backup."
+	}
+
 	, "ERROR_BACKUP_FAILED": {
 		"message": "Could not backup shortcuts! May be over size limit."
 		, "description": "Error message to be displayed to user when backup fails."

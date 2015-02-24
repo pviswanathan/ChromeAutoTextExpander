@@ -255,6 +255,19 @@ $(function()
                             // Set textarea height to fit content and resize as user types
                             $('textarea').autosize();
                         }
+                        else    // First run already happened, why no shortcuts??
+                        {
+                            getLocalBackup(function (data) {    // Check local backup
+                                if (!data || $.isEmptyObject(data)) {   // No local backup
+                                    getEmergencyBackup(function (data) {    // Check emergency
+                                        if (!$.isEmptyObject(data)) {   // Has backup
+                                            //  prompt user to use emergency backup
+                                            promptEmergencyRestore();
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     });
                 }
 
@@ -571,6 +584,66 @@ $(function()
         $('#timeoutValue').text(' [' + value + 'ms]');
     }
 
+    // Get local backup, completionBlock parameter is required and should take an object
+    function getLocalBackup(completionBlock)
+    {
+        chrome.storage.local.get(APP_BACKUP_KEY, function(data)
+        {
+            if (chrome.runtime.lastError)	// Check for errors
+            {
+                console.log(chrome.runtime.lastError);
+                showCrouton("Error retrieving backup!", 'red');
+            }
+            else {  // Pass data along
+                completionBlock(data);
+            }
+        });
+    }
+
+    // Get emergency local backup, completionBlock parameter required and should take an object
+    function getEmergencyBackup(completionBlock)
+    {
+        chrome.storage.local.get(APP_EMERGENCY_BACKUP_KEY, function(data)
+        {
+            if (chrome.runtime.lastError)	// Check for errors
+            {
+                console.log(chrome.runtime.lastError);
+                showCrouton("Error retrieving backup!", 'red');
+            }
+            else {  // Pass data along
+                completionBlock(data);
+            }
+        });
+    }
+
+    // Prompt user for restoring synced data via emergency backup
+    function promptEmergencyRestore()
+    {
+        showModalPopup(chrome.i18n.getMessage("MESSAGE_EMERGENCY_RESTORE_WARNING"),
+            function(response) {
+                if (response)
+                {
+                    getEmergencyBackup(function(data)	// Restore using emergency backup
+                    {
+                        console.log("Restoring shortcuts: ", data[APP_EMERGENCY_BACKUP_KEY]);
+                        chrome.storage.sync.set(data[APP_EMERGENCY_BACKUP_KEY], function()
+                        {
+                            if (chrome.runtime.lastError) 	// Check for errors
+                            {
+                                console.log(chrome.runtime.lastError);
+                                showCrouton(chrome.i18n.getMessage("ERROR_RESTORE_FAILED"), 'red');
+                            }
+                            else 	// Show success
+                            {
+                                showCrouton('Shortcuts restored!');
+                                refreshShortcuts();
+                            }
+                        });
+                    });
+                }
+            }, true);
+    }
+
     // Restore shortcuts from backup
     function restoreShortcuts()
     {
@@ -584,27 +657,22 @@ $(function()
             function(response) {
                 if (response)
                 {
-                    chrome.storage.local.get(APP_BACKUP_KEY, function(data)
+                    getLocalBackup(function(data)	// Restore using backup shortcuts
                     {
-                        if (chrome.runtime.lastError) {	// Check for errors
-                            console.log(chrome.runtime.lastError);
-                            showCrouton("Error retrieving backup!", 'red');
-                        }
-                        else	// Restore using backup shortcuts
+                        console.log("Restoring shortcuts: ", data[APP_BACKUP_KEY]);
+                        chrome.storage.sync.set(data[APP_BACKUP_KEY], function()
                         {
-                            console.log("Restoring shortcuts: ", data[APP_BACKUP_KEY]);
-                            chrome.storage.sync.set(data[APP_BACKUP_KEY], function()
+                            if (chrome.runtime.lastError) 	// Check for errors
                             {
-                                if (chrome.runtime.lastError) {	// Check for errors
-                                    console.log(chrome.runtime.lastError);
-                                    showCrouton(chrome.i18n.getMessage("ERROR_RESTORE_FAILED"), 'red');
-                                }
-                                else {	// Show success
-                                    showCrouton('Shortcuts restored!');
-                                    refreshShortcuts();
-                                }
-                            });
-                        }
+                                console.log(chrome.runtime.lastError);
+                                showCrouton(chrome.i18n.getMessage("ERROR_RESTORE_FAILED"), 'red');
+                            }
+                            else 	// Show success
+                            {
+                                showCrouton('Shortcuts restored!');
+                                refreshShortcuts();
+                            }
+                        });
                     });
                 }
             }, true);
