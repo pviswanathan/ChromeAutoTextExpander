@@ -307,8 +307,9 @@ jQuery.noConflict();
         if (hasParentSelector(textInput, 'div', ['textInput'])) 
         {
             debugLog('facebook search bar');
-            if ($textInput.find('span').get().length) {
-                $textInput = $textInput.find('span').first();
+            var span = textInput.querySelector('span');
+            if (span) {
+                textInput = span;
             }
 
             // Get text and replace it
