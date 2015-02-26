@@ -302,7 +302,6 @@ jQuery.noConflict();
         debugLog("Domain: Facebook");
 
         // Check if it is the search bar vs comments
-        var $textInput = $(textInput);
         var text;
         if (hasParentSelector(textInput, 'div', ['textInput'])) 
         {
@@ -364,7 +363,7 @@ jQuery.noConflict();
         debugLog("Domain: Outlook");
 
         // Get the focused / selected text node
-        var iframeWindow = document.querySelector(SELECTOR_OUTLOOK_EDIT).contentWindow;
+        var iframeWindow = document.getElementById(SELECTOR_OUTLOOK_EDIT).contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog(node);
 
@@ -378,7 +377,7 @@ jQuery.noConflict();
         debugLog("Domain: Evernote");
 
         // Get the focused / selected text node
-        var iframeWindow = document.querySelectorAll(SELECTOR_EVERNOTE_EDIT)
+        var iframeWindow = document.getElementById(SELECTOR_EVERNOTE_EDIT)
             .querySelector('iframe').contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog(node);
