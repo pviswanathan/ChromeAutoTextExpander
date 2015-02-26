@@ -323,7 +323,7 @@ jQuery.noConflict();
             // Set new cursor position
             setCursorPosition(textInput, cursorPosition - shortcut.length + autotext.length);
         } 
-        else if (hasParentSelector(textInput,'div', ['UFICommentContainer']) {
+        else if (hasParentSelector(textInput,'div', ['UFICommentContainer'])) {
             debugLog('facebook comments');  // doesn't work, due to ReactJS framework
         } 
         else 
