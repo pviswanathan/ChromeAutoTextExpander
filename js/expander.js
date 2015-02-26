@@ -304,7 +304,7 @@ jQuery.noConflict();
         // Check if it is the search bar vs comments
         var $textInput = $(textInput);
         var text;
-        if ($textInput.parents('div.textInput').length) 
+        if (hasParentSelector(textInput, 'div', ['textInput'])) 
         {
             debugLog('facebook search bar');
             if ($textInput.find('span').get().length) {
@@ -323,28 +323,8 @@ jQuery.noConflict();
             // Set new cursor position
             setCursorPosition(textInput, cursorPosition - shortcut.length + autotext.length);
         } 
-        else if ($textInput.parents('div.UFICommentContainer').length) {
-            debugLog('facebook comments');
-
-            // this doesn't work, probably due to ReactJS framework, doesn't allow expansion to stay
-            /*
-            // Get spans in the comment container div, and find the right one to replace
-            $textNode = recursiveFindContainingTextNode($textInput, shortcut);
-            node = $textNode.get(0);
-            debugLog($textNode);
-            debugLog(node);
-
-            // Replace text in node
-            var text = replaceText(
-                $textNode.text(),
-                shortcut,
-                autotext,
-                cursorPosition
-            );
-            node.nodeValue = text;
-
-            // Set cursor position?
-            */
+        else if (hasParentSelector(textInput,'div', ['UFICommentContainer']) {
+            debugLog('facebook comments');  // doesn't work, due to ReactJS framework
         } 
         else 
         {
@@ -535,6 +515,30 @@ jQuery.noConflict();
 		}
 		return null;
 	}
+
+    // Returns the first match for a parent matching the given tag and classes.
+    //  Tag parameter should be a string, el is the element to query on, and
+    //  classes should be an array of strings of the names of the classes.
+    function hasParentSelector(el, tag, classes) 
+    {
+        tag = tag.toUpperCase();
+        var found = false;
+        while (el.parentNode && !found) 
+        {
+            el = el.parentNode;     // Check parent
+            if (el && el.tagName == tag) {
+                for (var i = 0; i < classes.length; i++) 
+                {
+                    if (!el.classList.contains(classes[i])) {
+                        break;
+                    }
+                    found = true;   // Found = true if element has all classes
+                    break;          // Break to while loop
+                }
+            }
+        }
+        return el; 
+    }
 
     // Cross-browser solution for getting cursor position
     function getCursorPosition(el, win, doc) 
