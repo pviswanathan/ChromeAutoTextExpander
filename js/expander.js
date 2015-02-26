@@ -197,7 +197,6 @@ jQuery.noConflict();
 						// Setup for processing
 						var domain = window.location.host;
 						var cursorPosition = getCursorPosition(textInput);
-						var text;
 
                         debugLog("textInput: ", textInput);
 
@@ -251,22 +250,21 @@ jQuery.noConflict();
             autotext,
             cursorPosition
         );
-        setCursorPosition(textInput, cursorPosition
-            - shortcut.length + autotext.length);
+        setCursorPosition(textInput, cursorPosition - shortcut.length + autotext.length);
     }
 
     // Handler for replacing text in editable divs
     function replaceTextEditableDiv(shortcut, autotext, cursorPosition)
     {
         // Get the focused / selected text node
-        var node = findFocusedNode();
-        var $textNode = $(node);
+        var oldNode = findFocusedNode();
+        var node = oldNode;
 
         // Find focused div instead of what's receiving events
-        textInput = node.parentNode;
+        var textInput = node.parentNode;
 
         // Get and process text
-        text = replaceText(node.textContent,
+        var text = replaceText(node.textContent,
             shortcut, autotext, cursorPosition);
 
         // If autotext is single line, simple case
@@ -274,7 +272,7 @@ jQuery.noConflict();
         {
             // Set text node in element
             node = document.createTextNode(text);
-            $textNode.replaceWith(node);
+            textInput.replaceChild(node, oldNode);
 
             // Update cursor position
             setCursorPositionInNode(node,
@@ -286,18 +284,15 @@ jQuery.noConflict();
             var lines = text.split('\n');
 
             // For simplicity, join with <br> tag instead
-            $textNode.replaceWith(lines.join('<br>'));
+            node = document.createTextNode(lines.join('<br>'));
+            textInput.replaceChild(node, oldNode);
 
             // Find the last added text node
-            $textNode = findMatchingTextNode(textInput,
-                lines[lines.length - 1]);
-            node = $textNode.get(0);
-            debugLog($textNode);
+            node = findMatchingTextNode(textInput, lines[lines.length - 1]);
             debugLog(node);
 
             // Update cursor position
-            setCursorPositionInNode(node,
-                lines[lines.length - 1].length);
+            setCursorPositionInNode(node, lines[lines.length - 1].length);
         }
     }
 
@@ -308,6 +303,7 @@ jQuery.noConflict();
 
         // Check if it is the search bar vs comments
         var $textInput = $(textInput);
+        var text;
         if ($textInput.parents('div.textInput').length) 
         {
             debugLog('facebook search bar');
@@ -325,8 +321,7 @@ jQuery.noConflict();
             );
 
             // Set new cursor position
-            setCursorPosition(textInput, 
-                cursorPosition - shortcut.length + autotext.length);
+            setCursorPosition(textInput, cursorPosition - shortcut.length + autotext.length);
         } 
         else if ($textInput.parents('div.UFICommentContainer').length) {
             debugLog('facebook comments');
@@ -415,20 +410,21 @@ jQuery.noConflict();
     function replaceTextEditableIframe(shortcut, autotext, node, iframeWindow)
     {
         // Find focused div instead of what's receiving events
-        textInput = node.parentNode;
+        var newNode
+            , textInput = node.parentNode;
         debugLog(textInput);
 
         // Get and process text, update cursor position
-        cursorPosition = getCursorPosition(node.parentNode, iframeWindow);
-        text = replaceText(node.textContent,
+        var cursorPosition = getCursorPosition(textInput, iframeWindow);
+        var text = replaceText(node.textContent,
             shortcut, autotext, cursorPosition);
 
         // If autotext is single line, simple case
         if (autotext.indexOf('\n') < 0)
         {
             // Set text node in element
-            var newNode = document.createTextNode(text);
-            node.parentNode.replaceChild(newNode, node);
+            newNode = document.createTextNode(text);
+            textInput.replaceChild(newNode, node);
 
             // Update cursor position
             setCursorPositionInNode(newNode,
@@ -440,18 +436,15 @@ jQuery.noConflict();
             var lines = text.split('\n');
 
             // For simplicity, join with <br> tag instead
-            var $textNode = $(node);
-            $textNode.replaceWith(lines.join('<br>'));
+            newNode = document.createTextNode(lines.join('<br>'));
+            textInput.replaceChild(newNode, node);
 
             // Find the last added text node
-            $textNode = findMatchingTextNode(textInput,
-                lines[lines.length - 1]);
-            node = $textNode.get(0);
-            debugLog($textNode);
+            node = findMatchingTextNode(textInput, lines[lines.length - 1]);
             debugLog(node);
 
             // Update cursor position
-            setCursorPositionInNode(node,
+            setCursorPositionInNode(newNode,
                 lines[lines.length - 1].length, iframeWindow);
         }
     }
@@ -521,7 +514,7 @@ jQuery.noConflict();
 					&& (this.nodeValue.length == text.length);	// with same text length
 			}).filter(function() {
 				return (this.nodeValue == text);	// Filter for same text
-			}).first();
+			}).first().get(0);
 	}
 
 	// Find node that user is editing right now, for editable divs
