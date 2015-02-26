@@ -442,51 +442,7 @@ jQuery.noConflict();
 			autotext, text.slice(cursorPosition)].join('');
 	}
 
-    // Recursive search for node containing text
-    function recursiveFindContainingTextNode($div, text)  {
-        var $result = recursiveFindContainingTextNodeHelper($div, text, 0);
-        return ($result.value.get(0).nodeValue.indexOf(text) >= 0) ? $result.value : null;
-    }
-    // Recursive helper for containing search
-    function recursiveFindContainingTextNodeHelper($div, text, level) 
-    {
-        // If it has children, recurse
-        var children = $div.children()
-            , childResults = [];
-        for (var i = 0; i < children.length; ++i) {
-            childResults.push(
-                recursiveFindContainingTextNodeHelper($(children[i]), text, level + 1)
-            );
-        }
-
-        // Get value for existing node
-        var value = findContainingTextNode($div, text);
-
-        // Compare to children, get deepest level
-        var maxDepth = level;
-        for (var i = 0, result; i < childResults.length; ++i) {
-            result = childResults[i];
-            if (result.value && result.level > maxDepth) {
-                maxDepth = result.level;
-                value = result.value;
-            }
-        }
-
-        // Return deepest result
-        return {level: maxDepth, value: value};
-    }
-	// Find node that has text contents that contains text
-	function findContainingTextNode($div, text)
-	{
-		var result = $div.contents().filter(function() {
-				return (this.nodeType == 3)						// Return all text nodes
-					&& (this.nodeValue.indexOf(text) >= 0);	    // containing text
-			}).last();  // Return last (deepest) match
-        return (!result || (Object.keys(result).length === 0) || (result.length === 0)) 
-            ? null : result;
-	}
-
-	// Find node that has text contents that matches text
+    // Find node that has text contents that matches text
 	function findMatchingTextNode(div, text)
 	{
 		return $(div).contents().filter(function() {
