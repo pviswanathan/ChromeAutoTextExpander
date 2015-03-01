@@ -10,6 +10,8 @@ jQuery.noConflict();
 		, KEYCODE_RETURN = 13
 		, KEYCODE_SPACEBAR = 32
 
+        , NODETYPE_TEXT = 3
+
 		, DEFAULT_CLEAR_BUFFER_TIMEOUT = 750
         , TIME_OUTLOOK_EDITOR_CHECK = 500
 
@@ -422,15 +424,15 @@ jQuery.noConflict();
         textInput.replaceChild(frag, node);             // Replace old node with frag
 
         // Set cursor position
-        var leftOffset = cursorPosition - shortcut.length;  // Where to calculate from
-        var cursorOffset = autotext.length;                 // How far to place cursor
-        if (multiline) 
-        {
-            leftOffset = 0;     // Start from 0, won't have any content before expansion
-            cursorOffset = lines[lines.length - 1].length   // offset without html tags
-                - (lastNode.outerHTML.length - lastNode.innerHTML.length);
+        if (multiline) {
+            if (lastNode.nodeType === NODETYPE_TEXT) {
+                setCursorPositionAfterNode(lastNode, iframeWindow);
+            } else {
+            }
+        } else {
+            setCursorPositionInNode(lastNode, 
+                    cursorPosition - shortcut.length + autotext.length, iframeWindow);
         }
-        setCursorPositionInNode(lastNode, leftOffset + cursorOffset, iframeWindow);
 
 /*
         // If autotext is single line, simple case
@@ -619,6 +621,40 @@ jQuery.noConflict();
 				range.setStart(node, pos);
 				range.select();
 			}
+		}
+	}
+
+	// Sets cursor position after a specific node, and optional
+    //  parameter to set what the window/document should be
+	function setCursorPositionAfterNode(node, win, doc)
+	{
+        debugLog('setCursorPositionAfterNode:', node);
+
+        // Setup variables
+		var sel, range;
+        if (!win) {
+            win = window;
+        }
+        if (!doc) {
+            doc = document;
+        }
+
+        // Check for getSelection(), if not available, try createTextRange
+		if (win.getSelection && doc.createRange) 
+        {
+			range = doc.createRange();
+            range.setStartAfter(node);
+            range.collapse(true);
+			sel = win.getSelection();
+			sel.removeAllRanges();
+			sel.addRange(range);
+		} 
+        else if (doc.body.createTextRange) 
+        {
+			range = doc.body.createTextRange();
+            range.setStartAfter(node);
+            range.collapse(true);
+			range.select();
 		}
 	}
 
