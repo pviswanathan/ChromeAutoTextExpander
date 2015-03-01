@@ -414,28 +414,23 @@ jQuery.noConflict();
         {
             // Split text by lines
             var lines = text.split('\n');
-            text = lines.join('<br>');
+            text = lines.join('<br>');  // For simplicity, join with <br> tag instead
 
             // A way to insert HTML into a content editable div with raw JS.
             //  Creates an element with the HTML content, then transfers node by node
             //  to a new Document Fragment, while keeping track of last node.
+            //  To make HTML work, can't use document.createTextNode()
             //  Sourced from: http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
             var el = document.createElement("div");
             el.innerHTML = text;
-            var frag = document.createDocumentFragment(), tempNode;
-            while ( (tempNode = el.firstChild) ) {
-                node = frag.appendChild(tempNode);
-            }
-
-            // For simplicity, join with <br> tag instead
-            //  To make HTML work, can't use document.createTextNode()
+            var frag = document.createDocumentFragment()
+            ;
+            for (var tempNode; tempNode = el.firstChild; frag.appendChild(tempNode)) {}
             textInput.replaceChild(frag, node);
 
-            /* -- Unnecessary with new code?
             // Find the last added text node
             node = findMatchingTextNode(textInput, lines[lines.length - 1]);
             debugLog(node);
-            */
 
             // Update cursor position
             setCursorPositionInNode(node,

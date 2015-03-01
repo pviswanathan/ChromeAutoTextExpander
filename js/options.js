@@ -504,6 +504,9 @@ $(function()
                             }
                         });
 
+                        // Set textarea height to fit content and resize as user types
+                        $('textarea').autosize();
+
                         // Update quota labels
                         refreshQuotaLabels(data);
 
