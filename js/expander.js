@@ -17,11 +17,11 @@ jQuery.noConflict();
 		, DATE_MACRO_CLOSE_TAG = ')'
 		, CLIP_MACRO_REGEX = /%clip%/g
 		, WHITESPACE_REGEX = /(\s)/
-        , CURSOR_TRACKING_TAG   // Way to track cursor location
+        , CURSOR_TRACKING_TAG = '?atec?'    // Way to track cursor location
+        , CURSOR_TRACKING_HTML              // HTML to insert into expansion
             = (function() {
                 var container = document.createElement('div');
-                container.appendChild(
-                    document.createProcessingInstruction('autoTextExpander-cursor', ''));
+                container.appendChild(document.createComment(CURSOR_TRACKING_TAG));
                 return container.innerHTML;
             })()
 
@@ -203,20 +203,17 @@ jQuery.noConflict();
 
 						// Setup for processing
 						var domain = window.location.host;
-						var cursorPosition = getCursorPosition(textInput);
-
                         debugLog("textInput: ", textInput);
 
 						// If input or textarea field, can easily change the val
 						if (textInput.nodeName == "TEXTAREA" || textInput.nodeName == "INPUT") {
-                            replaceTextRegular(shortcut, autotext, cursorPosition, textInput);
+                            replaceTextRegular(shortcut, autotext, textInput);
 						}
 						else	// Trouble... editable divs & special cases
 						{
                             // Check special domains
 							if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
-                                replaceTextFacebook(shortcut, autotext, 
-                                                    cursorPosition, textInput);
+                                replaceTextFacebook(shortcut, autotext, textInput);
                             } else if (OUTLOOK_DOMAIN_REGEX.test(domain)) {
                                 replaceTextOutlook(shortcut, autotext);
                             } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
@@ -225,7 +222,7 @@ jQuery.noConflict();
                                 replaceTextBasecamp(shortcut, autotext);
 							} else {
                                 debugLog("Domain:", domain);
-								replaceTextEditableDiv(shortcut, autotext, cursorPosition);
+								replaceTextEditableDiv(shortcut, autotext, textInput);
 							}
 						}
 					});	// END - getClipboardData()
@@ -240,8 +237,10 @@ jQuery.noConflict();
 	}
 
     // Specific handler for regular textarea and input elements
-    function replaceTextRegular(shortcut, autotext, cursorPosition, textInput)
+    function replaceTextRegular(shortcut, autotext, textInput)
     {
+	    var cursorPosition = getCursorPosition(textInput);
+
         // Fix for input[type=email] and input[type=number]
         if (cursorPosition === 0 && textInput.nodeName == "INPUT") 
         {
@@ -260,56 +259,15 @@ jQuery.noConflict();
         setCursorPosition(textInput, cursorPosition - shortcut.length + autotext.length);
     }
 
-    // Handler for replacing text in editable divs
-    function replaceTextEditableDiv(shortcut, autotext, cursorPosition)
-    {
-        // Get the focused / selected text node
-        var oldNode = findFocusedNode();
-        var node = oldNode;
-
-        // Find focused div instead of what's receiving events
-        var textInput = node.parentNode;
-
-        // Get and process text
-        var text = replaceText(node.textContent,
-            shortcut, autotext, cursorPosition);
-
-        // If autotext is single line, simple case
-        if (autotext.indexOf('\n') < 0)
-        {
-            // Set text node in element
-            node = document.createTextNode(text);
-            textInput.replaceChild(node, oldNode);
-
-            // Update cursor position
-            setCursorPositionInNode(node,
-                cursorPosition - shortcut.length + autotext.length);
-        }
-        else	// Multiline expanded text
-        {
-            // Split text by lines
-            var lines = text.split('\n');
-
-            // For simplicity, join with <br> tag instead
-            node = document.createTextNode(lines.join('<br>'));
-            textInput.replaceChild(node, oldNode);
-
-            // Find the last added text node
-            node = findMatchingTextNode(textInput, lines[lines.length - 1]);
-            debugLog("node:", node);
-
-            // Update cursor position
-            setCursorPositionInNode(node, lines[lines.length - 1].length);
-        }
-    }
-
     // Specific handler for Facebook element replacements
-    function replaceTextFacebook(shortcut, autotext, cursorPosition, textInput)
+    function replaceTextFacebook(shortcut, autotext, textInput)
     {
         debugLog("Domain: Facebook");
 
-        // Check if it is the search bar vs comments
         var text;
+        var cursorPosition = getCursorPosition(textInput);
+
+        // Check if it is the search bar vs comments
         if (hasParentSelector(textInput, 'div', ['textInput'])) 
         {
             debugLog('facebook search bar');
@@ -425,7 +383,9 @@ jQuery.noConflict();
             , cursorNode;                               // To track cursor position
         el.innerHTML = text;                            // Set HTML to div, then move to frag
         for (var tempNode; tempNode = el.firstChild; frag.appendChild(tempNode)) {
-            if (tempNode.nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+            debugLog(tempNode.nodeType, tempNode);
+            if (tempNode.nodeType === Node.COMMENT_NODE 
+                    && tempNode.nodeValue == CURSOR_TRACKING_TAG) {
                 cursorNode = tempNode;
             }
         }
@@ -436,6 +396,50 @@ jQuery.noConflict();
         setCursorPositionAfterNode(cursorNode || textInput.lastChild, iframeWindow);
         if (cursorNode) {
             cursorNode.parentNode.removeChild(cursorNode);
+        }
+    }
+
+    // Handler for replacing text in generic editable divs
+    function replaceTextEditableDiv(shortcut, autotext, textInput)
+    {
+        // Get the focused / selected text node
+        var oldNode = findFocusedNode();
+        var node = oldNode;
+        var cursorPosition = getCursorPosition(textInput);
+
+        // Find focused div instead of what's receiving events
+        textInput = node.parentNode;
+
+        // Get and process text
+        var text = replaceText(node.textContent,
+            shortcut, autotext, cursorPosition);
+
+        // If autotext is single line, simple case
+        if (autotext.indexOf('\n') < 0)
+        {
+            // Set text node in element
+            node = document.createTextNode(text);
+            textInput.replaceChild(node, oldNode);
+
+            // Update cursor position
+            setCursorPositionInNode(node,
+                cursorPosition - shortcut.length + autotext.length);
+        }
+        else	// Multiline expanded text
+        {
+            // Split text by lines
+            var lines = text.split('\n');
+
+            // For simplicity, join with <br> tag instead
+            node = document.createTextNode(lines.join('<br>'));
+            textInput.replaceChild(node, oldNode);
+
+            // Find the last added text node
+            node = findMatchingTextNode(textInput, lines[lines.length - 1]);
+            debugLog("node:", node);
+
+            // Update cursor position
+            setCursorPositionInNode(node, lines[lines.length - 1].length);
         }
     }
 
@@ -462,7 +466,7 @@ jQuery.noConflict();
 
 		// Replace shortcut based off cursorPosition, insert tracking tag for cursor
 		return [text.slice(0, cursorPosition - shortcut.length),
-			autotext, CURSOR_TRACKING_TAG, text.slice(cursorPosition)].join('');
+			autotext, CURSOR_TRACKING_HTML, text.slice(cursorPosition)].join('');
 	}
 
     // Find node that has text contents that matches text
