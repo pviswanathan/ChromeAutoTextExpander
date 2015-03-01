@@ -10,8 +10,6 @@ jQuery.noConflict();
 		, KEYCODE_RETURN = 13
 		, KEYCODE_SPACEBAR = 32
 
-        , NODETYPE_TEXT = 3
-
 		, DEFAULT_CLEAR_BUFFER_TIMEOUT = 750
         , TIME_OUTLOOK_EDITOR_CHECK = 500
 
@@ -19,6 +17,13 @@ jQuery.noConflict();
 		, DATE_MACRO_CLOSE_TAG = ')'
 		, CLIP_MACRO_REGEX = /%clip%/g
 		, WHITESPACE_REGEX = /(\s)/
+        , CURSOR_TRACKING_TAG   // Way to track cursor location
+            = (function() {
+                var container = document.createElement('div');
+                container.appendChild(
+                    document.createProcessingInstruction('autoTextExpander-cursor', ''));
+                return container.innerHTML;
+            })()
 
 		, BASECAMP_DOMAIN_REGEX = /basecamp.com/
 		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
@@ -398,7 +403,7 @@ jQuery.noConflict();
 
         // Get and process text, update cursor position
         var cursorPosition = getCursorPosition(textInput, iframeWindow)
-            , text = replaceText(node.textContent, shortcut, autotext, cursorPosition)
+            , text = replaceHTMLContent(node.textContent, shortcut, autotext, cursorPosition)
             , multiline = false
             , lines
         ;
@@ -413,67 +418,25 @@ jQuery.noConflict();
 
         // A way to insert HTML into a content editable div with raw JS.
         //  Creates an element with the HTML content, then transfers node by node
-        //  to a new Document Fragment, while keeping track of last node.
-        //  To make HTML work, can't use document.createTextNode()
-        //  Sourced from: http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+        //  to a new Document Fragment that replaces old node
+        //  Source from: http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
         var el = document.createElement("div")          // Used to store HTML
             , frag = document.createDocumentFragment()  // To replace old node
-            , lastNode;                                 // To track last node
+            , cursorNode;                               // To track cursor position
         el.innerHTML = text;                            // Set HTML to div, then move to frag
-        for (var tempNode; tempNode = el.firstChild; lastNode = frag.appendChild(tempNode)) {}
+        for (var tempNode; tempNode = el.firstChild; frag.appendChild(tempNode)) {
+            if (tempNode.nodeType === Node.PROCESSING_INSTRUCTION_NODE) {
+                cursorNode = tempNode;
+            }
+        }
         textInput.replaceChild(frag, node);             // Replace old node with frag
 
-        // Set cursor position
-        if (multiline) {
-            if (lastNode.nodeType === NODETYPE_TEXT) {
-                setCursorPositionAfterNode(lastNode, iframeWindow);
-            } else {
-            }
-        } else {
-            setCursorPositionInNode(lastNode, 
-                    cursorPosition - shortcut.length + autotext.length, iframeWindow);
+        // Set cursor position based off tracking node (or last child if we
+        //  weren't able to find the cursor tracker), then remove tracking node
+        setCursorPositionAfterNode(cursorNode || textInput.lastChild, iframeWindow);
+        if (cursorNode) {
+            cursorNode.parentNode.removeChild(cursorNode);
         }
-
-/*
-        // If autotext is single line, simple case
-        if (autotext.indexOf('\n') < 0)
-        {
-            // Set text node in element
-            var newNode = document.createTextNode(text);
-            textInput.replaceChild(newNode, node);
-
-            // Update cursor position
-            setCursorPositionInNode(newNode,
-                cursorPosition - shortcut.length + autotext.length, iframeWindow);
-        }
-        else	// Multiline expanded text
-        {
-            // Split text by lines
-            var lines = text.split('\n');
-            text = lines.join('<br>');  // For simplicity, join with <br> tag instead
-
-            // A way to insert HTML into a content editable div with raw JS.
-            //  Creates an element with the HTML content, then transfers node by node
-            //  to a new Document Fragment, while keeping track of last node.
-            //  To make HTML work, can't use document.createTextNode()
-            //  Sourced from: http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
-            var el = document.createElement("div");
-            el.innerHTML = text;
-            var frag = document.createDocumentFragment()
-            ;
-            for (var tempNode; tempNode = el.firstChild; frag.appendChild(tempNode)) {}
-            textInput.replaceChild(frag, node);
-
-            // Find the last added text node
-            node = findMatchingTextNode(textInput, lines[lines.length - 1]);
-            debugLog(node);
-
-            // Update cursor position
-            setCursorPositionInNode(node,
-                lines[lines.length - 1].length, iframeWindow);
-
-        }
-*/
     }
 
 	// Replacing shortcut with autotext in text at cursorPosition
@@ -489,11 +452,24 @@ jQuery.noConflict();
 			autotext, text.slice(cursorPosition)].join('');
 	}
 
+	// Replacing shortcut with autotext HTML content at cursorPosition
+	function replaceHTMLContent(text, shortcut, autotext, cursorPosition)
+	{
+		debugLog("cursorPosition:", cursorPosition);
+		debugLog("currentText:", text);
+		debugLog("shortcut:", shortcut);
+		debugLog("expandedText:", autotext);
+
+		// Replace shortcut based off cursorPosition, insert tracking tag for cursor
+		return [text.slice(0, cursorPosition - shortcut.length),
+			autotext, CURSOR_TRACKING_TAG, text.slice(cursorPosition)].join('');
+	}
+
     // Find node that has text contents that matches text
 	function findMatchingTextNode(div, text)
 	{
 		return $(div).contents().filter(function() {
-				return (this.nodeType == 3)						// Return all text nodes
+				return (this.nodeType == Node.TEXT_NODE)	    // Return all text nodes
 					&& (this.nodeValue.length == text.length);	// with same text length
 			}).filter(function() {
 				return (this.nodeValue == text);	// Filter for same text
