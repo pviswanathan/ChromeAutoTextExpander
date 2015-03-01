@@ -289,7 +289,7 @@ jQuery.noConflict();
 
             // Find the last added text node
             node = findMatchingTextNode(textInput, lines[lines.length - 1]);
-            debugLog(node);
+            debugLog("node:", node);
 
             // Update cursor position
             setCursorPositionInNode(node, lines[lines.length - 1].length);
@@ -351,7 +351,7 @@ jQuery.noConflict();
         // Get the focused / selected text node
         var iframeWindow = document.querySelector(SELECTOR_BASECAMP_EDIT).contentWindow;
         var node = findFocusedNode(iframeWindow);
-        debugLog(node);
+        debugLog("node:", node);
 
         // Pass onto editable iframe text handler
         replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
@@ -366,7 +366,7 @@ jQuery.noConflict();
         var iframeWindow = document.getElementById(SELECTOR_OUTLOOK_EDIT.substr(1))
             .contentWindow; // Need to cut off the # sign
         var node = findFocusedNode(iframeWindow);
-        debugLog(node);
+        debugLog("node:", node);
 
         // Pass onto editable iframe text handler
         replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
@@ -381,7 +381,7 @@ jQuery.noConflict();
         var iframeWindow = document.getElementById(SELECTOR_EVERNOTE_EDIT)
             .querySelector('iframe').contentWindow;
         var node = findFocusedNode(iframeWindow);
-        debugLog(node);
+        debugLog("node:", node);
 
         // Pass onto editable iframe text handler
         replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
@@ -395,10 +395,44 @@ jQuery.noConflict();
         debugLog(textInput);
 
         // Get and process text, update cursor position
-        var cursorPosition = getCursorPosition(textInput, iframeWindow);
-        var text = replaceText(node.textContent,
-            shortcut, autotext, cursorPosition);
+        var cursorPosition = getCursorPosition(textInput, iframeWindow)
+            , text = replaceText(node.textContent, shortcut, autotext, cursorPosition)
+            , multiline = false
+            , lines
+        ;
 
+        // If autotext is multiline text, split by newlines, join with <br> tag instead
+        if (autotext.indexOf('\n') >= 0) 
+        {
+            lines = text.split('\n');
+            text = lines.join('<br>');
+            multiline = true;
+        }
+
+        // A way to insert HTML into a content editable div with raw JS.
+        //  Creates an element with the HTML content, then transfers node by node
+        //  to a new Document Fragment, while keeping track of last node.
+        //  To make HTML work, can't use document.createTextNode()
+        //  Sourced from: http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+        var el = document.createElement("div")          // Used to store HTML
+            , frag = document.createDocumentFragment()  // To replace old node
+            , lastNode;                                 // To track last node
+        el.innerHTML = text;                            // Set HTML to div, then move to frag
+        for (var tempNode; tempNode = el.firstChild; lastNode = frag.appendChild(tempNode)) {}
+        textInput.replaceChild(frag, node);             // Replace old node with frag
+
+        // Set cursor position
+        var leftOffset = cursorPosition - shortcut.length;  // Where to calculate from
+        var cursorOffset = autotext.length;                 // How far to place cursor
+        if (multiline) 
+        {
+            leftOffset = 0;     // Start from 0, won't have any content before expansion
+            cursorOffset = lines[lines.length - 1].length   // offset without html tags
+                - (lastNode.outerHTML.length - lastNode.innerHTML.length);
+        }
+        setCursorPositionInNode(lastNode, leftOffset + cursorOffset, iframeWindow);
+
+/*
         // If autotext is single line, simple case
         if (autotext.indexOf('\n') < 0)
         {
@@ -435,7 +469,9 @@ jQuery.noConflict();
             // Update cursor position
             setCursorPositionInNode(node,
                 lines[lines.length - 1].length, iframeWindow);
+
         }
+*/
     }
 
 	// Replacing shortcut with autotext in text at cursorPosition
