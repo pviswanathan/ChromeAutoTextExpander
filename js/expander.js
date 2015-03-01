@@ -35,7 +35,7 @@ jQuery.noConflict();
 		, SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
         , SELECTOR_GMAIL_EDIT = 'div.aoI'
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'
-        , SELECTOR_EVERNOTE_EDIT = '#gwt-debug-noteEditor'
+        , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-noteEditor'
         , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'
 	;
 
@@ -306,7 +306,7 @@ jQuery.noConflict();
         if (hasParentSelector(textInput, 'div', ['textInput'])) 
         {
             debugLog('facebook search bar');
-            var span = textInput.querySelector('span');
+            var span = textInput.querySelector('span'); // Can only get collection
             if (span) {
                 textInput = span;
             }
@@ -363,7 +363,8 @@ jQuery.noConflict();
         debugLog("Domain: Outlook");
 
         // Get the focused / selected text node
-        var iframeWindow = document.getElementById(SELECTOR_OUTLOOK_EDIT).contentWindow;
+        var iframeWindow = document.getElementById(SELECTOR_OUTLOOK_EDIT.substr(1))
+            .contentWindow; // Need to cut off the # sign
         var node = findFocusedNode(iframeWindow);
         debugLog(node);
 
@@ -390,8 +391,7 @@ jQuery.noConflict();
     function replaceTextEditableIframe(shortcut, autotext, node, iframeWindow)
     {
         // Find focused div instead of what's receiving events
-        var newNode
-            , textInput = node.parentNode;
+        var textInput = node.parentNode;
         debugLog(textInput);
 
         // Get and process text, update cursor position
@@ -403,7 +403,7 @@ jQuery.noConflict();
         if (autotext.indexOf('\n') < 0)
         {
             // Set text node in element
-            newNode = document.createTextNode(text);
+            var newNode = document.createTextNode(text);
             textInput.replaceChild(newNode, node);
 
             // Update cursor position
@@ -414,17 +414,31 @@ jQuery.noConflict();
         {
             // Split text by lines
             var lines = text.split('\n');
+            text = lines.join('<br>');
+
+            // A way to insert HTML into a content editable div with raw JS.
+            //  Creates an element with the HTML content, then transfers node by node
+            //  to a new Document Fragment, while keeping track of last node.
+            //  Sourced from: http://stackoverflow.com/questions/6690752/insert-html-at-caret-in-a-contenteditable-div
+            var el = document.createElement("div");
+            el.innerHTML = text;
+            var frag = document.createDocumentFragment(), tempNode;
+            while ( (tempNode = el.firstChild) ) {
+                node = frag.appendChild(tempNode);
+            }
 
             // For simplicity, join with <br> tag instead
-            newNode = document.createTextNode(lines.join('<br>'));
-            textInput.replaceChild(newNode, node);
+            //  To make HTML work, can't use document.createTextNode()
+            textInput.replaceChild(frag, node);
 
+            /* -- Unnecessary with new code?
             // Find the last added text node
             node = findMatchingTextNode(textInput, lines[lines.length - 1]);
             debugLog(node);
+            */
 
             // Update cursor position
-            setCursorPositionInNode(newNode,
+            setCursorPositionInNode(node,
                 lines[lines.length - 1].length, iframeWindow);
         }
     }
