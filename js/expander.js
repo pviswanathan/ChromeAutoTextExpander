@@ -222,7 +222,7 @@ jQuery.noConflict();
                                 replaceTextBasecamp(shortcut, autotext);
 							} else {
                                 debugLog("Domain:", domain);
-								replaceTextEditableDiv(shortcut, autotext, textInput);
+                                replaceTextContentEditable(shortcut, autotext, findFocusedNode());
 							}
 						}
 					});	// END - getClipboardData()
@@ -319,7 +319,7 @@ jQuery.noConflict();
         debugLog("node:", node);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
+        replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
     }
 
     // Specific handler for Outlook iframe replacements
@@ -334,7 +334,7 @@ jQuery.noConflict();
         debugLog("node:", node);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
+        replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
     }
 
     // Specific handler for Evernote iframe replacements
@@ -349,19 +349,19 @@ jQuery.noConflict();
         debugLog("node:", node);
 
         // Pass onto editable iframe text handler
-        replaceTextEditableIframe(shortcut, autotext, node, iframeWindow);
+        replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
     }
 
     // Reusable handler for editable iframe text replacements
-    function replaceTextEditableIframe(shortcut, autotext, node, iframeWindow)
+    function replaceTextContentEditable(shortcut, autotext, node, win)
     {
         // Find focused div instead of what's receiving events
         var textInput = node.parentNode;
         debugLog(textInput);
 
         // Get and process text, update cursor position
-        var cursorPosition = getCursorPosition(textInput, iframeWindow)
-            , text = replaceHTMLContent(node.textContent, shortcut, autotext, cursorPosition)
+        var cursorPosition = getCursorPosition(textInput, win)
+            , text = replaceHTML(node.textContent, shortcut, autotext, cursorPosition)
             , multiline = false
             , lines
         ;
@@ -393,53 +393,9 @@ jQuery.noConflict();
 
         // Set cursor position based off tracking node (or last child if we
         //  weren't able to find the cursor tracker), then remove tracking node
-        setCursorPositionAfterNode(cursorNode || textInput.lastChild, iframeWindow);
+        setCursorPositionAfterNode(cursorNode || textInput.lastChild, win);
         if (cursorNode) {
             cursorNode.parentNode.removeChild(cursorNode);
-        }
-    }
-
-    // Handler for replacing text in generic editable divs
-    function replaceTextEditableDiv(shortcut, autotext, textInput)
-    {
-        // Get the focused / selected text node
-        var oldNode = findFocusedNode();
-        var node = oldNode;
-        var cursorPosition = getCursorPosition(textInput);
-
-        // Find focused div instead of what's receiving events
-        textInput = node.parentNode;
-
-        // Get and process text
-        var text = replaceText(node.textContent,
-            shortcut, autotext, cursorPosition);
-
-        // If autotext is single line, simple case
-        if (autotext.indexOf('\n') < 0)
-        {
-            // Set text node in element
-            node = document.createTextNode(text);
-            textInput.replaceChild(node, oldNode);
-
-            // Update cursor position
-            setCursorPositionInNode(node,
-                cursorPosition - shortcut.length + autotext.length);
-        }
-        else	// Multiline expanded text
-        {
-            // Split text by lines
-            var lines = text.split('\n');
-
-            // For simplicity, join with <br> tag instead
-            node = document.createTextNode(lines.join('<br>'));
-            textInput.replaceChild(node, oldNode);
-
-            // Find the last added text node
-            node = findMatchingTextNode(textInput, lines[lines.length - 1]);
-            debugLog("node:", node);
-
-            // Update cursor position
-            setCursorPositionInNode(node, lines[lines.length - 1].length);
         }
     }
 
@@ -457,7 +413,7 @@ jQuery.noConflict();
 	}
 
 	// Replacing shortcut with autotext HTML content at cursorPosition
-	function replaceHTMLContent(text, shortcut, autotext, cursorPosition)
+	function replaceHTML(text, shortcut, autotext, cursorPosition)
 	{
 		debugLog("cursorPosition:", cursorPosition);
 		debugLog("currentText:", text);
@@ -527,15 +483,24 @@ jQuery.noConflict();
     function getCursorPosition(el, win, doc) 
     {
 		var pos = 0, sel;
-		if (!win) { win = window; }
-		if (!doc) { doc = document; }
-		if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
-			try {	// Needed for new input[type=email] failing
+		if (!win) { 
+            win = window; 
+        }
+		if (!doc) { 
+            doc = document; 
+        }
+		if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') 
+        {
+			try 	// Needed for new input[type=email] failing
+            {
 				if (el.selectionStart) {
 					pos = el.selectionStart;
-				} else if (doc.selection) {
+				} 
+                else if (doc.selection) 
+                {
 					el.focus();
 					sel = doc.selection.createRange();
+
 					var SelLength = doc.selection.createRange().text.length;
 					Sel.moveStart('character', -el.value.length);
 					pos = Sel.text.length - SelLength;
@@ -543,16 +508,22 @@ jQuery.noConflict();
 			} catch (exception) {
 				console.log('getCursorPosition:', exception);
 			}
-		} else {	// Other elements
-			if (win.getSelection) {
+		} 
+        else	// Other elements
+        {
+			if (win.getSelection) 
+            {
 				sel = win.getSelection();
 				if (sel.rangeCount) {
 					pos = sel.getRangeAt(0).endOffset;
 				}
-			} else if (doc.selection && doc.selection.createRange) {
+			} 
+            else if (doc.selection && doc.selection.createRange) 
+            {
 				sel = doc.selection.createRange();
 				var tempEl = doc.createElement("span");
 				el.insertBefore(tempEl, el.firstChild);
+
 				var tempRange = sel.duplicate();
 				tempRange.moveToElementText(tempEl);
 				tempRange.setEndPoint("EndToEnd", sel);
