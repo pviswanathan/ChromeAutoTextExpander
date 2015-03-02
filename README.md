@@ -16,8 +16,6 @@ Technologies Used:
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
- - Allow embedding of html into single-line expansions
- - Easy to access testing ground
  - Nested shortcuts
  - Date Arithmetic
  - Opera extension version
@@ -35,10 +33,11 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 ## Version History
 v1.7.1
- - Removing jQuery to reduce js dependencies and speed things up
+ - Removing lots of jQuery dependencies to keep things lean and speed things up
  - Added checks into expander code to prevent expansion and warn user to refresh browser if shortcut database version is different
  - Added shortcut recovery in case of shortcuts disappearing for some reason
  - Adding localization for dates based off your browser locale (+160kb for locales)
+ - Rewrote logic for inserting into editable iframes and divs, much more accurate and reliable
  
 v1.7.0
  - Revamped options page!
