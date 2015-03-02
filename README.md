@@ -17,6 +17,7 @@ Technologies Used:
 
 Feature Requests:
  - Allow embedding of html into single-line expansions
+ - Easy to access testing ground
  - Nested shortcuts
  - Date Arithmetic
  - Opera extension version
