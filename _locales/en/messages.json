@@ -194,6 +194,16 @@
 		, "description": "Text to insert into the demo section of the options page"
 	}
 
+	, "TITLE_TIPS_LINK": {
+		"message": "Useful tips"
+		, "description": "Title for the link to useful tips and information on the options page"
+	}
+
+	, "TEXT_OPTIONS_DESCRIPTION": {
+		"message": "Edit your database of shortcuts and expansions here!"
+		, "description": "Text for options page description text."
+	}
+
 	, "TEMPLATE": {
 		"message": "template"
 		, "description": "Template"

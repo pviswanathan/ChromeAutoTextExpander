@@ -2,23 +2,7 @@
 	<head>
 		<title>Auto Text Expander : Demo</title>
 		<meta charset="utf-8" />
-
-        <!-- CSS -->
-        <style>
-            #editor {
-                width:100%; 
-                height:100%; 
-                overflow:auto;
-            }
-
-            #convertHTMLButton {
-                position:fixed;
-                top: 8px;
-                right: 8px;
-                width: 24px;
-                height: 24px;
-            }
-        </style>
+		<link rel="stylesheet" type="text/css" href="css/demo.css" />
 	</head>
 
 	<body>
@@ -33,16 +17,7 @@
 	<script src="js/moment-with-locales.min.js"></script>
 	<script src="js/constants.js"></script>
 	<script src="js/expander.js"></script>
-
-    <script type="text/javascript">
-        $('#convertHTMLButton').on('click', function(event) 
-        {
-            console.log("convertHTMLButton clicked");
-            var text = $('#editor').innerHTML;
-            console.log('HTML:', text);
-            $('#editor').text(text);
-        });
-    </script>
+	<script src="js/demo.js"></script>
 
 </html>
 
