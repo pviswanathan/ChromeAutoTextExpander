@@ -37,7 +37,10 @@ v1.7.1
  - Added checks into expander code to prevent expansion and warn user to refresh browser if shortcut database version is different
  - Added shortcut recovery in case of shortcuts disappearing for some reason
  - Adding localization for dates based off your browser locale (+160kb for locales)
- - Rewrote logic for inserting into editable iframes and divs, much more accurate and reliable
+ - Rewrote logic for inserting into editable iframes and divs, more accurate and reliable
+ - Allowing HTML expansions for single line expansions too
+ - Added demo area on the options page where you can test your shortcuts live!
+ - Adding ability to convert what is in the demo area into HTML, so it doubles as a place where you can copy-paste HTML content and have it translated to expansion format.
  
 v1.7.0
  - Revamped options page!

@@ -18,7 +18,7 @@
 				</span>
 			</h1>
 
-            <section>
+            <section id="tipsSection">
 			<p>
 				Edit your database of shortcuts and expansions here!
 				<strong><a id="tipsLink" class="error" href="#" 
@@ -97,17 +97,22 @@
 			    <section id="shortcutsSection">
                 <h2>Shortcuts
                     <div class="storage label">
-                        <span id="countStorage">#</span> shortcuts out of 
-                        <span id="countQuota">#</span> available
+                        <span id="countStorage">#</span> shortcuts used out of 
+                        <span id="countQuota">#</span>
                     </div> 
                 </h2>
                 <fieldset>
-                    <button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
-                    <button type="button" class="addButton">Add</button>
-                    <button type="button" class="saveButton">Save</button>
+                    <button type="button" class="refreshButton">
+                        <img src="images/refresh.png" alt="" /> Refresh</button>
+                    <button type="button" class="addButton">
+                        <img src="images/add.png" alt="" /> Add</button>
+                    <button type="button" class="saveButton">
+                        <img src="images/save.png" alt="" /> Save</button>
                     <div class="storage label">
                         <span id="totalStorage">#</span> bytes used out of 
-                        <a id="totalQuota" target="_blank" href="https://developer.chrome.com/extensions/storage#properties" title="Chrome Storage Quotas">#</a> available
+                        <a id="totalQuota" target="_blank" 
+                            href="https://developer.chrome.com/extensions/storage#properties" 
+                            title="Chrome Storage Quotas">#</a>
                     </div>
                 </fieldset>
 
@@ -123,9 +128,12 @@
                 </table>
 
                 <fieldset class="fR tR"> <!-- Saving options -->
-                    <button type="button" class="refreshButton"><img src="images/reload.png" alt="Reload" /> Refresh</button>
-                    <button type="button" class="addButton append">Add</button>
-                    <button type="button" class="saveButton">Save</button>
+                    <button type="button" class="refreshButton">
+                        <img src="images/refresh.png" alt="" /> Refresh</button>
+                    <button type="button" class="addButton">
+                        <img src="images/add.png" alt="" /> Add</button>
+                    <button type="button" class="saveButton">
+                        <img src="images/save.png" alt="" /> Save</button>
                 </fieldset>
 			    </section>
 

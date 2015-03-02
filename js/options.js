@@ -178,7 +178,7 @@ $(function()
         console.log('database version:', shortcutVersion);
         if (shortcutVersion && shortcutVersion != metaData[SHORTCUT_VERSION_KEY]) 
         {
-            // Warn user that their shortcuts aren't synced yet, they should reload
+            // Warn user that their shortcuts aren't synced yet, they should refresh
             console.log(chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH"));
             alert(chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH"));
         }
@@ -190,7 +190,7 @@ $(function()
         console.log("setupShortcuts");
 
         var errors = false;					// Keep track of errors
-        var reloadStartTime = new Date();	// Keep track of time
+        var refreshStartTime = new Date();	// Keep track of time
         $('.refreshButton').find('img').attr('src', 'images/refresh.gif');
         $('#edit').fadeOut(ANIMATION_FAST, function() {
             $(this).html('').fadeIn(ANIMATION_FAST, function()
@@ -272,21 +272,21 @@ $(function()
                 }
 
                 // Add some delay so it looks like it's doing some work
-                var reloadTimeInMilliseconds = (new Date()).getTime() - reloadStartTime.getTime();
-                var reloadIconRefreshDelay = (1000 - reloadTimeInMilliseconds);
-                if (reloadIconRefreshDelay < 0) {
-                    reloadIconRefreshDelay = 0;
+                var refreshTimeInMilliseconds = (new Date()).getTime() - refreshStartTime.getTime();
+                var refreshIconRefreshDelay = (1000 - refreshTimeInMilliseconds);
+                if (refreshIconRefreshDelay < 0) {
+                    refreshIconRefreshDelay = 0;
                 }
 
-                // Done! Set reloader icon back and call custom completionBlock
+                // Done! Set refresher icon back and call custom completionBlock
                 setTimeout(function()
                 {
-                    $('.refreshButton').find('img').attr('src', 'images/reload.png');
+                    $('.refreshButton').find('img').attr('src', 'images/refresh.png');
 
                     if (completionBlock) {
                         completionBlock(!errors);
                     }
-                }, reloadIconRefreshDelay);
+                }, refreshIconRefreshDelay);
             });
         });
 

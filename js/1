@@ -1,32 +1,22 @@
 {
 	"EXTENSION_NAME": {
 		"message": "Auto Text Expander for Google Chrome™"
-		, "description": "Extension name for the Chrome webstore."
-	}
-
-	, "EXTENSION_TITLE": {
-		"message": "Auto Text Expander"
-		, "description": "Extension short title."
+		, "description": "Extension name."
 	}
 
 	, "EXTENSION_DESCRIPTION": {
 		"message": "Create custom keyboard shortcuts to expand and replace text as you type!"
-		, "description": "Extension description for the chrome webstore."
+		, "description": "Extension description."
 	}
+
+	, "PAGE_ACTION_TITLE": {
+		"message": "AutoTextExpander should work on this site"
+		, "description": "Page action default title."
+    }
 
 	, "BROWSER_ACTION_TITLE": {
 		"message": "Click to view options for AutoTextExpander"
 		, "description": "Browser action default title."
-	}
-
-	, "TITLE_OPTIONS_PAGE": {
-		"message": "Options"
-		, "description": "Title for the options page"
-	}
-
-	, "TITLE_DEMO_PAGE": {
-		"message": "Demo"
-		, "description": "Title for the demo page"
 	}
 
 	, "TITLE_WARNING_POPUP": {
@@ -136,62 +126,32 @@
 
 	, "TITLE_CONVERT_BUTTON": {
 		"message": "Convert"
-		, "description": "Title for the convert button for the options page"
+		, "description": "Template"
 	}
 
 	, "TITLE_BACKUP_BUTTON": {
 		"message": "Backup"
-		, "description": "Title for the backup button for the options page"
+		, "description": "Template"
 	}
 
 	, "TITLE_IMPORT_BUTTON": {
 		"message": "Import / Export"
-		, "description": "Title for the import/export button for the options page"
+		, "description": "Template"
 	}
 
-	, "HEADER_SHORTCUT_SECTION": {
-		"message": "Shortcuts"
-		, "description": "Header for the shortcuts section of the options page"
+	, "TEMPLATE": {
+		"message": "template"
+		, "description": "Template"
 	}
 
-	, "TITLE_TIMEOUT_LABEL": {
-		"message": "Shortcut Timeout"
-		, "description": "Title for the shortcut timeout label on the options page"
+	, "TEMPLATE": {
+		"message": "template"
+		, "description": "Template"
 	}
 
-	, "TITLE_FEEDBACK_LINK": {
-		"message": "Feedback"
-		, "description": "Title for the feedback link on the options page"
-	}
-
-	, "TITLE_FEATURE_REQUEST_LINK": {
-		"message": "Feature Requests"
-		, "description": "Title for the feature request link on the options page"
-	}
-
-	, "TITLE_BACKUP_TIMESTAMP_LABEL": {
-		"message": "Last local backup was"
-		, "description": "Title for the last local backup timestamp message label"
-	}
-
-	, "TITLE_SHORTCUT_QUOTA_LABEL": {
-		"message": "shortcuts used out of"
-		, "description": "Title for the # of shortcuts of sync storage used message label"
-	}
-
-	, "TITLE_STORAGE_QUOTA_LABEL": {
-		"message": "bytes used out of"
-		, "description": "Title for the # of bytes of sync storage used message label"
-	}
-
-	, "TITLE_BACK_TO_TOP_LINK": {
-		"message": "Back to top"
-		, "description": "Title for the link to jump back to the top of the page"
-	}
-
-	, "TEXT_DEMO_SECTION": {
-		"message": "Try your shortcuts here! Make sure to save them first."
-		, "description": "Text to insert into the demo section of the options page"
+	, "TEMPLATE": {
+		"message": "template"
+		, "description": "Template"
 	}
 
 	, "TEMPLATE": {
