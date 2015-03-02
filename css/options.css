@@ -132,7 +132,7 @@ label, button {
 	position: relative;
 	padding-left: 24px;
 }
-.refreshButton img {
+button img {
 	position: absolute;
 	left: 6px;
 	top: 5px;
