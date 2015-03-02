@@ -16,15 +16,14 @@ Technologies Used:
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
- - Nested shortcuts
  - Date Arithmetic
- - Opera extension version
  - Work with Google's Inbox
  - Work with Chatango
  - Work with Google Translate (http://translate.google.com/toolkit)
  - Work with Outlook Meeting Request Body?
  - Work with Microsoft Forums (http://trainingsupport.microsoft.com/en-us/tcmva/forum)
  - Rich HTML editor
+ - Opera extension version
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
 
