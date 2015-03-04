@@ -245,7 +245,7 @@ jQuery.noConflict();
         if (cursorPosition === 0 && textInput.nodeName == "INPUT") 
         {
             var type = textInput.getAttribute('type').toUpperCase();
-            if (type == 'email' || type == 'number') {
+            if (type == 'EMAIL' || type == 'NUMBER') {
                 cursorPosition = textInput.value.length;
             }
         }
