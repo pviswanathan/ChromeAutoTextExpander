@@ -16,6 +16,7 @@ Technologies Used:
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
+ - Cursor placement
  - Date Arithmetic
  - Work with Google's Inbox
  - Work with Chatango

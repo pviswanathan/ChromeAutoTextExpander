@@ -128,7 +128,7 @@ label, button {
 	color: #444;
 }
 
-.refreshButton {
+.refreshButton, .addButton, .saveButton {
 	position: relative;
 	padding-left: 24px;
 }
