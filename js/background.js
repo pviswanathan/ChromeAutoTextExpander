@@ -3,7 +3,6 @@ var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
     , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts' // For shortcut DB migration
     , OLD_SHORTCUT_VERSION_KEY = 'v'            // For shortcut DB migration
     , TEST_OLD_APP_VERSION                      // For testing upgrades from older versions
-    , ON_INSTALLED_CALLED = false               // Track if onInstalled() is called
 ;
 console.log('Initializing ATE v' + MANIFEST.version, chrome.i18n.getMessage('@@ui_locale'));
 
@@ -48,73 +47,47 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 chrome.runtime.onInstalled.addListener(function(details)
 {
 	console.log("onInstalled: " + details.reason);
-    ON_INSTALLED_CALLED = true;     // Flag this so we know onInstalled() has been called
 
-	// Action to take depending on reason
-	var executeFunction;
-	switch (details.reason)
-	{
-		case "install":
-			executeFunction = injectScript;		// Inject content script
-			break;
-
-		case "update":  // Don't reinject script, sometimes doesn't work and have two copies
-		default: 
-            break;
-	}
-
-	// Only act on if was fresh install
-	if (executeFunction)
-	{
-		// Execute on all open tabs
+	// Inject script into all open tabs if first install
+	if (details.reason == "install") {
 		chrome.tabs.query({}, function(tabs)
 		{
 			console.log("Executing on tabs: ", tabs);
 			for (var i = 0, l = tabs.length; i < l; ++i) {
-				executeFunction(tabs[i]);
+				injectScript(tabs[i]);
 			}
 		});
 	}
 
 	// If upgrade and new version number, process upgrade
-	if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
+    else if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
         processVersionUpgrade(details.previousVersion);
 	}
+
+    // Check synced shortcuts in case of need to update, show options, etc.
+    else {
+        chrome.storage.sync.get(null, function(data)
+        {
+            console.log('checking shortcuts...');
+
+            if (chrome.runtime.lastError) {	// Check for errors
+                console.log(chrome.runtime.lastError);
+            } else if (!data || Object.keys(data).length == 0) {
+                // If no shortcuts exist, show options page (should show emergency backup restore)
+                chrome.tabs.create({url: "options.html"});
+            } else if (data[SHORTCUT_VERSION_KEY] 
+                    && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
+                // If version is off, try to initiate upgrade
+                processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
+            }
+        });
+    }
 });
 
 // Show options page when browser action is clicked
 //  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
 chrome.browserAction.onClicked.addListener(function(tab) {
    openOrFocusOptionsPage();
-});
-
-// On startup
-chrome.runtime.onInstalled.addListener(function()
-{
-    console.log('onStart');
-
-    // If already being installed or upgraded, don't need to do another check
-    if (ON_INSTALLED_CALLED) {
-        console.log('onInstalled() already called');
-        return;
-    }
-
-    // Check synced shortcuts in case of need to update, show options, etc.
-    chrome.storage.sync.get(null, function(data)
-    {
-        console.log('checking shortcuts...');
-
-        if (chrome.runtime.lastError) {	// Check for errors
-            console.log(chrome.runtime.lastError);
-        } else if (!data || Object.keys(data).length == 0) {
-            // If no shortcuts exist, show options page (should show emergency backup restore)
-            chrome.tabs.create({url: "options.html"});
-        } else if (data[SHORTCUT_VERSION_KEY] 
-                && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
-            // If version is off, try to initiate upgrade
-            processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
-        }
-    });
 });
 
 
