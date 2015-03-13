@@ -26,8 +26,8 @@
 	, "content_scripts": [{
 		"matches": [ "<all_urls>" ]
 		, "js": [
-			"js/jquery-2.1.1-simplified.min.js"
-			, "js/moment-with-locales.min.js"
+			"js/third_party/jquery-2.1.1-simplified.min.js"
+			, "js/third_party/moment-with-locales.min.js"
             , "js/constants.js"
 			, "js/expander.js"
 		]

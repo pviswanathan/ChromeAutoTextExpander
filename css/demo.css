@@ -4,10 +4,13 @@
     overflow:auto;
 }
 
-#convertHTMLButton {
+#toolbar {
     position:fixed;
     top: 8px;
     right: 8px;
+}
+
+.toolbarButton {
     width: 24px;
     height: 24px;
 }

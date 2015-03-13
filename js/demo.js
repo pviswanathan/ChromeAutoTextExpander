@@ -1,6 +1,7 @@
 
 (function($)
 {
+    // Setup editor buttons
     $('#convertHTMLButton').click(function(event) 
     {
         console.log("convertHTMLButton clicked");
@@ -8,4 +9,5 @@
         console.log('HTML:', text);
         $('#editor').text(text);
     });
+
 })(jQuery);

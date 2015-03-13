@@ -11,8 +11,8 @@ $(function()
         , KEYCODE_TAB = 9
         , KEYCODE_ESC = 27
 
-        , IMAGE_REFRESH_ICON = 'images/open-iconic/reload-2x.png'
-        , IMAGE_REMOVE_ICON = 'images/open-iconic/trash-2x.png'
+        , IMAGE_REFRESH_ICON = 'images/third_party/open-iconic/reload-2x.png'
+        , IMAGE_REMOVE_ICON = 'images/third_party/open-iconic/trash-2x.png'
 
         , ANIMATION_FAST = 200
         , ANIMATION_NORMAL = 400
