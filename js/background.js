@@ -95,6 +95,7 @@ chrome.runtime.onInstalled.addListener(function()
 
     // If already being installed or upgraded, don't need to do another check
     if (ON_INSTALLED_CALLED) {
+        console.log('onInstalled() already called');
         return;
     }
 
