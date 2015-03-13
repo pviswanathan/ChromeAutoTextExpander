@@ -4,6 +4,11 @@
 		, "description": "Extension name for the Chrome webstore."
 	}
 
+	,"EXTENSION_SHORTNAME": {
+		"message": "(txt)^r"
+		, "description": "Extension short name for the Chrome webstore (< 12 chars)."
+	}
+
 	, "EXTENSION_TITLE": {
 		"message": "Auto Text Expander"
 		, "description": "Extension short title."
