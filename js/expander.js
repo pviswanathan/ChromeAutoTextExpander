@@ -491,44 +491,18 @@ jQuery.noConflict();
         }
 		if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') 
         {
-			try 	// Needed for new input[type=email] failing
-            {
-				if (el.selectionStart) {
-					pos = el.selectionStart;
-				} 
-                else if (doc.selection) 
-                {
-					el.focus();
-					sel = doc.selection.createRange();
-
-					var SelLength = doc.selection.createRange().text.length;
-					Sel.moveStart('character', -el.value.length);
-					pos = Sel.text.length - SelLength;
-				}
+			try { 	// Needed for new input[type=email] failing
+				pos = el.selectionStart;
 			} catch (exception) {
 				console.log('getCursorPosition:', exception);
 			}
 		} 
         else	// Other elements
         {
-			if (win.getSelection) 
-            {
-				sel = win.getSelection();
-				if (sel.rangeCount) {
-					pos = sel.getRangeAt(0).endOffset;
-				}
-			} 
-            else if (doc.selection && doc.selection.createRange) 
-            {
-				sel = doc.selection.createRange();
-				var tempEl = doc.createElement("span");
-				el.insertBefore(tempEl, el.firstChild);
-
-				var tempRange = sel.duplicate();
-				tempRange.moveToElementText(tempEl);
-				tempRange.setEndPoint("EndToEnd", sel);
-				pos = tempRange.text.length;
-			}
+            sel = win.getSelection();
+            if (sel.rangeCount) {
+                pos = sel.getRangeAt(0).endOffset;
+            }
 		}
 		return pos;
     }

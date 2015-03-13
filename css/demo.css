@@ -1,17 +1,40 @@
-#editor {
-    width:100%; 
-    height:100%; 
-    overflow:auto;
+body {
+    margin: 0;
 }
 
 #toolbar {
-    position:fixed;
-    top: 8px;
-    right: 8px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 24px;
+    padding: 2px;
+    background: #ddd;
+    border-bottom: 1px solid #bbb;
+    box-shadow: 0 -2px 8px 0px #000;
 }
 
 .toolbarButton {
     width: 24px;
     height: 24px;
+    padding: 0px;
+    vertical-align: middle;
+    text-align: center;
+}
+.toolbarButton img {
+    width: 12px;
+    height: 12px;
+}
+
+#convertHTMLButton {
+    float: right;
+}
+
+#editor {
+    overflow: auto;
+    outline: 1px solid transparent;
+    margin-top: 30px;
+    padding: 6px;
+    height: 66%;
 }
 
