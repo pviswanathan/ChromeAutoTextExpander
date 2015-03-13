@@ -187,6 +187,8 @@ $(function()
             // Warn user that their shortcuts aren't synced yet, they should refresh
             console.log(chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH"));
             alert(chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH"));
+            console.log('Database version:', shortcutVersion);
+            console.log('Extension version:', metaData[SHORTCUT_VERSION_KEY]);
         }
     }
 

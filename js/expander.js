@@ -843,6 +843,8 @@ jQuery.noConflict();
                 var warning = chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH")
                     + '\n\n' + chrome.i18n.getMessage("WARNING_SHORTCUT_DISABLED");
                 console.log(warning);
+                console.log('Database version:', data[SHORTCUT_VERSION_KEY]);
+                console.log('Extension version:', APP_VERSION);
                 if (!disableShortcuts) {
                     alert(warning);
                 }
