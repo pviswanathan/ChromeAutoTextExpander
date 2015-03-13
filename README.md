@@ -40,7 +40,7 @@ v1.8.0
  - Allowing HTML expansions for single line expansions too
  - Added demo area on the options page where you can test your shortcuts live!
  - Adding ability to convert what is in the demo area into HTML, so it doubles as a place where you can copy-paste HTML content and have it translated to expansion format.
- - Adding ability to determine cursor location when expanding into contenteditable divs by including a special tag in the expansion.
+ - Adding ability to determine cursor location when expanding into contenteditable divs by including a special tag in the expansion, instructions in Useful Tips section of options.
  
 v1.7.0
  - Revamped options page!
