@@ -11,6 +11,9 @@ $(function()
         , KEYCODE_TAB = 9
         , KEYCODE_ESC = 27
 
+        , IMAGE_REFRESH_ICON = 'images/open-iconic/reload-2x.png'
+        , IMAGE_REMOVE_ICON = 'images/open-iconic/trash-2x.png'
+
         , ANIMATION_FAST = 200
         , ANIMATION_NORMAL = 400
         , ANIMATION_SLOW = 1000
@@ -281,7 +284,7 @@ $(function()
                 // Done! Set refresher icon back and call custom completionBlock
                 setTimeout(function()
                 {
-                    $('.refreshButton').find('img').attr('src', 'images/refresh.png');
+                    $('.refreshButton').find('img').attr('src', IMAGE_REFRESH_ICON);
 
                     if (completionBlock) {
                         completionBlock(!errors);
@@ -371,7 +374,7 @@ $(function()
                     .addClass('remove')
                     .attr('title', 'Remove Shortcut')
                     .append($(document.createElement('img'))
-                        .attr('src', 'images/remove.png')
+                        .attr('src', IMAGE_REMOVE_ICON)
                         .attr('alt', 'x')
                     )
                 )

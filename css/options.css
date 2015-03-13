@@ -86,6 +86,19 @@ table tr td:first-child::before { /* Row numbering */
     right: 108px;
     text-align: right;
 }
+table tr td a {
+    opacity: 0.5;
+}
+table tr td a:hover {
+    opacity: 1.0;
+}
+table tr td img {
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 7px;
+    left: 4px;
+}
 
 input, textarea {
 	font: normal 10pt/auto Verdana;
@@ -128,14 +141,16 @@ label, button {
 	color: #444;
 }
 
-.refreshButton, .addButton, .saveButton {
+button.icon {
 	position: relative;
 	padding-left: 24px;
 }
 button img {
-	position: absolute;
-	left: 6px;
-	top: 5px;
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
 }
 
 .label, #restore.disabled, #totalQuota, #countQuota {

@@ -80,9 +80,11 @@
 
             <form>
 			    <section id="actionsSection">
-                <button type="button" id="port">Import / Export</button>
-                <button type="button" id="backup">Backup</button>
-                <div class="restore label">Last local backup was
+                <button type="button" class="icon" id="port">
+                    <img src="images/open-iconic/transfer-2x.png" alt="" /> Import / Export</button>
+                <button type="button" class="icon" id="backup">
+                    <img src="images/open-iconic/cloud-upload-2x.png" alt="" /> Backup</button>
+                <div class="restore label">Last local backup:
                     <a id="restore" href="#" title="Restore Backup Shortcuts"></a>
                 </div>
                 <br />
@@ -102,12 +104,12 @@
                     </div> 
                 </h2>
                 <fieldset>
-                    <button type="button" class="refreshButton">
-                        <img src="images/refresh.png" alt="" /> Refresh</button>
-                    <button type="button" class="addButton">
-                        <img src="images/add.png" alt="" /> Add</button>
-                    <button type="button" class="saveButton">
-                        <img src="images/save.png" alt="" /> Save</button>
+                    <button type="button" class="refreshButton icon">
+                        <img src="images/open-iconic/reload-2x.png" alt="" /> Refresh</button>
+                    <button type="button" class="addButton icon">
+                        <img src="images/open-iconic/plus-2x.png" alt="" /> Add</button>
+                    <button type="button" class="saveButton icon">
+                        <img src="images/open-iconic/check-2x.png" alt="" /> Save</button>
                     <div class="storage label">
                         <span id="totalStorage">#</span> bytes used out of 
                         <a id="totalQuota" target="_blank" 
@@ -123,19 +125,20 @@
                     <tr id="input">
                         <td><input type="text" class="shortcut" value="Shortcut" /></td>
                         <td><input type="text" class="autotext" value="Expanded Text" /></td>
-                        <td><a href="#" class="remove" title="Remove Shortcut"><img src="images/remove.png" alt="x" /></a></td>
+                        <td><a href="#" class="remove" title="Remove Shortcut"><img src="images/open-iconic/trash-2x.png" alt="x" /></a></td>
                     </tr>
                 </table>
 
                 <fieldset class="fR tR"> <!-- Saving options -->
-                    <button type="button" class="refreshButton">
-                        <img src="images/refresh.png" alt="" /> Refresh</button>
-                    <button type="button" class="addButton">
-                        <img src="images/add.png" alt="" /> Add</button>
-                    <button type="button" class="saveButton">
-                        <img src="images/save.png" alt="" /> Save</button>
+                    <button type="button" class="refreshButton icon">
+                        <img src="images/open-iconic/reload-2x.png" alt="" /> Refresh</button>
+                    <button type="button" class="addButton icon">
+                        <img src="images/open-iconic/plus-2x.png" alt="" /> Add</button>
+                    <button type="button" class="saveButton icon">
+                        <img src="images/open-iconic/check-2x.png" alt="" /> Save</button>
                 </fieldset>
 			    </section>
+                <br />
 
                 <p><a class="backToTop" href="#">Back to Top</a></p>
             </form>
