@@ -13,17 +13,16 @@ Known Issues:
 
 Technologies Used:
  - jQuery
+ - Moment.js
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
- - Cursor placement
  - Date Arithmetic
  - Work with Google's Inbox
  - Work with Chatango
  - Work with Google Translate (http://translate.google.com/toolkit)
  - Work with Outlook Meeting Request Body?
  - Work with Microsoft Forums (http://trainingsupport.microsoft.com/en-us/tcmva/forum)
- - Rich HTML editor
  - Opera extension version
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
@@ -32,7 +31,7 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 . Carlin
 
 ## Version History
-v1.7.1
+v1.8.0
  - Removing lots of jQuery dependencies to keep things lean and speed things up
  - Added checks into expander code to prevent expansion and warn user to refresh browser if shortcut database version is different
  - Added shortcut recovery in case of shortcuts disappearing for some reason
@@ -41,6 +40,7 @@ v1.7.1
  - Allowing HTML expansions for single line expansions too
  - Added demo area on the options page where you can test your shortcuts live!
  - Adding ability to convert what is in the demo area into HTML, so it doubles as a place where you can copy-paste HTML content and have it translated to expansion format.
+ - Adding ability to determine cursor location when expanding into contenteditable divs by including a special tag in the expansion.
  
 v1.7.0
  - Revamped options page!

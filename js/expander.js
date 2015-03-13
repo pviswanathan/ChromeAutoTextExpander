@@ -17,13 +17,6 @@ jQuery.noConflict();
 		, DATE_MACRO_CLOSE_TAG = ')'
 		, CLIP_MACRO_REGEX = /%clip%/g
 		, WHITESPACE_REGEX = /(\s)/
-        , CURSOR_TRACKING_TAG = '?atec?'    // Way to track cursor location
-        , CURSOR_TRACKING_HTML              // HTML to insert into expansion
-            = (function() {
-                var container = document.createElement('div');
-                container.appendChild(document.createComment(CURSOR_TRACKING_TAG));
-                return container.innerHTML;
-            })()
 
 		, BASECAMP_DOMAIN_REGEX = /basecamp.com/
 		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
@@ -420,9 +413,14 @@ jQuery.noConflict();
 		debugLog("shortcut:", shortcut);
 		debugLog("expandedText:", autotext);
 
-		// Replace shortcut based off cursorPosition, insert tracking tag for cursor
+        // If autotext expansion already has cursor tag in it, don't insert
+        var cursorTag = (autotext.indexOf(CURSOR_TRACKING_HTML) >= 0) 
+            ? "" : CURSOR_TRACKING_HTML;
+
+		// Replace shortcut based off cursorPosition, 
+        //  insert tracking tag for cursor if it isn't already defined in autotext
 		return [text.slice(0, cursorPosition - shortcut.length),
-			autotext, CURSOR_TRACKING_HTML, text.slice(cursorPosition)].join('');
+			autotext, cursorTag, text.slice(cursorPosition)].join('');
 	}
 
     // Find node that has text contents that matches text

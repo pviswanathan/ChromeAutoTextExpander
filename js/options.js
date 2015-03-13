@@ -35,6 +35,9 @@ $(function()
     // Set version
     $('#version').text('v' + APP_VERSION);
 
+    // Set cursor tracker html
+    $('#cursorTrackerHTML').text(CURSOR_TRACKING_HTML);
+
     // Warn user before leaving if they haven't saved new rows
     $(window).bind('beforeunload', function(){
         if ($('tr:not(.saved)').length) {
