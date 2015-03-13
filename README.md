@@ -6,6 +6,9 @@ Another fun side project in my spare time. This simple chrome extension uses con
 
 It basically keeps track of any consecutive keystrokes within 500ms or since the last space character you typed, and checks to see if the series of keystrokes matches any of a number of custom shortcuts you may have defined, and will then replace and expand the text in the field if it matches anything.
 
+Chrome Webstore Link:
+https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp?hl=en-US
+
 Known Issues:
  - I can't get this to work in Google Docs due to how Docs is architected. T_T
  - Similarly, Facebook comments is unavailable due to ReactJS's system.
