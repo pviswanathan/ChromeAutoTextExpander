@@ -64,8 +64,12 @@ chrome.runtime.onInstalled.addListener(function(details)
         processVersionUpgrade(details.previousVersion);
 	}
 
-    // Check synced shortcuts in case of need to update, show options, etc.
-    else {
+    else    // likely just reloaded extension
+    {
+        // Run testing if need be
+        //runTests();
+        
+        // Check synced shortcuts in case of need to update, show options, etc.
         chrome.storage.sync.get(null, function(data)
         {
             console.log('checking shortcuts...');
@@ -81,6 +85,9 @@ chrome.runtime.onInstalled.addListener(function(details)
                 processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
             }
         });
+
+        // Run testing if need be
+        //runTests();
     }
 });
 
@@ -94,12 +101,24 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 //////////////////////////////////////////////////////////
 // TESTING
 
-/* TESTING
-testV170Migration(function() {
-    processVersionUpgrade(TEST_OLD_APP_VERSION);
-});
-testDataLoss();
-// */
+function runTests()
+{
+    /*
+    testVersionMismatch(function() {
+        // Do nothing
+    });
+    // */
+    /*
+    testV170Migration(function() {
+        processVersionUpgrade(TEST_OLD_APP_VERSION);
+    });
+    // */
+    /*
+    testDataLoss(function() {
+        // Do nothing
+    });
+    // */
+}
 
 // Test shortcut database version mismatch
 function testVersionMismatch(completionBlock)
@@ -574,7 +593,7 @@ function upgradeShortcutsToV170(completionBlocks)
 // Moves version shortcut to new format to avoid accientally tripping it
 function upgradeShortcutsToV171(completionBlocks)
 {
-    console.log("upgradeShortcutsToLatest");
+    console.log("upgradeShortcutsToV171");
 
     // Upgrade shortcut database version
     chrome.storage.sync.get(null, function(data)
