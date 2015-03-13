@@ -48,8 +48,13 @@ chrome.runtime.onInstalled.addListener(function(details)
 {
 	console.log("onInstalled: " + details.reason);
 
-	// Inject script into all open tabs if first install
-	if (details.reason == "install") {
+    // On first install
+	if (details.reason == "install") 
+    {
+        // Open up options page
+        chrome.tabs.create({url: "options.html"});
+
+	    // Inject script into all open tabs
 		chrome.tabs.query({}, function(tabs)
 		{
 			console.log("Executing on tabs: ", tabs);
@@ -59,12 +64,12 @@ chrome.runtime.onInstalled.addListener(function(details)
 		});
 	}
 
-	// If upgrade and new version number, process upgrade
+	// If upgrading to new version number
     else if (details.reason == "update" && details.previousVersion != MANIFEST.version) {
         processVersionUpgrade(details.previousVersion);
 	}
 
-    else    // likely just reloaded extension
+    else    // All other - reloaded extension
     {
         // Run testing if need be
         //runTests();
