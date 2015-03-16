@@ -20,9 +20,12 @@ Technologies Used:
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
+ - Localizing options page
  - Date Arithmetic
  - Work with Google's Inbox
+ - Work with Mailhchimp
  - Work with Chatango
+ - Work with Confluence (Atlassian)
  - Work with Google Translate (http://translate.google.com/toolkit)
  - Work with Outlook Meeting Request Body?
  - Work with Microsoft Forums (http://trainingsupport.microsoft.com/en-us/tcmva/forum)
