@@ -23,6 +23,7 @@ jQuery.noConflict();
 		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
 		, GMAIL_DOMAIN_REGEX = /mail.google.com/
 		, INBOX_DOMAIN_REGEX = /inbox.google.com/
+		, GTT_DOMAIN_REGEX = /translate.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
         , MAILCHIMP_DOMAIN_REGEX = /admin.mailchimp.com/
 
@@ -37,6 +38,7 @@ jQuery.noConflict();
 		, SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
         , SELECTOR_GMAIL_EDIT = 'div.aoI'   // Class for Gmail's popup message composer
         , SELECTOR_INBOX_EDIT = 'div.aT'    // Class for Inbox's inline reply container
+        , SELECTOR_GTT_EDIT = 'div.goog-splitpane-second-container'   // GTT editor
         , SELECTOR_MAILCHIMP_EDIT = 'iframe.cke_wysiwyg_frame'  // Mailchimp web editor
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'   // Outlook web editor
         , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-noteEditor'       // Evernote web note editor
@@ -217,6 +219,8 @@ jQuery.noConflict();
                                 replaceTextEvernote(shortcut, autotext);
                             } else if (MAILCHIMP_DOMAIN_REGEX.test(domain)) {
                                 replaceTextMailchimp(shortcut, autotext);
+                            } else if (GTT_DOMAIN_REGEX.test(domain)) {
+                                replaceTextTranslate(shortcut, autotext);
                             } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
                                 replaceTextBasecamp(shortcut, autotext);
 							} else {
@@ -359,6 +363,21 @@ jQuery.noConflict();
         // Get the focused / selected text node
         var iframeWindow = document.querySelector(SELECTOR_MAILCHIMP_EDIT)
             .contentWindow;
+        var node = findFocusedNode(iframeWindow);
+        debugLog("node:", node);
+
+        // Pass onto editable iframe text handler
+        replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
+    }
+
+    // Specific handler for Google Translate iframe replacements
+    function replaceTextTranslate(shortcut, autotext)
+    {
+        debugLog("Domain: Google Translate");
+
+        // Get the focused / selected text node
+        var iframeWindow = document.querySelector(SELECTOR_GTT_EDIT)
+            .querySelector('iframe').contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog("node:", node);
 
@@ -809,7 +828,6 @@ jQuery.noConflict();
 		// Add to editable divs, textareas, inputs
 		var $document = $(document);
         var domain = window.location.host;
-
 		$document.on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
 		$document.on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
 		$document.on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
@@ -858,6 +876,21 @@ jQuery.noConflict();
                 if ($target.length) {
                     clearInterval(editorCheck);
                     addListenersToIframe($target);
+                }
+            }, TIME_EDITOR_CHECK);
+        }
+
+        // Special case for Google Translate
+        if (GTT_DOMAIN_REGEX.test(domain)) 
+        {
+            debugLog("Domain: Google Translate");
+
+            // Annoying, need to check for existence of editor element
+            var editorCheck = setInterval(function() {
+                var $target = $(SELECTOR_GTT_EDIT);
+                if ($target.length) {
+                    clearInterval(editorCheck);
+                    addListenersToIframe($target.find('iframe'));
                 }
             }, TIME_EDITOR_CHECK);
         }

@@ -24,7 +24,6 @@ Feature Requests:
  - Date Arithmetic
  - Work with Chatango
  - Work with Confluence (Atlassian)
- - Work with Google Translate (http://translate.google.com/toolkit)
  - Work with Outlook Meeting Request Body?
  - Work with Microsoft Forums (http://trainingsupport.microsoft.com/en-us/tcmva/forum)
  - Opera extension version
@@ -37,6 +36,7 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 ## Version History
 v1.8.1
  - Added support for Google Inbox
+ - Added support for Google Translate
  - Added support for MailChimp
  - Replacing annoying exception messages in console when script does not work with iframes
 
