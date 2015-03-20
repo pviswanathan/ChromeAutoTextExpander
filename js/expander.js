@@ -26,6 +26,7 @@ jQuery.noConflict();
 		, GTT_DOMAIN_REGEX = /translate.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
         , MAILCHIMP_DOMAIN_REGEX = /admin.mailchimp.com/
+        , ATLASSIAN_DOMAIN_REGEX = /atlassian.net/
 
 		, EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
 		, EVENT_NAME_KEYUP = 'keyup.auto-expander'
@@ -43,6 +44,7 @@ jQuery.noConflict();
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'   // Outlook web editor
         , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-noteEditor'       // Evernote web note editor
         , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'   // Basecamp message editor
+        , SELECTOR_ATLASSIAN_EDIT = 'iframe#wysiwygTextarea_ifr'   // Confluence editor
 	;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -220,7 +222,9 @@ jQuery.noConflict();
                             } else if (MAILCHIMP_DOMAIN_REGEX.test(domain)) {
                                 replaceTextMailchimp(shortcut, autotext);
                             } else if (GTT_DOMAIN_REGEX.test(domain)) {
-                                replaceTextTranslate(shortcut, autotext);
+                                replaceTextGTT(shortcut, autotext);
+                            } else if (ATLASSIAN_DOMAIN_REGEX.test(domain)) {
+                                replaceTextAtlassian(shortcut, autotext);
                             } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
                                 replaceTextBasecamp(shortcut, autotext);
 							} else {
@@ -370,14 +374,28 @@ jQuery.noConflict();
         replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
     }
 
-    // Specific handler for Google Translate iframe replacements
-    function replaceTextTranslate(shortcut, autotext)
+    // Specific handler for Google Translate iframe text replacements
+    function replaceTextGTT(shortcut, autotext)
     {
         debugLog("Domain: Google Translate");
 
         // Get the focused / selected text node
         var iframeWindow = document.querySelector(SELECTOR_GTT_EDIT)
             .querySelector('iframe').contentWindow;
+        var node = findFocusedNode(iframeWindow);
+        debugLog("node:", node);
+
+        // Pass onto editable iframe text handler
+        replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
+    }
+
+    // Specific handler for Atlassian frame editor text replacements
+    function replaceTextAtlassian(shortcut, autotext)
+    {
+        debugLog("Domain: Atlassian");
+
+        // Get the focused / selected text node
+        var iframeWindow = document.querySelector(SELECTOR_ATLASSIAN_EDIT).contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog("node:", node);
 
@@ -891,6 +909,21 @@ jQuery.noConflict();
                 if ($target.length) {
                     clearInterval(editorCheck);
                     addListenersToIframe($target.find('iframe'));
+                }
+            }, TIME_EDITOR_CHECK);
+        }
+
+        // Special case for Atlassian
+        if (ATLASSIAN_DOMAIN_REGEX.test(domain)) 
+        {
+            debugLog("Domain: Atlassian");
+
+            // SUPER annoying, need to continually check for existence of editor iframe
+            //  because the iframe gets recreated each time and starts with cross-origin
+            var editorCheck = setInterval(function() {
+                var $target = $(SELECTOR_ATLASSIAN_EDIT);
+                if ($target.length) {
+                    addListenersToIframe($target);
                 }
             }, TIME_EDITOR_CHECK);
         }
