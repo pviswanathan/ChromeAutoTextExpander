@@ -22,7 +22,6 @@ Technologies Used:
 Feature Requests:
  - Localizing options page
  - Date Arithmetic
- - Work with Mailchimp
  - Work with Chatango
  - Work with Confluence (Atlassian)
  - Work with Google Translate (http://translate.google.com/toolkit)
@@ -37,7 +36,8 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 ## Version History
 v1.8.1
- - Adding support for Google Inbox
+ - Added support for Google Inbox
+ - Added support for MailChimp
  - Replacing annoying exception messages in console when script does not work with iframes
 
 v1.8.0

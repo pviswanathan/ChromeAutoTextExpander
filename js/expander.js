@@ -11,7 +11,7 @@ jQuery.noConflict();
 		, KEYCODE_SPACEBAR = 32
 
 		, DEFAULT_CLEAR_BUFFER_TIMEOUT = 750
-        , TIME_OUTLOOK_EDITOR_CHECK = 500
+        , TIME_EDITOR_CHECK = 500
 
 		, DATE_MACRO_REGEX = /%d\(/g
 		, DATE_MACRO_CLOSE_TAG = ')'
@@ -24,6 +24,7 @@ jQuery.noConflict();
 		, GMAIL_DOMAIN_REGEX = /mail.google.com/
 		, INBOX_DOMAIN_REGEX = /inbox.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
+        , MAILCHIMP_DOMAIN_REGEX = /admin.mailchimp.com/
 
 		, EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
 		, EVENT_NAME_KEYUP = 'keyup.auto-expander'
@@ -36,9 +37,10 @@ jQuery.noConflict();
 		, SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
         , SELECTOR_GMAIL_EDIT = 'div.aoI'   // Class for Gmail's popup message composer
         , SELECTOR_INBOX_EDIT = 'div.aT'    // Class for Inbox's inline reply container
-        , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'
-        , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-noteEditor'
-        , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'
+        , SELECTOR_MAILCHIMP_EDIT = 'iframe.cke_wysiwyg_frame'  // Mailchimp web editor
+        , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'   // Outlook web editor
+        , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-noteEditor'       // Evernote web note editor
+        , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'   // Basecamp message editor
 	;
 
 	var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -213,6 +215,8 @@ jQuery.noConflict();
                                 replaceTextOutlook(shortcut, autotext);
                             } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
                                 replaceTextEvernote(shortcut, autotext);
+                            } else if (MAILCHIMP_DOMAIN_REGEX.test(domain)) {
+                                replaceTextMailchimp(shortcut, autotext);
                             } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
                                 replaceTextBasecamp(shortcut, autotext);
 							} else {
@@ -340,6 +344,21 @@ jQuery.noConflict();
         // Get the focused / selected text node
         var iframeWindow = document.getElementById(SELECTOR_EVERNOTE_EDIT)
             .querySelector('iframe').contentWindow;
+        var node = findFocusedNode(iframeWindow);
+        debugLog("node:", node);
+
+        // Pass onto editable iframe text handler
+        replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
+    }
+
+    // Specific handler for Mailchimp iframe replacements
+    function replaceTextMailchimp(shortcut, autotext)
+    {
+        debugLog("Domain: Mailchimp");
+
+        // Get the focused / selected text node
+        var iframeWindow = document.querySelector(SELECTOR_MAILCHIMP_EDIT)
+            .contentWindow;
         var node = findFocusedNode(iframeWindow);
         debugLog("node:", node);
 
@@ -738,8 +757,10 @@ jQuery.noConflict();
                 return; // Just return, otherwise will throw exception
             }
 
-			$target.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
-			$target.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+			$target.contents().off(EVENT_NAME_KEYPRESS)
+                .on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+			$target.contents()
+                .on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
 		} 
         catch (exception) {
 			console.log(exception);
@@ -799,7 +820,7 @@ jQuery.noConflict();
             debugLog("Domain: Gmail");
             SELECTOR_INPUT += ',div.editable';
 
-            // Annoying way to do this, but need to check for focus on div.aoI
+            // Need to check for focus on div.aoI
             $document.on(EVENT_NAME_FOCUS, SELECTOR_GMAIL_EDIT, function(event) 
             {
                 debugLog('focused on message editor');
@@ -818,7 +839,7 @@ jQuery.noConflict();
             debugLog("Domain: Google Inbox");
             SELECTOR_INPUT += ',' + SELECTOR_INBOX_EDIT;
 
-            // Annoying way to do this, but need to check for focus on editable elements
+            // Need to check for focus on editable elements
             $document.on(EVENT_NAME_FOCUS, SELECTOR_INPUT, function(event) 
             {
                 debugLog('focused on editable element:', event.target);
@@ -826,20 +847,34 @@ jQuery.noConflict();
             });
         }
 
-
         // Special case for Outlook.com
         if (OUTLOOK_DOMAIN_REGEX.test(domain)) 
         {
             debugLog("Domain: Outlook");
 
-            // Super annoying way to do this, need to check for #ComposeRteEditor_surface
+            // Annoying, need to check for existence of editor element
             var editorCheck = setInterval(function() {
                 var $target = $(SELECTOR_OUTLOOK_EDIT);
                 if ($target.length) {
                     clearInterval(editorCheck);
                     addListenersToIframe($target);
                 }
-            }, TIME_OUTLOOK_EDITOR_CHECK);
+            }, TIME_EDITOR_CHECK);
+        }
+
+        // Special case for Mailchimp
+        if (MAILCHIMP_DOMAIN_REGEX.test(domain)) 
+        {
+            debugLog("Domain: Mailchimp");
+
+            // SUPER annoying, need to continually check for existence of editor iframe
+            //  because the iframe gets recreated each time and starts with cross-origin
+            var editorCheck = setInterval(function() {
+                var $target = $(SELECTOR_MAILCHIMP_EDIT);
+                if ($target.length) {
+                    addListenersToIframe($target);
+                }
+            }, TIME_EDITOR_CHECK);
         }
 
 		// Attach to future iframes
