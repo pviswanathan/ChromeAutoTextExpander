@@ -20,12 +20,8 @@ Technologies Used:
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
 Feature Requests:
- - Localizing options page
+ - Localizing the extension
  - Date Arithmetic
- - Work with Chatango
- - Work with Confluence (Atlassian)
- - Work with Outlook Meeting Request Body?
- - Work with Microsoft Forums (http://trainingsupport.microsoft.com/en-us/tcmva/forum)
  - Opera extension version
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
@@ -38,6 +34,7 @@ v1.8.1
  - Added support for Google Inbox
  - Added support for Google Translate
  - Added support for MailChimp
+ - Added support for Confluence (Atlassian)
  - Replacing annoying exception messages in console when script does not work with iframes
 
 v1.8.0
