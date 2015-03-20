@@ -22,8 +22,7 @@ Technologies Used:
 Feature Requests:
  - Localizing options page
  - Date Arithmetic
- - Work with Google's Inbox
- - Work with Mailhchimp
+ - Work with Mailchimp
  - Work with Chatango
  - Work with Confluence (Atlassian)
  - Work with Google Translate (http://translate.google.com/toolkit)
@@ -37,6 +36,10 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 . Carlin
 
 ## Version History
+v1.8.1
+ - Adding support for Google Inbox
+ - Replacing annoying exception messages in console when script does not work with iframes
+
 v1.8.0
  - Removing lots of jQuery dependencies to keep things lean and speed things up
  - Added checks into expander code to prevent expansion and warn user to refresh browser if shortcut database version is different
