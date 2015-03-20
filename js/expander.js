@@ -22,6 +22,7 @@ jQuery.noConflict();
 		, EVERNOTE_DOMAIN_REGEX = /evernote.com/
 		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
 		, GMAIL_DOMAIN_REGEX = /mail.google.com/
+		, INBOX_DOMAIN_REGEX = /inbox.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
 
 		, EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
@@ -33,7 +34,8 @@ jQuery.noConflict();
 
         , SELECTOR_EDITABLE_BODY = 'body[contenteditable=true]'
 		, SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
-        , SELECTOR_GMAIL_EDIT = 'div.aoI'
+        , SELECTOR_GMAIL_EDIT = 'div.aoI'   // Class for Gmail's popup message composer
+        , SELECTOR_INBOX_EDIT = 'div.aT'    // Class for Inbox's inline reply container
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'
         , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-noteEditor'
         , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'
@@ -705,13 +707,22 @@ jQuery.noConflict();
 		});
 	}
 
-    // Add event listeners to specific div
-    function refreshListenersOnDiv($target)
+    // Add event listeners to specific container
+    function refreshListenersOnContainer($target)
     {
-        debugLog('refreshListeners:', $target);
+        debugLog('refreshListenersOnContainer:', $target);
         $target.off(EVENT_NAME_KEYPRESS).on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
         $target.off(EVENT_NAME_KEYUP).on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
 		$target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
+    }
+
+    // Add event listeners to specific element, without filtering on child elements
+    function refreshListenersOnElement($target)
+    {
+        debugLog('refreshListenersOnElement:', $target);
+        $target.off(EVENT_NAME_KEYPRESS).on(EVENT_NAME_KEYPRESS, keyPressHandler);
+        $target.off(EVENT_NAME_KEYUP).on(EVENT_NAME_KEYUP, keyUpHandler);
+		$target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, clearTypingBuffer);
     }
 
 	// Add event listeners to iframe - based off PopChrom
@@ -721,7 +732,9 @@ jQuery.noConflict();
 		try 
         {
             // Check for origin match first before even trying to attach
-            if (location.origin != $target.get(0).contentDocument.location.origin) {
+            if (location.origin != $target.get(0).contentDocument.location.origin) 
+            {
+                console.log("couldn't attach to iframe due to security policy");
                 return; // Just return, otherwise will throw exception
             }
 
@@ -740,7 +753,9 @@ jQuery.noConflict();
 			try 
             {
                 // Check for origin match first before even trying to attach
-                if (location.origin != $target.get(0).contentDocument.location.origin) {
+                if (location.origin != $iframe.get(0).contentDocument.location.origin) 
+                {
+                    console.log("couldn't attach to iframe due to security policy");
                     return; // Just return, otherwise will throw exception
                 }
 
@@ -788,12 +803,29 @@ jQuery.noConflict();
             $document.on(EVENT_NAME_FOCUS, SELECTOR_GMAIL_EDIT, function(event) 
             {
                 debugLog('focused on message editor');
+
                 // Check that it is the dialog
-                if ($(event.target).parents('div[role=dialog]').length) {
-                    refreshListenersOnDiv($(event.target).parents(SELECTOR_GMAIL_EDIT));
+                var $target = $(event.target);
+                if ($target.parents('div[role=dialog]').length) {
+                    refreshListenersOnContainer($target.parents(SELECTOR_GMAIL_EDIT));
                 }
             });
         }
+
+        // Special case for Google Inbox
+        if (INBOX_DOMAIN_REGEX.test(domain)) 
+        {
+            debugLog("Domain: Google Inbox");
+            SELECTOR_INPUT += ',' + SELECTOR_INBOX_EDIT;
+
+            // Annoying way to do this, but need to check for focus on editable elements
+            $document.on(EVENT_NAME_FOCUS, SELECTOR_INPUT, function(event) 
+            {
+                debugLog('focused on editable element:', event.target);
+                refreshListenersOnElement($(event.target));
+            });
+        }
+
 
         // Special case for Outlook.com
         if (OUTLOOK_DOMAIN_REGEX.test(domain)) 
