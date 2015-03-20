@@ -720,6 +720,11 @@ jQuery.noConflict();
 		// Attach to iframe's contents
 		try 
         {
+            // Check for origin match first before even trying to attach
+            if (location.origin != $target.get(0).contentDocument.location.origin) {
+                return; // Just return, otherwise will throw exception
+            }
+
 			$target.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
 			$target.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
 		} 
@@ -734,15 +739,20 @@ jQuery.noConflict();
 			var $iframe = $(this);
 			try 
             {
-				$iframe.contents().on(EVENT_NAME_KEYPRESS,
-					SELECTOR_INPUT, keyPressHandler);
-				$iframe.contents().on(EVENT_NAME_KEYUP,
-					SELECTOR_INPUT, keyUpHandler);
+                // Check for origin match first before even trying to attach
+                if (location.origin != $target.get(0).contentDocument.location.origin) {
+                    return; // Just return, otherwise will throw exception
+                }
+
+                // Attach listeners
+				$iframe.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+				$iframe.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
 
 				// Special cases
 				var domain = $iframe.contents().get(0).location.host;
 				debugLog('iframe location:', domain);
 
+                // Special Evernote case
 				if (EVERNOTE_DOMAIN_REGEX.test(domain))
 				{
 					$iframe.contents().find(SELECTOR_EDITABLE_BODY)

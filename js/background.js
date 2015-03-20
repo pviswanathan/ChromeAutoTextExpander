@@ -394,6 +394,7 @@ function processVersionUpgrade(oldVersion)
                 break;
 
             case '1.7.1':
+            case '1.8.0':
             default:
                 upgradeShortcutsToLatest();
         }
