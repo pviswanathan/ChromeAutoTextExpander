@@ -769,7 +769,7 @@ jQuery.noConflict();
         debugLog('refreshListenersOnContainer:', $target);
         $target.off(EVENT_NAME_KEYPRESS).on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
         $target.off(EVENT_NAME_KEYUP).on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
-		$target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
+	    $target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
     }
 
     // Add event listeners to specific element, without filtering on child elements
@@ -784,20 +784,26 @@ jQuery.noConflict();
 	// Add event listeners to iframe - based off PopChrom
 	function addListenersToIframe($target)
 	{
-		// Attach to iframe's contents
-		try 
+        // Variables
+        var iframeOrigin = $target.get(0).contentDocument.location.origin
+            , windowOrigin = location.origin;
+
+        // Attach to iframe's contents
+        try 
         {
             // Check for origin match first before even trying to attach
-            if (location.origin != $target.get(0).contentDocument.location.origin) 
+            if (windowOrigin == iframeOrigin) 
             {
-                console.log("couldn't attach to iframe due to security policy");
-                return; // Just return, otherwise will throw exception
+                $target.contents().off(EVENT_NAME_KEYPRESS)
+                    .on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+                $target.contents()
+                    .on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
             }
-
-			$target.contents().off(EVENT_NAME_KEYPRESS)
-                .on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
-			$target.contents()
-                .on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+            else 
+            {
+                console.log("couldn't attach to iframe due to security policy:");
+                console.log(windowOrigin, "!=", iframeOrigin);
+            }
 		} 
         catch (exception) {
 			console.log(exception);
@@ -808,31 +814,34 @@ jQuery.noConflict();
 		{
 			debugLog("Attempting to attach listeners to new iframe");
 			var $iframe = $(this);
+                , iframeOrigin = $iframe.get(0).contentDocument.location.origin;
 			try 
             {
                 // Check for origin match first before even trying to attach
-                if (location.origin != $iframe.get(0).contentDocument.location.origin) 
+                if (location.origin == $iframe.get(0).contentDocument.location.origin) 
                 {
-                    console.log("couldn't attach to iframe due to security policy");
-                    return; // Just return, otherwise will throw exception
+                    // Attach listeners
+                    $iframe.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+                    $iframe.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+
+                    // Special cases
+                    var domain = $iframe.contents().get(0).location.host;
+                    debugLog('iframe location:', domain);
+
+                    // Special Evernote case
+                    if (EVERNOTE_DOMAIN_REGEX.test(domain))
+                    {
+                        $iframe.contents().find(SELECTOR_EDITABLE_BODY)
+                            .on(EVENT_NAME_KEYPRESS, keyPressHandler);
+                        $iframe.contents().find(SELECTOR_EDITABLE_BODY)
+                            .on(EVENT_NAME_KEYUP, keyUpHandler);
+                    }
                 }
-
-                // Attach listeners
-				$iframe.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
-				$iframe.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
-
-				// Special cases
-				var domain = $iframe.contents().get(0).location.host;
-				debugLog('iframe location:', domain);
-
-                // Special Evernote case
-				if (EVERNOTE_DOMAIN_REGEX.test(domain))
-				{
-					$iframe.contents().find(SELECTOR_EDITABLE_BODY)
-						.on(EVENT_NAME_KEYPRESS, keyPressHandler);
-					$iframe.contents().find(SELECTOR_EDITABLE_BODY)
-						.on(EVENT_NAME_KEYUP, keyUpHandler);
-				}
+                else 
+                {
+                    console.log("couldn't attach to iframe due to security policy:");
+                    console.log(windowOrigin, "!=", iframeOrigin);
+                }
 			} 
             catch (exception) {
 				console.log(exception);
@@ -870,7 +879,7 @@ jQuery.noConflict();
         }
 
         // Special case for Google Inbox
-        if (INBOX_DOMAIN_REGEX.test(domain)) 
+        else if (INBOX_DOMAIN_REGEX.test(domain)) 
         {
             debugLog("Domain: Google Inbox");
             SELECTOR_INPUT += ',' + SELECTOR_INBOX_EDIT;
@@ -884,7 +893,7 @@ jQuery.noConflict();
         }
 
         // Special case for Outlook.com
-        if (OUTLOOK_DOMAIN_REGEX.test(domain)) 
+        else if (OUTLOOK_DOMAIN_REGEX.test(domain)) 
         {
             debugLog("Domain: Outlook");
 
@@ -899,7 +908,7 @@ jQuery.noConflict();
         }
 
         // Special case for Google Translate
-        if (GTT_DOMAIN_REGEX.test(domain)) 
+        else if (GTT_DOMAIN_REGEX.test(domain)) 
         {
             debugLog("Domain: Google Translate");
 
@@ -914,7 +923,7 @@ jQuery.noConflict();
         }
 
         // Special case for Atlassian
-        if (ATLASSIAN_DOMAIN_REGEX.test(domain)) 
+        else if (ATLASSIAN_DOMAIN_REGEX.test(domain)) 
         {
             debugLog("Domain: Atlassian");
 
@@ -929,7 +938,7 @@ jQuery.noConflict();
         }
 
         // Special case for Mailchimp
-        if (MAILCHIMP_DOMAIN_REGEX.test(domain)) 
+        else if (MAILCHIMP_DOMAIN_REGEX.test(domain)) 
         {
             debugLog("Domain: Mailchimp");
 
