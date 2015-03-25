@@ -9,25 +9,34 @@ It basically keeps track of any consecutive keystrokes within 500ms or since the
 Chrome Webstore Link:
 https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp?hl=en-US
 
-Known Issues:
+## Known Issues
  - I can't get this to work in Google Docs due to how Docs is architected. T_T
  - Similarly, Facebook comments is unavailable due to ReactJS's system.
- - Also, this doesn't work in Google Hangouts due to its security policies.
+ - Also, this doesn't work in Google Hangouts due to cross-origin policies.
 
-Technologies Used:
+## Technologies Used
  - jQuery
  - Moment.js
  - Chrome's Sync Storage (shortcuts are synced across browsers)
 
-Feature Requests:
+## Feature Requests
  - Localizing the extension
  - Date Arithmetic
  - Opera extension version
+
+## Updating Instructions
+When releasing a new version, please update the following with the version number:
+ - manifest.json [for json key "version"]
+ - constants.js [for variable APP_VERSION]
+ - background.js [function processingVersionUpgrade()]
+ - README.md [version history section]
+
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
 
 
 . Carlin
+
 
 ## Version History
 v1.8.2
