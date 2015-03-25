@@ -813,7 +813,7 @@ jQuery.noConflict();
 		$target.on(EVENT_NAME_LOAD, function(event)		// On load
 		{
 			debugLog("Attempting to attach listeners to new iframe");
-			var $iframe = $(this);
+			var $iframe = $(this)
                 , iframeOrigin = $iframe.get(0).contentDocument.location.origin;
 			try 
             {

@@ -1,25 +1,58 @@
 
-.toolbarButton {
-    width: 24px;
-    height: 24px;
-    padding: 0px;
-    vertical-align: middle;
-    text-align: center;
+body, html {
+    margin: 0;
+    padding: 0;
 }
-.toolbarButton img {
+
+#toolbar {
+    width: 100%;
+    height: 12%;
+    float: none;
+    clear: both;
+    background: #EEE;
+    box-shadow: 0 -2px 6px #000;
+    padding: 0.65% 0;
+    vertical-align: middle;
+}
+#toolbar > span {
+    margin: 0 0 0 4px;
+}
+.toolbar {
+    margin-left: 8px;
+}
+
+#convertHTMLButton {
+    height: 24px;
+    width: 24px;
+    position: fixed;
+    bottom: 4px;
+    right: 4px;
+    padding: 0px;
+    display: none;
+}
+#convertHTMLButton img {
     width: 12px;
     height: 12px;
 }
 
-#convertHTMLButton {
-    position: fixed;
-    bottom: 4px;
-    right: 4px;
+.editor {
+    overflow: auto;
+    display: none;
+    padding: 1%;
+}
+div.editor {
+    outline: 1px solid transparent;
+    height: 79%;
+}
+textarea.editor {
+    width: 100%;
+    height: 84%;
+    border: none;
+    resize: none;
+}
+.active {
+    display: inline-block !important;
 }
 
-#editor {
-    overflow: auto;
-    outline: 1px solid transparent;
-    height: 100%;
-}
+
 

@@ -7,12 +7,20 @@
 
 	<body>
         <!-- toolbar -->
-        <button id="convertHTMLButton" class="toolbarButton" type="button" title="Convert to HTML">
-            <img src="images/third_party/open-iconic/code-2x.png" alt="" /> 
-        </button>
+        <div id="toolbar">
+            <span>Switch Demo Element :</span>
+            <input id="demoDivButton" class="toolbar" type="radio" name="editor" title="Switch to Editable Div" checked="checked" />
+            <label for="demoDivButton">Editable Div</label>
+            <input id="demoTextareaButton" class="toolbar" type="radio" name="editor" title="Switch to Demo Textarea" />
+            <label for="demoTextareaButton">Textarea</label>
+
+            <button id="convertHTMLButton" class="active" type="button" title="Convert to HTML">
+                <img src="images/third_party/open-iconic/code-2x.png" alt="" /> 
+            </button>
+        </div>
 
         <!-- Rich text Editor -->
-        <div id="editor" title="Shortcut Demo Editable Div" contenteditable=true>
+        <div id="demoDiv" class="editor active" title="Shortcut Demo Editable Div" contenteditable=true>
             Try your shortcuts here! Make sure to save them first. 
             <br /><br />
             Want to spice things up with a little HTML? Draft up your content with 
@@ -21,6 +29,15 @@
             <br /><br />
             Now you can simply copy and paste the HTML to put into your expansions!
         </div>
+
+        <!-- Textarea Editor -->
+        <textarea id="demoTextArea" class="editor" title="Shortcut Demo Textarea">
+Try your shortcuts here! Make sure to save them first. 
+
+This is a textarea, which doesn't support HTML, but can add multiline text.
+
+Switch to the editable div to test HTML expansions!
+        </textarea>
 
     </body>
 
