@@ -30,6 +30,11 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 . Carlin
 
 ## Version History
+v1.8.2
+ - Fix for Salesforce support (was cutting short attaching listeners to new iframes).
+ - Added new Textarea option for demoing shortcuts.
+ - Slight optimization to attaching listeners by not running regex over all special cases.
+
 v1.8.1
  - Added support for Google Inbox
  - Added support for Google Translate
