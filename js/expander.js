@@ -550,7 +550,7 @@ jQuery.noConflict();
 			try { 	// Needed for new input[type=email] failing
 				pos = el.selectionStart;
 			} catch (exception) {
-				console.log('getCursorPosition:', exception);
+				debugLog('getCursorPosition:', exception);
 			}
 		} 
         else	// Other elements
@@ -567,7 +567,7 @@ jQuery.noConflict();
     // Cross-browser solution for setting cursor position
     function setCursorPosition(el, pos) 
     {
-        console.log('setCursorPosition:', pos);
+        debugLog('setCursorPosition:', pos);
 		var sel, range;
 		if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
 			try {	// Needed for new input[type=email] failing
@@ -581,7 +581,7 @@ jQuery.noConflict();
 					range.select();
 				}
 			} catch (exception) {
-				console.log('setCursorPosition', exception);
+				debugLog('setCursorPosition', exception);
 			}
 		} else {	// Other elements
 			var node = el.childNodes[0];	// Need to get text node
@@ -692,14 +692,14 @@ jQuery.noConflict();
 
 		// Loop through and replace clip tags with clipboard pasted text
 		var processedText = [text.slice(0, clipTags[0])];
-		console.log(processedText);
+		debugLog(processedText);
 		for (var i = 0, len = clipTags.length; i < len; ++i)
 		{
 			processedText.push(clipboard);
-		    console.log('pre', processedText);
+		    debugLog('pre', processedText);
 			processedText.push(text.slice(clipTags[i] + 6,	// 6 for "%clip%"
 				(i == len - 1) ? undefined : clipTags[i+1]));
-		    console.log('post', processedText);
+		    debugLog('post', processedText);
 		}
 
 		// Return processed dates
@@ -755,7 +755,7 @@ jQuery.noConflict();
 		chrome.runtime.sendMessage({
 			request:"getClipboardData"
 		}, function(data) {
-			console.log('getClipboardData:', data);
+			debugLog('getClipboardData:', data);
 			clipboard = data.paste;
 			if (completionBlock) {
 				completionBlock();
@@ -801,12 +801,12 @@ jQuery.noConflict();
             }
             else 
             {
-                console.log("couldn't attach to iframe due to security policy:");
-                console.log(windowOrigin, "!=", iframeOrigin);
+                debugLog("couldn't attach to iframe due to security policy:");
+                debugLog(windowOrigin, "!=", iframeOrigin);
             }
 		} 
         catch (exception) {
-			console.log(exception);
+			debugLog(exception);
 		}
 
 		// Attach to its load event in case it hasn't loaded yet
@@ -839,12 +839,12 @@ jQuery.noConflict();
                 }
                 else 
                 {
-                    console.log("couldn't attach to iframe due to security policy:");
-                    console.log(windowOrigin, "!=", iframeOrigin);
+                    debugLog("couldn't attach to iframe due to security policy:");
+                    debugLog(windowOrigin, "!=", iframeOrigin);
                 }
 			} 
             catch (exception) {
-				console.log(exception);
+				debugLog(exception);
 			}
 		});
 	}
@@ -994,9 +994,9 @@ jQuery.noConflict();
                 // Alert users that shortcuts aren't synced yet, they should reload
                 var warning = chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH")
                     + '\n\n' + chrome.i18n.getMessage("WARNING_SHORTCUT_DISABLED");
-                console.log(warning);
-                console.log('Database version:', data[SHORTCUT_VERSION_KEY]);
-                console.log('Extension version:', APP_VERSION);
+                debugLog(warning);
+                debugLog('Database version:', data[SHORTCUT_VERSION_KEY]);
+                debugLog('Extension version:', APP_VERSION);
                 if (!disableShortcuts) {
                     alert(warning);
                 }
