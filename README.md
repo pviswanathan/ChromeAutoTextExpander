@@ -39,6 +39,9 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 
 ## Version History
+v1.8.3
+ - Replacing console.log() statements with debugLog() to reduce developer console spam.
+
 v1.8.2
  - Fix for Salesforce support (was cutting short attaching listeners to new iframes).
  - Added new Textarea option for demoing shortcuts.
