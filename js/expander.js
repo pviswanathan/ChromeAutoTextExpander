@@ -567,7 +567,7 @@ jQuery.noConflict();
     // Cross-browser solution for setting cursor position
     function setCursorPosition(el, pos) 
     {
-        console.log('setCursorPosition:', pos);
+        debugLog('setCursorPosition:', pos);
 		var sel, range;
 		if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
 			try {	// Needed for new input[type=email] failing
@@ -692,14 +692,14 @@ jQuery.noConflict();
 
 		// Loop through and replace clip tags with clipboard pasted text
 		var processedText = [text.slice(0, clipTags[0])];
-		console.log(processedText);
+		debugLog(processedText);
 		for (var i = 0, len = clipTags.length; i < len; ++i)
 		{
 			processedText.push(clipboard);
-		    console.log('pre', processedText);
+		    debugLog('pre', processedText);
 			processedText.push(text.slice(clipTags[i] + 6,	// 6 for "%clip%"
 				(i == len - 1) ? undefined : clipTags[i+1]));
-		    console.log('post', processedText);
+		    debugLog('post', processedText);
 		}
 
 		// Return processed dates
@@ -755,7 +755,7 @@ jQuery.noConflict();
 		chrome.runtime.sendMessage({
 			request:"getClipboardData"
 		}, function(data) {
-			console.log('getClipboardData:', data);
+			debugLog('getClipboardData:', data);
 			clipboard = data.paste;
 			if (completionBlock) {
 				completionBlock();
@@ -784,13 +784,12 @@ jQuery.noConflict();
 	// Add event listeners to iframe - based off PopChrom
 	function addListenersToIframe($target)
 	{
-        // Variables
-        var iframeOrigin = $target.get(0).contentDocument.location.origin
-            , windowOrigin = location.origin;
-
         // Attach to iframe's contents
         try 
         {
+            var iframeOrigin = $target.get(0).contentDocument.location.origin
+                , windowOrigin = location.origin;
+
             // Check for origin match first before even trying to attach
             if (windowOrigin == iframeOrigin) 
             {
@@ -801,24 +800,25 @@ jQuery.noConflict();
             }
             else 
             {
-                console.log("couldn't attach to iframe due to security policy:");
-                console.log(windowOrigin, "!=", iframeOrigin);
+                debugLog("couldn't attach to iframe due to security policy:");
+                debugLog(windowOrigin, "!=", iframeOrigin);
             }
 		} 
         catch (exception) {
-			console.log(exception);
+			debugLog(exception);
 		}
 
 		// Attach to its load event in case it hasn't loaded yet
 		$target.on(EVENT_NAME_LOAD, function(event)		// On load
 		{
 			debugLog("Attempting to attach listeners to new iframe");
-			var $iframe = $(this)
-                , iframeOrigin = $iframe.get(0).contentDocument.location.origin;
 			try 
             {
+                var $iframe = $(this)
+                    , iframeOrigin = $iframe.get(0).contentDocument.location.origin;
+
                 // Check for origin match first before even trying to attach
-                if (location.origin == $iframe.get(0).contentDocument.location.origin) 
+                if (location.origin == iframeOrigin) 
                 {
                     // Attach listeners
                     $iframe.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
@@ -839,12 +839,12 @@ jQuery.noConflict();
                 }
                 else 
                 {
-                    console.log("couldn't attach to iframe due to security policy:");
-                    console.log(windowOrigin, "!=", iframeOrigin);
+                    debugLog("couldn't attach to iframe due to security policy:");
+                    debugLog(windowOrigin, "!=", iframeOrigin);
                 }
 			} 
             catch (exception) {
-				console.log(exception);
+				debugLog(exception);
 			}
 		});
 	}
