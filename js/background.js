@@ -397,6 +397,7 @@ function processVersionUpgrade(oldVersion)
             case '1.8.0':
             case '1.8.1':
             case '1.8.2':
+            case '1.8.3':
             default:
                 upgradeShortcutsToLatest();
         }
