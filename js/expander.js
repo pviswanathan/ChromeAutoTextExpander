@@ -550,7 +550,7 @@ jQuery.noConflict();
 			try { 	// Needed for new input[type=email] failing
 				pos = el.selectionStart;
 			} catch (exception) {
-				console.log('getCursorPosition:', exception);
+				debugLog('getCursorPosition:', exception);
 			}
 		} 
         else	// Other elements
@@ -581,7 +581,7 @@ jQuery.noConflict();
 					range.select();
 				}
 			} catch (exception) {
-				console.log('setCursorPosition', exception);
+				debugLog('setCursorPosition', exception);
 			}
 		} else {	// Other elements
 			var node = el.childNodes[0];	// Need to get text node
@@ -994,9 +994,9 @@ jQuery.noConflict();
                 // Alert users that shortcuts aren't synced yet, they should reload
                 var warning = chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH")
                     + '\n\n' + chrome.i18n.getMessage("WARNING_SHORTCUT_DISABLED");
-                console.log(warning);
-                console.log('Database version:', data[SHORTCUT_VERSION_KEY]);
-                console.log('Extension version:', APP_VERSION);
+                debugLog(warning);
+                debugLog('Database version:', data[SHORTCUT_VERSION_KEY]);
+                debugLog('Extension version:', APP_VERSION);
                 if (!disableShortcuts) {
                     alert(warning);
                 }
