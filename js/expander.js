@@ -275,6 +275,8 @@ jQuery.noConflict();
                     // Add whitespace if was last character
                     if (lastChar == ' ') {
                         autotext += '&nbsp;';
+                    } else if (lastChar == '\t') {
+                        autoText += '&#9;';
                     }
 
                     // Check special domains
