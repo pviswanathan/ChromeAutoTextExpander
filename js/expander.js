@@ -14,6 +14,10 @@ jQuery.noConflict();
         , TIME_EDITOR_CHECK = 500
         , TIME_SHOW_CROUTON = 1000 * 3	              // Show croutons for 3s
 
+        , ENUM_CAPITALIZATION_NONE = 0
+        , ENUM_CAPITALIZATION_FIRST = 1
+        , ENUM_CAPITALIZATION_ALL = 2
+
 		, DATE_MACRO_REGEX = /%d\(/g
 		, DATE_MACRO_CLOSE_TAG = ')'
 		, CLIP_MACRO_REGEX = /%clip%/g
@@ -164,7 +168,8 @@ jQuery.noConflict();
 	{
  		debugLog("checkShortcuts:", lastChar, shortcut);
 
-		var shortcutKey = SHORTCUT_PREFIX + shortcut;   // Key for fetching expansion
+        var isAllCaps = (shortcut == shortcut.toUpperCase());   // Check for all caps
+		var shortcutKey = SHORTCUT_PREFIX + shortcut;           // Key for expansion
 		var shortcutKeyLowercase = SHORTCUT_PREFIX + shortcut.toLowerCase(); // For auto-capitalization
 
 		// Get shortcuts
@@ -194,7 +199,12 @@ jQuery.noConflict();
                     // Check that data is returned and shortcut exists
                     else if (data && Object.keys(data).length)
                     {
-                        processAutoTextExpansion(data[shortcutKeyLowercase], lastChar, textInput);
+                        processAutoTextExpansion(data[shortcutKeyLowercase], 
+                            lastChar, 
+                            textInput, 
+                            (isAllCaps ? ENUM_CAPITALIZATION_ALL
+                                : ENUM_CAPITALIZATION_FIRST)
+                        );
                     }
                 });
             }
@@ -207,10 +217,10 @@ jQuery.noConflict();
 	}
 
     // Process autotext expansion and replace text
-    function processAutoTextExpansion(autotext, lastChar, textInput)
+    function processAutoTextExpansion(autotext, lastChar, textInput, capitalization)
     {
         // Check if shortcut exists and should be triggered
-        if (autotext)
+        if (autotext && textInput)
         {
             // Check for version changes
             checkShortcutVersion();
@@ -228,6 +238,20 @@ jQuery.noConflict();
 
                 // Handle moment.js dates
                 autotext = processDates(autotext);
+
+                // Adjust capitalization
+                switch (capitalization) 
+                {
+                    case ENUM_CAPITALIZATION_FIRST:
+                        autotext = autotext.charAt(0).toUpperCase() + autotext.slice(1);
+                        break;
+
+                    case ENUM_CAPITALIZATION_ALL:
+                        autotext = autotext.toUpperCase();
+                        break;
+
+                    default: break;
+                }
 
                 // Setup for processing
                 var domain = window.location.host;
@@ -272,6 +296,9 @@ jQuery.noConflict();
                 }
             });	// END - getClipboardData()
         }	// END - if (autotext)
+        else {  // Error
+            console.log('Invalid input, missing autotext or textinput parameters.');
+        }
     }
 
     // Specific handler for regular textarea and input elements
