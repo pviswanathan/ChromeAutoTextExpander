@@ -88,7 +88,7 @@ jQuery.noConflict();
 		typingBuffer.push(char);
 
 		// Check typed text for shortcuts
-		checkShortcuts(char, typingBuffer, event.target);
+		checkShortcuts(typingBuffer.join(''), char, event.target);
 	}
 
 	// When user lifts up on a key, to catch backspace
@@ -160,82 +160,44 @@ jQuery.noConflict();
 	}
 
 	// Check to see if text in argument corresponds to any shortcuts
-	function checkShortcuts(lastChar, textBuffer, textInput)
+	function checkShortcuts(shortcut, lastChar, textInput)
 	{
- 		debugLog("checkShortcuts:", lastChar, textBuffer);
+ 		debugLog("checkShortcuts:", lastChar, shortcut);
+
+		var shortcutKey = SHORTCUT_PREFIX + shortcut;   // Key for fetching expansion
+		var shortcutKeyLowercase = SHORTCUT_PREFIX + shortcut.toLowerCase(); // For auto-capitalization
 
 		// Get shortcuts
-		var shortcut = textBuffer.join('');
-		var shortcutKey = SHORTCUT_PREFIX + shortcut;   // Key for fetching
 		chrome.storage.sync.get(shortcutKey, function (data)
 		{
 			// Check for errors
 			if (chrome.runtime.lastError) {
 				console.log(chrome.runtime.lastError);
 			}
-			// Check that data is returned and shortcut library exists
+			// Check that data is returned and shortcut exists
 			else if (data && Object.keys(data).length)
 			{
-				// Check if shortcut exists and should be triggered
-				var autotext = data[shortcutKey];
-
-				if (autotext)	// Shortcut exists! Expand and replace text
-				{
-                    // Check for version changes
-                    checkShortcutVersion();
-
-                    // If shortcuts are disabled, abort early
-                    if (disableShortcuts) {
-                        return;
-                    }
-
-					// Update / get clipboard text
-					getClipboardData(function()
-					{
-						// Handle clipboard pastes
-						autotext = processClips(autotext);
-
-						// Handle moment.js dates
-						autotext = processDates(autotext);
-
-						// Add whitespace if was last character
-						if (WHITESPACE_REGEX.test(lastChar)) {
-							autotext += lastChar;
-						}
-
-						// Setup for processing
-						var domain = window.location.host;
-                        debugLog("textInput: ", textInput);
-
-						// If input or textarea field, can easily change the val
-						if (textInput.nodeName == "TEXTAREA" || textInput.nodeName == "INPUT") {
-                            replaceTextRegular(shortcut, autotext, textInput);
-						}
-						else	// Trouble... editable divs & special cases
-						{
-                            // Check special domains
-							if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
-                                replaceTextFacebook(shortcut, autotext, textInput);
-                            } else if (OUTLOOK_DOMAIN_REGEX.test(domain)) {
-                                replaceTextOutlook(shortcut, autotext);
-                            } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
-                                replaceTextEvernote(shortcut, autotext);
-                            } else if (MAILCHIMP_DOMAIN_REGEX.test(domain)) {
-                                replaceTextMailchimp(shortcut, autotext);
-                            } else if (GTT_DOMAIN_REGEX.test(domain)) {
-                                replaceTextGTT(shortcut, autotext);
-                            } else if (ATLASSIAN_DOMAIN_REGEX.test(domain)) {
-                                replaceTextAtlassian(shortcut, autotext);
-                            } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
-                                replaceTextBasecamp(shortcut, autotext);
-							} else {
-                                debugLog("Domain:", domain);
-                                replaceTextContentEditable(shortcut, autotext, findFocusedNode());
-							}
-						}
-					});	// END - getClipboardData()
-				}	// END - if (autotext)
+                processAutoTextExpansion(data[shortcutKey], lastChar, textInput);
 			}
+
+            // No expansion for the shortcut, see if case is different
+            else if (shortcutKeyLowercase != shortcutKey)
+            {
+                // Check to see if there is a result lowercase version, 
+                //  and if yes, then do auto-capitalization instead
+                chrome.storage.sync.get(shortcutKeyLowercase, function (data)
+                {
+                    // Check for errors
+                    if (chrome.runtime.lastError) {
+                        console.log(chrome.runtime.lastError);
+                    }
+                    // Check that data is returned and shortcut exists
+                    else if (data && Object.keys(data).length)
+                    {
+                        processAutoTextExpansion(data[shortcutKeyLowercase], lastChar, textInput);
+                    }
+                });
+            }
 
 			// If last character is whitespace, clear buffer
 			if (WHITESPACE_REGEX.test(lastChar)) {
@@ -243,6 +205,68 @@ jQuery.noConflict();
 			}
 		});
 	}
+
+    // Process autotext expansion and replace text
+    function processAutoTextExpansion(autotext, lastChar, textInput)
+    {
+        // Check if shortcut exists and should be triggered
+        if (autotext)
+        {
+            // Check for version changes
+            checkShortcutVersion();
+
+            // If shortcuts are disabled, abort early
+            if (disableShortcuts) {
+                return;
+            }
+
+            // Update / get clipboard text
+            getClipboardData(function()
+            {
+                // Handle clipboard pastes
+                autotext = processClips(autotext);
+
+                // Handle moment.js dates
+                autotext = processDates(autotext);
+
+                // Add whitespace if was last character
+                if (WHITESPACE_REGEX.test(lastChar)) {
+                    autotext += lastChar;
+                }
+
+                // Setup for processing
+                var domain = window.location.host;
+                debugLog("textInput: ", textInput);
+
+                // If input or textarea field, can easily change the val
+                if (textInput.nodeName == "TEXTAREA" || textInput.nodeName == "INPUT") {
+                    replaceTextRegular(shortcut, autotext, textInput);
+                }
+                else	// Trouble... editable divs & special cases
+                {
+                    // Check special domains
+                    if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
+                        replaceTextFacebook(shortcut, autotext, textInput);
+                    } else if (OUTLOOK_DOMAIN_REGEX.test(domain)) {
+                        replaceTextOutlook(shortcut, autotext);
+                    } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
+                        replaceTextEvernote(shortcut, autotext);
+                    } else if (MAILCHIMP_DOMAIN_REGEX.test(domain)) {
+                        replaceTextMailchimp(shortcut, autotext);
+                    } else if (GTT_DOMAIN_REGEX.test(domain)) {
+                        replaceTextGTT(shortcut, autotext);
+                    } else if (ATLASSIAN_DOMAIN_REGEX.test(domain)) {
+                        replaceTextAtlassian(shortcut, autotext);
+                    } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
+                        replaceTextBasecamp(shortcut, autotext);
+                    } else {
+                        debugLog("Domain:", domain);
+                        replaceTextContentEditable(shortcut, autotext, findFocusedNode());
+                    }
+                }
+            });	// END - getClipboardData()
+        }	// END - if (autotext)
+    }
 
     // Specific handler for regular textarea and input elements
     function replaceTextRegular(shortcut, autotext, textInput)
