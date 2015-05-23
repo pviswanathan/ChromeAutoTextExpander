@@ -206,9 +206,11 @@ button img {
 .crouton.green { background-color: #6c6; }
 .crouton.orange { background-color: #e90; }
 .crouton .closeButton {
-    font: bold 13px/16px Verdana;
-    color: #fff;
-    background: transparent;
+    font: bold 13px/13px Verdana;
+    margin: 0 4px;
+    padding: 4px;
+    float: right;
+    margin-right: 20px;
 }
 
 .popup {

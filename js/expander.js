@@ -1099,9 +1099,11 @@ jQuery.noConflict();
                     $(this).append($(document.createElement('button'))
                         .text('x')
                         .css({
-                            font: 'bold 13px/16px Verdana',
-                            color: '#fff',
-                            background: 'transparent',
+                            font: 'bold 13px/13px Verdana',
+                            margin: '0 4px',
+                            padding: '4px',
+                            float: 'right',
+                            margin-right: '20px',
                         })
                         .click(function(e) {
                             $(this).parent().fadeOut(ANIMATION_FAST, function() {
