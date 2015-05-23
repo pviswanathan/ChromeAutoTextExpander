@@ -31,7 +31,6 @@ When releasing a new version, please update the following with the version numbe
  - background.js [function processingVersionUpgrade()]
  - README.md [version history section]
 
-
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
 
 
