@@ -229,21 +229,27 @@ jQuery.noConflict();
                 // Handle moment.js dates
                 autotext = processDates(autotext);
 
-                // Add whitespace if was last character
-                if (WHITESPACE_REGEX.test(lastChar)) {
-                    autotext += lastChar;
-                }
-
                 // Setup for processing
                 var domain = window.location.host;
                 debugLog("textInput: ", textInput);
 
                 // If input or textarea field, can easily change the val
-                if (textInput.nodeName == "TEXTAREA" || textInput.nodeName == "INPUT") {
+                if (textInput.nodeName == "TEXTAREA" || textInput.nodeName == "INPUT") 
+                {
+                    // Add whitespace if was last character
+                    if (WHITESPACE_REGEX.test(lastChar)) {
+                        autotext += lastChar;
+                    }
+
                     replaceTextRegular(shortcut, autotext, textInput);
                 }
                 else	// Trouble... editable divs & special cases
                 {
+                    // Add whitespace if was last character
+                    if (lastChar == ' ') {
+                        autotext += '&nbsp;';
+                    }
+
                     // Check special domains
                     if (FACEBOOK_DOMAIN_REGEX.test(domain)) {
                         replaceTextFacebook(shortcut, autotext, textInput);
