@@ -182,7 +182,7 @@ jQuery.noConflict();
 			// Check that data is returned and shortcut exists
 			else if (data && Object.keys(data).length)
 			{
-                processAutoTextExpansion(data[shortcutKey], lastChar, textInput);
+                processAutoTextExpansion(shortcut, data[shortcutKey], lastChar, textInput);
 			}
 
             // No expansion for the shortcut, see if case is different
@@ -199,7 +199,8 @@ jQuery.noConflict();
                     // Check that data is returned and shortcut exists
                     else if (data && Object.keys(data).length)
                     {
-                        processAutoTextExpansion(data[shortcutKeyLowercase], 
+                        processAutoTextExpansion(shortcut, 
+                            data[shortcutKeyLowercase], 
                             lastChar, 
                             textInput, 
                             (isAllCaps ? ENUM_CAPITALIZATION_ALL
@@ -217,8 +218,10 @@ jQuery.noConflict();
 	}
 
     // Process autotext expansion and replace text
-    function processAutoTextExpansion(autotext, lastChar, textInput, capitalization)
+    function processAutoTextExpansion(shortcut, autotext, lastChar, textInput, capitalization)
     {
+ 		debugLog("processAutoTextExpansion:", autotext, capitalization);
+
         // Check if shortcut exists and should be triggered
         if (autotext && textInput)
         {
