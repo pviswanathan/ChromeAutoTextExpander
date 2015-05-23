@@ -724,7 +724,7 @@ $(function()
             {
                 // Show message to user
                 if (success) {
-                    showCrouton(chrome.i18n.getMessage("MESSAGE_IMPORT_SUCCESS"), 'orange');
+                    showCrouton(chrome.i18n.getMessage("MESSAGE_IMPORT_SUCCESS"), 'orange', true);
                 } else {
                     showCrouton(chrome.i18n.getMessage("ERROR_IMPORT_ADDING_ROWS"), 'red');
                 }
