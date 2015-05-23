@@ -1107,7 +1107,7 @@ jQuery.noConflict();
                             $(this).parent().fadeOut(ANIMATION_FAST, function() {
                                 $(this).remove();
                             });
-                        });
+                        })
                     );
                 }
             })

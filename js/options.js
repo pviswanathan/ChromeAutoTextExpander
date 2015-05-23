@@ -33,7 +33,7 @@ $(function()
     metaData[SHORTCUT_VERSION_KEY] = APP_VERSION;
 
     // Set version
-    $('#version').text('v' + APP_VERSION);
+    $('#versionHistory').text('v' + APP_VERSION);
 
     // Set cursor tracker html
     $('#cursorTrackerHTML').text(CURSOR_TRACKING_HTML);
@@ -756,7 +756,7 @@ $(function()
                             $(this).parents('.crouton').fadeOut(ANIMATION_FAST, function() {
                                 $(this).remove();
                             });
-                        });
+                        })
                     );
                 }
             })
