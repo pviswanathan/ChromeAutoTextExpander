@@ -21,7 +21,6 @@ https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmigge
 
 ## Feature Requests
  - Localizing the extension
- - Autocapitalization
  - Date Arithmetic
  - Opera extension version
 
@@ -43,6 +42,7 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 v1.8.4
  - Changed popup warnings when Chrome is not syncing the shortcuts properly to use a warning banner instead that is less in-your-face and still let you navigate sites without crying in frustration.
  - Fixing inconsistency with handling of trailing spaces. Should only add a space after the expansion if you typed a space.
+ - Adding auto-capitalization with checking for lower-case versions of the word typed, and applying all-caps or just first letter capitalization automatically.
 
 v1.8.3
  - Replacing console.log() statements with debugLog() to reduce developer console spam.
