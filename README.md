@@ -22,6 +22,8 @@ https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmigge
 ## Feature Requests
  - Localizing the extension
  - Date Arithmetic
+ - Increase detection timeout max limit
+ - Fix sometimes multiple shortcuts without spaces between them don't work
  - Opera extension version
 
 ## Updating Instructions
