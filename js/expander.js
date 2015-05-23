@@ -1074,17 +1074,17 @@ jQuery.noConflict();
         $('body').append($(document.createElement('div'))
             .text(message)
             .css({
-                width: '100%',
-                position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                padding: '8px 12px',
-                text-align: 'center',
-                font: 'bold 13px/16px Verdana',
-                color: '#fff',
-                background-color: color || '#bbb',
-                display: 'none',
+                'width': '100%',
+                'position': 'fixed',
+                'bottom': 0,
+                'left': 0,
+                'right': 0,
+                'padding': '8px 12px',
+                'text-align': 'center',
+                'font': 'bold 13px/16px Verdana',
+                'color': '#fff',
+                'background-color': color || '#bbb',
+                'display': 'none',
             })
             .fadeIn(ANIMATION_FAST, function() 
             {
@@ -1099,11 +1099,11 @@ jQuery.noConflict();
                     $(this).append($(document.createElement('button'))
                         .text('x')
                         .css({
-                            font: 'bold 13px/13px Verdana',
-                            margin: '0 4px',
-                            padding: '4px',
-                            float: 'right',
-                            margin-right: '20px',
+                            'font': 'bold 13px/13px Verdana',
+                            'margin': '0 4px',
+                            'padding': '4px',
+                            'float': 'right',
+                            'margin-right': '20px',
                         })
                         .click(function(e) {
                             $(this).parent().fadeOut(ANIMATION_FAST, function() {
