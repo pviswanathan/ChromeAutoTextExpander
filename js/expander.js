@@ -12,6 +12,9 @@ jQuery.noConflict();
 
 		, DEFAULT_CLEAR_BUFFER_TIMEOUT = 750
         , TIME_EDITOR_CHECK = 500
+        , ANIMATION_FAST = 200
+        , ANIMATION_NORMAL = 400
+        , ANIMATION_SLOW = 1000
         , TIME_SHOW_CROUTON = 1000 * 3	              // Show croutons for 3s
 
         , ENUM_CAPITALIZATION_NONE = 0
@@ -1061,7 +1064,7 @@ jQuery.noConflict();
                 console.log('Database version:', data[SHORTCUT_VERSION_KEY]);
                 console.log('Extension version:', APP_VERSION);
                 if (!disableShortcuts) {
-                    showCrouton(warning, 'red');
+                    showCrouton(warning);
                 }
                 
                 // Flag shortcuts disabled
@@ -1074,51 +1077,46 @@ jQuery.noConflict();
     }
 
     // Create and show a warning message crouton that can be dismissed or autohide
-    function showCrouton(message, color, autohide)
+    function showCrouton(message, autohide)
     {
-        $('body').append($(document.createElement('div'))
-            .text(message)
-            .css({
-                'width': '100%',
-                'position': 'fixed',
-                'bottom': 0,
-                'left': 0,
-                'right': 0,
-                'padding': '8px 12px',
-                'text-align': 'center',
-                'font': 'bold 13px/16px Verdana',
-                'color': '#fff',
-                'background-color': color || '#bbb',
-                'display': 'none',
-            })
-            .fadeIn(ANIMATION_FAST, function() 
-            {
-                if (autohide) 
-                {
-                    $(this).delay(TIME_SHOW_CROUTON).fadeOut(ANIMATION_FAST, function() {
-                        $(this).remove();
-                    })
-                } 
-                else    // Show a close button
-                {
-                    $(this).append($(document.createElement('button'))
-                        .text('x')
-                        .css({
-                            'font': 'bold 13px/13px Verdana',
-                            'margin': '0 4px',
-                            'padding': '4px',
-                            'float': 'right',
-                            'margin-right': '20px',
-                        })
-                        .click(function(e) {
-                            $(this).parent().fadeOut(ANIMATION_FAST, function() {
-                                $(this).remove();
-                            });
-                        })
-                    );
-                }
-            })
-        );
+        // Create and style crouton
+        var crouton = document.createElement('div');
+        crouton.style['width'] = '100%';
+        crouton.style['position'] = 'fixed';
+        crouton.style['bottom'] = 0;
+        crouton.style['left'] = 0;
+        crouton.style['right'] = 0;
+        crouton.style['padding'] = '4px 0';
+        crouton.style['text-align'] = 'center';
+        crouton.style['font'] = 'bold 13px/16px Verdana';
+        crouton.style['color'] = '#fff';
+        crouton.style['background-color'] = '#c66';
+        crouton.style['opacity'] = '.8';
+
+        // Add to body, add content
+        var $crouton = $(crouton);
+        $('body').append($crouton.text(message));
+
+        if (autohide) {
+            $crouton.delay(TIME_SHOW_CROUTON).remove();
+        } 
+        else    // Show a close button
+        {
+            // Create and style close button
+            var button = document.createElement('button');
+            button.style['font'] = 'bold 13px/13px Verdana';
+            button.style['margin'] = '0 6px';
+            button.style['padding'] = '4px';
+            button.style['float'] = 'right';
+
+            // Add to body, add content, and actions
+            $crouton.append($(button)
+                .text('x')
+                .click(function(e) {
+                    $(this).parent().remove();
+                })
+            );
+        }
     }
 
 	// Document ready function

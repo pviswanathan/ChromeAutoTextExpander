@@ -195,7 +195,7 @@ button img {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	padding: 8px 12px;
+	padding: 8px 0;
 	text-align: center;
 	font: bold 13px/16px Verdana;
 	color: #fff;
@@ -207,10 +207,9 @@ button img {
 .crouton.orange { background-color: #e90; }
 .crouton .closeButton {
     font: bold 13px/13px Verdana;
-    margin: 0 4px;
+    margin: 0 6px;
     padding: 4px;
     float: right;
-    margin-right: 20px;
 }
 
 .popup {
