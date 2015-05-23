@@ -522,7 +522,7 @@ $(function()
                         if (completionBlock) {
                             completionBlock();
                         } else {
-                            showCrouton('Shortcuts saved!');	// Indicate success saving
+                            showCrouton('Shortcuts saved!', 'green', true);	// Indicate success saving
                         }
                     }
                 });
@@ -556,7 +556,7 @@ $(function()
                                         showCrouton(chrome.i18n.getMessage("ERROR_BACKUP_FAILED"), 'red');
                                     }
                                     else {	// Show success
-                                        showCrouton('Shortcuts backed up locally!');
+                                        showCrouton('Shortcuts backed up locally!', 'green', true);
                                         updateBackupTimestamp();
                                     }
                                 });
@@ -647,7 +647,7 @@ $(function()
                             }
                             else 	// Show success
                             {
-                                showCrouton('Shortcuts restored!');
+                                showCrouton('Shortcuts restored!', 'green', true);
                                 refreshShortcuts();
                             }
                         });
@@ -681,7 +681,7 @@ $(function()
                             }
                             else 	// Show success
                             {
-                                showCrouton('Shortcuts restored!');
+                                showCrouton('Shortcuts restored!', 'green', true);
                                 refreshShortcuts();
                             }
                         });
