@@ -205,6 +205,11 @@ button img {
 .crouton.red { background-color: #c66; }
 .crouton.green { background-color: #6c6; }
 .crouton.orange { background-color: #e90; }
+.crouton .closeButton {
+    font: bold 13px/16px Verdana;
+    color: #fff;
+    background: transparent;
+}
 
 .popup {
 	z-index: 2;

@@ -12,6 +12,7 @@ jQuery.noConflict();
 
 		, DEFAULT_CLEAR_BUFFER_TIMEOUT = 750
         , TIME_EDITOR_CHECK = 500
+        , TIME_SHOW_CROUTON = 1000 * 3	              // Show croutons for 3s
 
 		, DATE_MACRO_REGEX = /%d\(/g
 		, DATE_MACRO_CLOSE_TAG = ')'
@@ -998,7 +999,7 @@ jQuery.noConflict();
                 console.log('Database version:', data[SHORTCUT_VERSION_KEY]);
                 console.log('Extension version:', APP_VERSION);
                 if (!disableShortcuts) {
-                    alert(warning);
+                    showCrouton(warning, 'red');
                 }
                 
                 // Flag shortcuts disabled
@@ -1008,6 +1009,52 @@ jQuery.noConflict();
                 disableShortcuts = false;
             }
         });
+    }
+
+    // Create and show a warning message crouton that can be dismissed or autohide
+    function showCrouton(message, color, autohide)
+    {
+        $('body').append($(document.createElement('div'))
+            .text(message)
+            .css({
+                width: '100%',
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                padding: '8px 12px',
+                text-align: 'center',
+                font: 'bold 13px/16px Verdana',
+                color: '#fff',
+                background-color: color || '#bbb',
+                display: 'none',
+            })
+            .fadeIn(ANIMATION_FAST, function() 
+            {
+                if (autohide) 
+                {
+                    $(this).delay(TIME_SHOW_CROUTON).fadeOut(ANIMATION_FAST, function() {
+                        $(this).remove();
+                    })
+                } 
+                else    // Show a close button
+                {
+                    $(this).append($(document.createElement('button'))
+                        .text('x')
+                        .css({
+                            font: 'bold 13px/16px Verdana',
+                            color: '#fff',
+                            background: 'transparent',
+                        })
+                        .click(function(e) {
+                            $(this).parent().fadeOut(ANIMATION_FAST, function() {
+                                $(this).remove();
+                            });
+                        });
+                    );
+                }
+            })
+        );
     }
 
 	// Document ready function

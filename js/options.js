@@ -735,15 +735,30 @@ $(function()
         });
     }
 
-    // Create and show and eventually hide a message crouton
-    function showCrouton(message, color)
+    // Create and show a warning message crouton that can be dismissed or autohide
+    function showCrouton(message, color, autohide)
     {
         $('body').append($(document.createElement('div'))
             .addClass('crouton').addClass(color || 'green').text(message)
-            .fadeIn(ANIMATION_FAST, function() {
-                $(this).delay(TIME_SHOW_CROUTON).fadeOut(ANIMATION_FAST, function() {
-                    $(this).remove();
-                })
+            .fadeIn(ANIMATION_FAST, function() 
+            {
+                if (autohide) 
+                {
+                    $(this).delay(TIME_SHOW_CROUTON).fadeOut(ANIMATION_FAST, function() {
+                        $(this).remove();
+                    })
+                } 
+                else    // Show a close button
+                {
+                    $(this).append($(document.createElement('button'))
+                        .addClass('closeButton').text('x')
+                        .click(function(e) {
+                            $(this).parents('.crouton').fadeOut(ANIMATION_FAST, function() {
+                                $(this).remove();
+                            });
+                        });
+                    );
+                }
             })
         );
     }

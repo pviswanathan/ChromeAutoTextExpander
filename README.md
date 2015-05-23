@@ -21,6 +21,8 @@ https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmigge
 
 ## Feature Requests
  - Localizing the extension
+ - Autocapitalization
+ - Lots of popups issue
  - Date Arithmetic
  - Opera extension version
 
