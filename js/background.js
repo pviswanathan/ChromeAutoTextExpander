@@ -370,7 +370,11 @@ function processVersionUpgrade(oldVersion)
             case '1.0.5':
             case '1.0.3':
             case '1.0.0':
-                upgradeShortcutsToV120([upgradeShortcutsToV170, upgradeShortcutsToLatest]);
+                upgradeShortcutsToV120([
+                    upgradeShortcutsToV170, 
+                    upgradeShortcutsToV171, 
+                    upgradeShortcutsToLatest
+                ]);
                 break;
 
             case '1.6.1':
@@ -386,11 +390,16 @@ function processVersionUpgrade(oldVersion)
             case '1.2.5':
             case '1.2.2':
             case '1.2.0':
-                upgradeShortcutsToV170([upgradeShortcutsToLatest]);
+                upgradeShortcutsToV170([
+                    upgradeShortcutsToV171, 
+                    upgradeShortcutsToLatest
+                ]);
                 break;
 
             case '1.7.0':
-                upgradeShortcutsToV171([upgradeShortcutsToLatest]);
+                upgradeShortcutsToV171([
+                    upgradeShortcutsToLatest
+                ]);
                 break;
 
             case '1.7.1':
@@ -399,8 +408,11 @@ function processVersionUpgrade(oldVersion)
             case '1.8.2':
             case '1.8.3':
             case '1.8.4':
-            default:
+            case '1.8.5':
                 upgradeShortcutsToLatest();
+                break;
+
+            default: break;
         }
     });
 }

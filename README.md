@@ -40,6 +40,11 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 
 ## Version History
+v1.8.5
+ - Fix Inbox support
+ - Increase max time for shortcut detection to 10s
+ - Figure out what's going on with the @ shortcut prefix issue
+
 v1.8.4
  - Changed popup warnings when Chrome is not syncing the shortcuts properly to use a warning banner instead that is less in-your-face and still let you navigate sites without crying in frustration.
  - Fixing inconsistency with handling of trailing spaces. Should only add a space after the expansion if you typed a space.

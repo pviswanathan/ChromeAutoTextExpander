@@ -46,7 +46,7 @@ jQuery.noConflict();
         , SELECTOR_EDITABLE_BODY = 'body[contenteditable=true]'
 		, SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
         , SELECTOR_GMAIL_EDIT = 'div.aoI'   // Class for Gmail's popup message composer
-        , SELECTOR_INBOX_EDIT = 'div.aT'    // Class for Inbox's inline reply container
+        , SELECTOR_INBOX_EDIT = 'div.dX'    // Class for Inbox's inline reply container
         , SELECTOR_GTT_EDIT = 'div.goog-splitpane-second-container'   // GTT editor
         , SELECTOR_MAILCHIMP_EDIT = 'iframe.cke_wysiwyg_frame'  // Mailchimp web editor
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'   // Outlook web editor
@@ -73,6 +73,8 @@ jQuery.noConflict();
 	// When user presses a key
 	function keyPressHandler(event)
 	{
+        debugLog('keyPressHandler:', event.target);
+
 		// Make sure it's not the same event firing over and over again
 		if (keyPressEvent == event) {
 			return;
@@ -918,12 +920,31 @@ jQuery.noConflict();
 	// Attach listener to keypresses
 	function addListeners()
 	{
-		// Add to editable divs, textareas, inputs
+        debugLog("addListeners()");
+
 		var $document = $(document);
         var domain = window.location.host;
-		$document.on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
-		$document.on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
-		$document.on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
+
+        // Special case for Google Inbox
+        if (INBOX_DOMAIN_REGEX.test(domain)) 
+        {
+            debugLog("Domain: Google Inbox");
+            SELECTOR_INPUT += ',' + SELECTOR_INBOX_EDIT;
+
+            // Need to check for focus on editable elements
+            $document.on(EVENT_NAME_FOCUS, SELECTOR_INPUT, function(event) 
+            {
+                debugLog('focused on editable element:', event.target);
+                refreshListenersOnElement($(event.target));
+            });
+        }
+        else    // Add to whole document
+        {
+            debugLog("adding default listeners to document");
+            $document.on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+            $document.on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+            $document.on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
+        }
 
         // Special case for Gmail.com
         if (GMAIL_DOMAIN_REGEX.test(domain)) 
@@ -941,20 +962,6 @@ jQuery.noConflict();
                 if ($target.parents('div[role=dialog]').length) {
                     refreshListenersOnContainer($target.parents(SELECTOR_GMAIL_EDIT));
                 }
-            });
-        }
-
-        // Special case for Google Inbox
-        else if (INBOX_DOMAIN_REGEX.test(domain)) 
-        {
-            debugLog("Domain: Google Inbox");
-            SELECTOR_INPUT += ',' + SELECTOR_INBOX_EDIT;
-
-            // Need to check for focus on editable elements
-            $document.on(EVENT_NAME_FOCUS, SELECTOR_INPUT, function(event) 
-            {
-                debugLog('focused on editable element:', event.target);
-                refreshListenersOnElement($(event.target));
             });
         }
 
