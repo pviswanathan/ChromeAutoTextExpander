@@ -30,7 +30,7 @@ https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmigge
 When releasing a new version, please update the following with the version number:
  - manifest.json [for json key "version"]
  - constants.js [for variable APP_VERSION]
- - background.js [function processingVersionUpgrade()]
+ - background.js [function processingVersionUpgrade(), add last version number]
  - README.md [version history section]
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
