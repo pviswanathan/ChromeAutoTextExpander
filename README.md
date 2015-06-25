@@ -23,6 +23,8 @@ https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmigge
  - Localizing the extension
  - Domain whitelist/blacklist or on/off switch
  - Date Arithmetic
+ - Add support for Google Docs comments
+ - Add support for everhour.com
  - Opera extension version
 
 ## Updating Instructions
