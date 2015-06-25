@@ -509,7 +509,7 @@ function processVersionUpgrade(oldVersion)
                 upgradeNotes.push({ title:"-", message:"Added support for Google Translate" });
                 upgradeNotes.push({ title:"-", message:"Added support for MailChimp" });
                 upgradeNotes.push({ title:"-", message:"Added support for Confluence" });
-                upgradeNotes.push({ title:"-", message:"Replace annoying exception messages" });
+
             case '1.8.1':
                 upgradeNotes.push({ title:"-", message:"Fix for Salesforce support" });
                 upgradeNotes.push({ title:"-", message:"Add new Textarea for demoing" });
