@@ -306,6 +306,9 @@ jQuery.noConflict();
                         replaceTextContentEditable(shortcut, autotext, findFocusedNode());
                     }
                 }
+
+                // Always clear the buffer after a shortcut fires
+                clearTypingBuffer();
             });	// END - getClipboardData()
         }	// END - if (autotext)
         else {  // Error

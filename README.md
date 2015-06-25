@@ -43,7 +43,7 @@ v1.9.0
  - Attempt to add support for O365 OWA
  - Adding support for G+ communities
  - Adding omnibox support
- - Fix sometimes multiple shortcuts without spaces between them don't work
+ - Fix to let consecutive shortcuts fire even if typed without whitespace
 
 v1.8.5
  - Fix Inbox support
