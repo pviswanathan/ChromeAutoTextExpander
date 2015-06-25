@@ -31,6 +31,7 @@ jQuery.noConflict();
 		, FACEBOOK_DOMAIN_REGEX = /facebook.com/
 		, GMAIL_DOMAIN_REGEX = /mail.google.com/
 		, INBOX_DOMAIN_REGEX = /inbox.google.com/
+		, GPLUS_DOMAIN_REGEX = /plus.google.com/
 		, GTT_DOMAIN_REGEX = /translate.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
 		, OUTLOOK_OWA_DOMAIN_REGEX = /outlook.office365.com/
@@ -941,6 +942,14 @@ jQuery.noConflict();
         }
         else    // Add to whole document
         {
+            // Special case for Google Plus
+            if (GPLUS_DOMAIN_REGEX.test(domain))
+            {
+                debugLog("Domain: Google Plus");
+                SELECTOR_INPUT += ',div.editable';
+            }
+
+            // Add default listeners to document
             debugLog("adding default listeners to document");
             $document.on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
             $document.on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);

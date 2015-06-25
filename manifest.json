@@ -1,7 +1,7 @@
 {
 	"name": "__MSG_EXTENSION_NAME__"
 	, "short_name": "__MSG_EXTENSION_SHORTNAME__"
-	, "version": "1.8.5"
+	, "version": "1.9.0"
 	, "manifest_version": 2
 	, "description": "__MSG_EXTENSION_DESCRIPTION__"
 	, "icons": {

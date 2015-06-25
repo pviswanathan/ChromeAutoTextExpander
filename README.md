@@ -21,16 +21,15 @@ https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmigge
 
 ## Feature Requests
  - Localizing the extension
+ - Domain whitelist/blacklist or on/off switch
  - Date Arithmetic
- - Increase detection timeout max limit
- - Fix sometimes multiple shortcuts without spaces between them don't work
  - Opera extension version
 
 ## Updating Instructions
 When releasing a new version, please update the following with the version number:
  - manifest.json [for json key "version"]
  - constants.js [for variable APP_VERSION]
- - background.js [function processingVersionUpgrade(), add last version number]
+ - background.js [function processingVersionUpgrade(), add previous version number]
  - README.md [version history section]
 
 Hope this is useful to someone out there; would love any help optimizing and improving on it. Feel free to help contribute and expand on this project!
@@ -40,6 +39,12 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 
 ## Version History
+v1.9.0
+ - Attempt to add support for O365 OWA
+ - Adding support for G+ communities
+ - Adding omnibox support
+ - Fix sometimes multiple shortcuts without spaces between them don't work
+
 v1.8.5
  - Fix Inbox support
  - Increase max time for shortcut detection to 10s
