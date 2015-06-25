@@ -52,7 +52,7 @@ jQuery.noConflict();
         , SELECTOR_GTT_EDIT = 'div.goog-splitpane-second-container'   // GTT editor
         , SELECTOR_MAILCHIMP_EDIT = 'iframe.cke_wysiwyg_frame'  // Mailchimp web editor
         , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'   // Outlook web editor
-        , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-noteEditor'       // Evernote web note editor
+        , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-NoteContentEditorView-root'  // Evernote web note editor
         , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'   // Basecamp message editor
         , SELECTOR_ATLASSIAN_EDIT = 'iframe#wysiwygTextarea_ifr'   // Confluence editor
 	;
@@ -900,15 +900,6 @@ jQuery.noConflict();
                     // Special cases
                     var domain = $iframe.contents().get(0).location.host;
                     debugLog('iframe location:', domain);
-
-                    // Special Evernote case
-                    if (EVERNOTE_DOMAIN_REGEX.test(domain))
-                    {
-                        $iframe.contents().find(SELECTOR_EDITABLE_BODY)
-                            .on(EVENT_NAME_KEYPRESS, keyPressHandler);
-                        $iframe.contents().find(SELECTOR_EDITABLE_BODY)
-                            .on(EVENT_NAME_KEYUP, keyUpHandler);
-                    }
                 }
                 else 
                 {
