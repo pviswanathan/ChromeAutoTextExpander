@@ -10,6 +10,7 @@
 		, "128": "images/icon128.png"
 	}
 	, "default_locale": "en"
+    , "offline_enabled": true
 	, "background": {
 		"scripts": [
             "js/constants.js"
