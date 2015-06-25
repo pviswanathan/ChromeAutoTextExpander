@@ -1,8 +1,9 @@
-// Constants
+// Constants & variables
 var MANIFEST = chrome.runtime.getManifest()     // Manifest reference
     , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts' // For shortcut DB migration
     , OLD_SHORTCUT_VERSION_KEY = 'v'            // For shortcut DB migration
     , TEST_OLD_APP_VERSION                      // For testing upgrades from older versions
+    , shortcutCache = {}                        // Cache for shortcuts
 ;
 console.log('Initializing ATE v' + MANIFEST.version, chrome.i18n.getMessage('@@ui_locale'));
 
@@ -25,14 +26,6 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 
 	switch (request.request)
 	{
-		case "showPageAction":  // No longer needed
-			chrome.pageAction.show(sender.tab.id);
-			break;
-
-		case "hidePageAction":  // No longer needed
-			chrome.pageAction.hide(sender.tab.id);
-			break;
-
 		case "getClipboardData":
 			sendResponse({ paste:pasteFromClipboard() });
 			break;
@@ -41,6 +34,97 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 			console.log("Unknown request received:", request);
 			break;
 	}
+});
+
+// Omnibox default first suggestion (instructions)
+chrome.omnibox.setDefaultSuggestion({
+    description: '<dim>Search shortcuts for:</dim> <match>%s</match>'
+});
+
+// On activation in omnibox
+chrome.omnibox.onInputStarted.addListener(function ()
+{
+    debugLog('Omnibox onInputStarted()');
+
+    // Get and cache latest shortcuts for performance
+    chrome.storage.sync.get(null, function(data)
+    {
+        debugLog('caching shortcuts...');
+
+        if (chrome.runtime.lastError) {	// Check for errors
+            console.log(chrome.runtime.lastError);
+        } else {
+            shortcutCache = data;
+        }
+    });
+});
+
+// On omnibox input changed (user typing)
+chrome.omnibox.onInputChanged.addListener(function (text, suggest)
+{
+    debugLog('Omnibox onInputChanged:', text);
+
+    // Use text to check shortcuts for expansions
+    var expansion = shortcutCache[SHORTCUT_PREFIX + text];
+
+    // If exists, surface expansion as suggestion
+    if (expansion && expansion.length)
+    {
+        var suggestions = [];
+
+        // Process expansion
+        var description = '<match>' + text + '</match>'
+            + '<dim> &#8594; ' + expansion.split('"').join('&quot;')
+                .split("'").join('&apos;')
+                .split('<').join('&lt;')
+                .split('>').join('&gt;')
+                .split('&').join('&amp;')
+            + '</dim>';
+        suggestions.push({
+            content: expansion,
+            description: description,
+        });
+
+        // Send suggestions to callback
+        suggest(suggestions);
+    }
+});
+ 
+// On omnibox suggestion accepted
+chrome.omnibox.onInputEntered.addListener(function (text, disposition)
+{
+    debugLog('Omnibox onInputEntered:', text, disposition);
+
+    // If the entered text is a shortcut, expand it and jump
+    var expansion = shortcutCache[SHORTCUT_PREFIX + text];
+
+    // If exists, update text with expansion instead
+    if (expansion && expansion.length) {
+        text = expansion;
+    }
+
+    // Check text for URL format prefix, otherwise add it
+    if (text.indexOf('http') != 0) {
+        text = 'http://' + text;
+    }
+    debugLog('url:', text);
+
+    // Update / open tab according to disposition
+    switch (disposition) 
+    {
+        default:    // Default to updating current tab
+        case "currentTab":
+            chrome.tabs.update({url: text});
+            break;
+
+        case "newForegroundTab":
+            chrome.tabs.create({url: text});
+            break;
+
+        case "newBackgroundTab":
+            chrome.tabs.create({url: text, active: false});
+            break;
+    }
 });
 
 // On first install or upgrade, make sure to inject into all tabs
@@ -57,7 +141,7 @@ chrome.runtime.onInstalled.addListener(function(details)
 	    // Inject script into all open tabs
 		chrome.tabs.query({}, function(tabs)
 		{
-			console.log("Executing on tabs: ", tabs);
+			debugLog("Executing on tabs: ", tabs);
 			for (var i = 0, l = tabs.length; i < l; ++i) {
 				injectScript(tabs[i]);
 			}
@@ -77,7 +161,7 @@ chrome.runtime.onInstalled.addListener(function(details)
         // Check synced shortcuts in case of need to update, show options, etc.
         chrome.storage.sync.get(null, function(data)
         {
-            console.log('checking shortcuts...');
+            debugLog('checking shortcuts...');
 
             if (chrome.runtime.lastError) {	// Check for errors
                 console.log(chrome.runtime.lastError);
@@ -128,7 +212,7 @@ function runTests()
 // Test shortcut database version mismatch
 function testVersionMismatch(completionBlock)
 {
-    console.log('testVersionMismatch');
+    debugLog('testVersionMismatch');
 
     chrome.storage.sync.get(null, function(data) 
     {
@@ -146,7 +230,7 @@ function testVersionMismatch(completionBlock)
                 } 
                 else 
                 {
-                    console.log('test setup complete');
+                    debugLog('test setup complete');
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -159,7 +243,7 @@ function testVersionMismatch(completionBlock)
 // Test shortcut database loss
 function testDataLoss(completionBlock)
 {
-    console.log('testDataLoss');
+    debugLog('testDataLoss');
 
     chrome.storage.sync.clear(function() 
     {
@@ -171,7 +255,7 @@ function testDataLoss(completionBlock)
                 if (chrome.runtime.lastError) {	// Check for errors
                     console.log(chrome.runtime.lastError);
                 } else {
-                    console.log('test setup complete');
+                    debugLog('test setup complete');
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -184,7 +268,7 @@ function testDataLoss(completionBlock)
 // Test pre-v1.2.0 database migration
 function testV120Migration(completionBlock)
 {
-    console.log('testV120Migration');
+    debugLog('testV120Migration');
     TEST_OLD_APP_VERSION = '1.1.0';
 
     var shortcuts = {};
@@ -205,7 +289,7 @@ function testV120Migration(completionBlock)
                 } 
                 else 
                 {
-                    console.log('test setup complete');
+                    debugLog('test setup complete');
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -218,7 +302,7 @@ function testV120Migration(completionBlock)
 // Test pre-v1.7.0 database migration
 function testV170Migration(completionBlock)
 {
-    console.log('testV170Migration');
+    debugLog('testV170Migration');
     TEST_OLD_APP_VERSION = '1.6.0';
 
     var shortcuts = {
@@ -241,7 +325,7 @@ function testV170Migration(completionBlock)
                 } 
                 else 
                 {
-                    console.log('test setup complete');
+                    debugLog('test setup complete');
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -254,7 +338,7 @@ function testV170Migration(completionBlock)
 // Test v1.7.0 to v1.7.1 database migration
 function testV171Migration(completionBlock)
 {
-    console.log('testV171Migration');
+    debugLog('testV171Migration');
     TEST_OLD_APP_VERSION = '1.7.0';
 
     var shortcuts = {
@@ -279,7 +363,7 @@ function testV171Migration(completionBlock)
                 } 
                 else 
                 {
-                    console.log('test setup complete');
+                    debugLog('test setup complete');
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -351,10 +435,13 @@ function openOrFocusOptionsPage()
 // Function for anything extra that needs doing related to new version upgrade
 function processVersionUpgrade(oldVersion)
 {
-    console.log('processVersionUpgrade:', oldVersion);
+    debugLog('processVersionUpgrade:', oldVersion);
 
     // Make backup of synced data before proceeding
-    makeEmergencyBackup(function() {
+    makeEmergencyBackup(function() 
+    {
+        var upgradeNotes = [];   // Upgrade version notes
+
         switch (oldVersion)
         {
             case '1.1.6':
@@ -402,14 +489,38 @@ function processVersionUpgrade(oldVersion)
                 ]);
                 break;
 
-            case '1.7.1':
             case '1.8.0':
+                upgradeNotes.push({ title:"-", message:"Added support for Google Inbox" });
+                upgradeNotes.push({ title:"-", message:"Added support for Google Translate" });
+                upgradeNotes.push({ title:"-", message:"Added support for MailChimp" });
+                upgradeNotes.push({ title:"-", message:"Added support for Confluence" });
+                upgradeNotes.push({ title:"-", message:"Replace annoying exception messages" });
             case '1.8.1':
+                upgradeNotes.push({ title:"-", message:"Fix for Salesforce support" });
+                upgradeNotes.push({ title:"-", message:"Add new Textarea for demoing" });
+                upgradeNotes.push({ title:"-", message:"Slight optimizations" });
+
             case '1.8.2':
             case '1.8.3':
+                upgradeNotes.push({ title:"-", message:"Change sync error popups to banners" });
+                upgradeNotes.push({ title:"-", message:"Fix handling of trailing spaces" });
+                upgradeNotes.push({ title:"-", message:"Add auto-capitalization/-all-caps" });
+                upgradeNotes.push({ title:"-", message:"Updating banners to be dismissable" });
+
             case '1.8.4':
+                upgradeNotes.push({ title:"-", message:"Fix Inbox support" });
+                upgradeNotes.push({ title:"-", message:"Raise shortcut detection limit to 10s" });
+                upgradeNotes.push({ title:"-", message:"Fix for @ shortcut prefix issue" });
+
             case '1.8.5':
-                upgradeShortcutsToLatest();
+                upgradeNotes.push({ title:"-", message:"Add omnibox (url bar!) support" });
+                upgradeNotes.push({ title:"-", message:"Allow consecutive shortcuts to fire" });
+                upgradeNotes.push({ title:"-", message:"Add support for O365 OWA" });
+                upgradeNotes.push({ title:"-", message:"Add support for G+ communities" });
+               
+
+                // Upgrade database to latest version and supply version notes
+                upgradeShortcutsToLatest(upgradeNotes);
                 break;
 
             default: break;
@@ -440,7 +551,7 @@ function makeEmergencyBackup(completionBlock)
                 }
                 else 	// Backup success
                 {
-                    console.log("Emergency backup before migration created.");
+                    debugLog("Emergency backup before migration created.");
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -470,7 +581,7 @@ function restoreEmergencyBackup(completionBlock)
                 }
                 else 	// Restore success
                 {
-                    console.log("Emergency backup restored.");
+                    debugLog("Emergency backup restored.");
                     if (completionBlock) {
                         completionBlock();
                     }
@@ -499,7 +610,7 @@ function upgradeShortcutsToV120(completionBlocks)
             for (var key in oldDataStore) {
                 if (oldDataStore.hasOwnProperty(key)) {
                     var value = oldDataStore[key];
-                    console.log('migrating:', key, '=>', value);
+                    debugLog('migrating:', key, '=>', value);
                     newDataStore[key] = value;
                 }
             }
@@ -569,7 +680,7 @@ function upgradeShortcutsToV170(completionBlocks)
         var newDataStore = {};
         for (var key in data) {
             if (data.hasOwnProperty(key)) {
-                console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
+                debugLog('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
                 newDataStore[SHORTCUT_PREFIX + key] = data[key];
             }
         }
@@ -625,7 +736,7 @@ function upgradeShortcutsToV171(completionBlocks)
         }
         else if (data && Object.keys(data).length) // Check that data is returned
         {
-            console.log("updating database version to", MANIFEST.version);
+            debugLog("updating database version to", MANIFEST.version);
 
             // Update metadata for shortcut version to manifest version
             delete data[OLD_SHORTCUT_VERSION_KEY];
@@ -659,10 +770,10 @@ function upgradeShortcutsToV171(completionBlocks)
 }
 
 
-// Updates the shortcut database with the latest version number
-function upgradeShortcutsToLatest(completionBlocks)
+// Updates the shortcut database with the latest version number, and support an optional message
+function upgradeShortcutsToLatest(upgradeNotesList)
 {
-    console.log("upgradeShortcutsToLatest");
+    console.log("upgradeShortcutsToLatest:", upgradeNotesList);
 
     // Upgrade shortcut database version
     chrome.storage.sync.get(null, function(data)
@@ -690,22 +801,22 @@ function upgradeShortcutsToLatest(completionBlocks)
                         }
                         else	// Done with migration
                         {
-                            console.log("upgrade complete!");
+                            debugLog("upgrade complete!");
+
+                            // Add upgrade message
+                            upgradeNotesList.unshift({
+                                title: "Please reload tabs, have a great day!",
+                                message: ""
+                            });
 
                             // Fire off notification about upgrade
                             chrome.notifications.create("", {
-                                type: "basic"
+                                type: "list"
                                 , iconUrl: "images/icon128.png"
                                 , title: "AutoTextExpander Updated v" + MANIFEST.version
-                                , message: "Hello hello! Please refresh your tabs to use the latest, and have a great day. :o)"
+                                , message: "Hello! Please refresh your tabs to use the latest, and have a great day. :o)"
+                                , items: upgradeNotesList
                             }, function(id) {});
-
-                            // Call first completion block, and pass the rest on
-                            if (completionBlocks && completionBlocks.length)
-                            {
-                                var block = completionBlocks.shift();
-                                block(completionBlocks);
-                            }
                         }
                     });
                 }

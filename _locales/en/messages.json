@@ -19,6 +19,11 @@
 		, "description": "Extension description for the chrome webstore."
 	}
 
+	, "KEYWORD_OMNIBAR_TRIGGER": {
+		"message": "ate"
+		, "description": "Omnibar (url address bar) trigger for extension."
+	}
+
 	, "BROWSER_ACTION_TITLE": {
 		"message": "Click to view options for AutoTextExpander"
 		, "description": "Browser action default title."

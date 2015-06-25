@@ -35,6 +35,9 @@ $(function()
     // Set version
     $('#versionHistory').text('v' + APP_VERSION);
 
+    // Set omnibar keyword
+    $('#omnibarKeyword').text(chrome.i18n.getMessage("KEYWORD_OMNIBAR_TRIGGER"));
+
     // Set cursor tracker html
     $('#cursorTrackerHTML').text(CURSOR_TRACKING_HTML);
 

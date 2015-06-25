@@ -11,6 +11,9 @@
 	}
 	, "default_locale": "en"
     , "offline_enabled": true
+    , "omnibox": { 
+        "keyword" : "__MSG_KEYWORD_OMNIBAR_TRIGGER__" 
+    }
 	, "background": {
 		"scripts": [
             "js/constants.js"
