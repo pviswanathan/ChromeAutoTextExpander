@@ -113,6 +113,18 @@ $(function()
 	// Tips link to show / hide tips
 	$('#tipsLink').click(toggleTips);
 
+    // Check if we opened the options page with a hash
+    var hash = window.location.hash;
+    if (hash)
+    {
+        console.log('Hash:', hash);
+
+        // If it is #tipsLink, trigger tips
+        if (hash == "#tipsLink") {
+            $(hash).click();
+        }
+    }
+
 	// Refresh and setup shortcuts
 	refreshShortcuts();
 

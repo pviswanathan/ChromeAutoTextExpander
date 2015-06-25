@@ -180,10 +180,17 @@ chrome.runtime.onInstalled.addListener(function(details)
     }
 });
 
+// If upgrade notification was clicked
+chrome.notifications.onClicked.addListener(function (notificationID)
+{
+    // Show options page
+    openOrFocusOptionsPage('#tipsLink');
+});
+
 // Show options page when browser action is clicked
 //  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
 chrome.browserAction.onClicked.addListener(function(tab) {
-   openOrFocusOptionsPage();
+    openOrFocusOptionsPage();
 });
 
 
@@ -415,8 +422,13 @@ function pasteFromClipboard()
 }
 
 // Opens or focuses on the options page if open
-function openOrFocusOptionsPage()
+function openOrFocusOptionsPage(params)
 {
+    // Check params is valid string
+    if (!params) {
+        params = "";
+    }
+
     // Get the url for the extension options page
     var optionsUrl = chrome.extension.getURL('options.html'); 
     chrome.tabs.query({ 'url': optionsUrl }, function(tabs) 
@@ -424,10 +436,13 @@ function openOrFocusOptionsPage()
         if (tabs.length)    // If options tab is already open, focus on it
         {
             debugLog("options page found:", tabs[0].id);
-            chrome.tabs.update(tabs[0].id, {"selected": true});
+            chrome.tabs.update(tabs[0].id, {
+                selected: true, 
+                url: optionsUrl + params,
+            });
         } 
         else {  // Open the options page otherwise
-            chrome.tabs.create({url: optionsUrl});
+            chrome.tabs.create({url: optionsUrl + params});
         }
     });
 }
@@ -639,6 +654,7 @@ function upgradeShortcutsToV120(completionBlocks)
                                 , iconUrl: "images/icon128.png"
                                 , title: "Database Update v1.2.0"
                                 , message: "Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct."
+                                , isClickable: true
                             }, function(id) {});
 
                             // Call first completion block, and pass the rest on
@@ -707,6 +723,7 @@ function upgradeShortcutsToV170(completionBlocks)
                             , iconUrl: "images/icon128.png"
                             , title: "Database Update v1.7.0"
                             , message: "Your shortcuts have been migrated to a new storage format! Please check that your shortcuts and expansions are correct."
+                            , isClickable: true
                         }, function(id) {});
 
                         // Call first completion block, and pass the rest on
@@ -816,6 +833,7 @@ function upgradeShortcutsToLatest(upgradeNotesList)
                                 , title: "AutoTextExpander Updated v" + MANIFEST.version
                                 , message: "Hello! Please refresh your tabs to use the latest, and have a great day. :o)"
                                 , items: upgradeNotesList
+                                , isClickable: true
                             }, function(id) {});
                         }
                     });

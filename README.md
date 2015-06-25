@@ -42,7 +42,8 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 v1.9.0
  - Attempt to add support for O365 OWA
  - Adding support for G+ communities
- - Adding omnibox support
+ - Fix support for Evernote
+ - Adding omnibox support (use keyword 'ate' and the Tab key to trigger)
  - Fix to let consecutive shortcuts fire even if typed without whitespace
 
 v1.8.5

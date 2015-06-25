@@ -44,7 +44,7 @@ p {
 #tipsList li {
 	margin: 8px 0;
 }
-#cursorTrackerHTML {
+#cursorTrackerHTML, #omniboxKeyword {
     margin: 0;
     display: inline-block;
     font-weight: bold;
