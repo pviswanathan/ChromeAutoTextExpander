@@ -34,7 +34,6 @@ jQuery.noConflict();
 		, GPLUS_DOMAIN_REGEX = /plus.google.com/
 		, GTT_DOMAIN_REGEX = /translate.google.com/
 		, OUTLOOK_DOMAIN_REGEX = /mail.live.com/
-		, OUTLOOK_OWA_DOMAIN_REGEX = /outlook.office365.com/
         , MAILCHIMP_DOMAIN_REGEX = /admin.mailchimp.com/
         , ATLASSIAN_DOMAIN_REGEX = /atlassian.net/
 
@@ -982,19 +981,6 @@ jQuery.noConflict();
                     addListenersToIframe($target);
                 }
             }, TIME_EDITOR_CHECK);
-        }
-
-        // Special case for Outlook OWA
-        else if (OUTLOOK_OWA_DOMAIN_REGEX.test(domain))
-        {
-            debugLog("Domain: Outlook OWA");
-
-            // Need to check for focus on div.aoI
-            $document.on(EVENT_NAME_FOCUS, SELECTOR_INPUT, function(event) 
-            {
-                debugLog('focused on editable element:', event.target);
-                refreshListenersOnElement($(event.target));
-            });
         }
 
         // Special case for Google Translate

@@ -533,6 +533,8 @@ function processVersionUpgrade(oldVersion)
                 upgradeNotes.push({ title:"-", message:"Add support for O365 OWA" });
                 upgradeNotes.push({ title:"-", message:"Add support for G+ communities" });
                
+            case '1.9.0':
+                upgradeNotes.push({ title:"-", message:"Fix for O365 OWA" });
 
                 // Upgrade database to latest version and supply version notes
                 upgradeShortcutsToLatest(upgradeNotes);

@@ -41,6 +41,9 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 
 ## Version History
+v1.9.1
+ - Fix for Outlook O365 OWA
+
 v1.9.0
  - Attempt to add support for O365 OWA
  - Adding support for G+ communities
