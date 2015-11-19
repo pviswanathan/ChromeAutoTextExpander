@@ -297,8 +297,8 @@ jQuery.noConflict();
             replaceTextMailchimp(shortcut, autotext);
           } else if (GTT_DOMAIN_REGEX.test(domain)) {
             replaceTextGTT(shortcut, autotext);
-          } else if (GDOCS_DOMAIN_REGEX.test(domain)) {
-            replaceTextGDOCS(shortcut, autotext);
+          // } else if (GDOCS_DOMAIN_REGEX.test(domain)) {
+          //   replaceTextGDOCS(shortcut, autotext);
           } else if (ATLASSIAN_DOMAIN_REGEX.test(domain)) {
             replaceTextAtlassian(shortcut, autotext);
           } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
@@ -1045,19 +1045,19 @@ jQuery.noConflict();
       }
 
       // Special case for Google Docs
-      else if (GDOCS_DOMAIN_REGEX.test(domain))
-      {
-        debugLog("Domain: Google Docs");
-
-        // Annoying, need to check for existence of editor element
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_GDOCS_EDIT);
-          if ($target.length) {
-            clearInterval(editorCheck);
-            addListenersToIframe($target, true);
-          }
-        }, TIME_EDITOR_CHECK);
-      }
+      // else if (GDOCS_DOMAIN_REGEX.test(domain))
+      // {
+      //   debugLog("Domain: Google Docs");
+      //
+      //   // Annoying, need to check for existence of editor element
+      //   var editorCheck = setInterval(function() {
+      //     var $target = $(SELECTOR_GDOCS_EDIT);
+      //     if ($target.length) {
+      //       clearInterval(editorCheck);
+      //       addListenersToIframe($target, true);
+      //     }
+      //   }, TIME_EDITOR_CHECK);
+      // }
 
       // Special case for Outlook.com
       else if (OUTLOOK_DOMAIN_REGEX.test(domain))

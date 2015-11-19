@@ -36,7 +36,7 @@ $(function()
     $('#versionHistory').text('v' + APP_VERSION);
 
     // Set omnibar keyword
-    $('#omnibarKeyword').text(chrome.i18n.getMessage("KEYWORD_OMNIBAR_TRIGGER"));
+    $('#omniboxKeyword').text(chrome.i18n.getMessage("KEYWORD_OMNIBAR_TRIGGER"));
 
     // Set cursor tracker html
     $('#cursorTrackerHTML').text(CURSOR_TRACKING_HTML);
@@ -53,7 +53,7 @@ $(function()
 	$('#edit').on('keyup', 'input[type=text], textarea', editRowKeyupHandler);
 
     // Detect when user types ESC in document to close modal popups
-    $(document).on('keydown', function(event) 
+    $(document).on('keydown', function(event)
     {
 		var charCode = event.keyCode || event.which;
         if (charCode == KEYCODE_ESC) {
@@ -78,7 +78,7 @@ $(function()
 	});
 
     // Listen to slider changes
-    $('#timeout').on('change mousemove', function(e) 
+    $('#timeout').on('change mousemove', function(e)
     {
         var timeout = $(this).val();
         metaData[SHORTCUT_TIMEOUT_KEY] = timeout;
@@ -165,12 +165,12 @@ $(function()
         console.log("refreshQuotaLabels");
 
         // Check that data is returned
-        if (!$.isEmptyObject(shortcuts)) 
+        if (!$.isEmptyObject(shortcuts))
         {
             // Current quotas
             $('#totalStorage').text(JSON.stringify(shortcuts).length);
-            $('#countStorage').text(Object.keys(shortcuts).length 
-                                    - Object.keys(metaData).length);        
+            $('#countStorage').text(Object.keys(shortcuts).length
+                                    - Object.keys(metaData).length);
         }
 
         // Max quotas
@@ -197,7 +197,7 @@ $(function()
         // Check that the shortcut database version matches app version
         var shortcutVersion = data[SHORTCUT_VERSION_KEY];
         console.log('database version:', shortcutVersion);
-        if (shortcutVersion && shortcutVersion != metaData[SHORTCUT_VERSION_KEY]) 
+        if (shortcutVersion && shortcutVersion != metaData[SHORTCUT_VERSION_KEY])
         {
             // Warn user that their shortcuts aren't synced yet, they should refresh
             console.log(chrome.i18n.getMessage("WARNING_SHORTCUT_VERSION_MISMATCH"));
@@ -226,13 +226,13 @@ $(function()
                     keys.sort(function(a, b) {
                         return b.toLowerCase().localeCompare(a.toLowerCase());
                     });
-                    $.each(keys, function(index, key) 
+                    $.each(keys, function(index, key)
                     {
                         // Only apply shortcuts
-                        if (key.indexOf(SHORTCUT_PREFIX) === 0) 
+                        if (key.indexOf(SHORTCUT_PREFIX) === 0)
                         {
                             var shortcut = key.substr(SHORTCUT_PREFIX.length);
-                            if (!addRow(shortcut, data[key])) 
+                            if (!addRow(shortcut, data[key]))
                             {
                                 errors = true;
                                 return false;	// Break out if over quota
@@ -350,7 +350,7 @@ $(function()
         // Check to see if input pair is valid
         var keyCode = event.keyCode || event.which;
         var $target = $(event.target);
-        
+
         // If enter pressed on shortcut field, move to autotext
         if (keyCode == KEYCODE_ENTER && $target.hasClass('shortcut'))
         {
@@ -430,7 +430,7 @@ $(function()
         var testObject = {};
         testObject[shortcut] = autotext;
         var itemSize = JSON.stringify(testObject).length;
-        if (itemSize >= itemStorageQuota) 
+        if (itemSize >= itemStorageQuota)
         {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             errors.autotext = " - Over max storage item size. Please reduce shortcut or autotext length.";
@@ -475,7 +475,7 @@ $(function()
         });
 
         // Check duplicates and warn user
-        if (duplicates.length) 
+        if (duplicates.length)
         {
             console.log(chrome.i18n.getMessage("ERROR_DUPLICATE_ITEMS"));
             showModalPopup(chrome.i18n.getMessage("ERROR_DUPLICATE_ITEMS")
@@ -484,14 +484,14 @@ $(function()
         }
 
         // Check storage capacity
-        if (JSON.stringify(data).length >= storageQuota) 
+        if (JSON.stringify(data).length >= storageQuota)
         {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             showCrouton(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
                 + " Chrome max capacity: " + storageQuota + " characters", 'red');
             return false;
         }
-        if (Object.keys(data).length >= countQuota) 
+        if (Object.keys(data).length >= countQuota)
         {
             console.log(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA"));
             showCrouton(chrome.i18n.getMessage("ERROR_OVER_SPACE_QUOTA")
@@ -651,7 +651,7 @@ $(function()
                 {
                     getEmergencyBackup(function(data)	// Restore using emergency backup
                     {
-                        console.log("Restoring emergency backup shortcuts: ", 
+                        console.log("Restoring emergency backup shortcuts: ",
                             data[APP_EMERGENCY_BACKUP_KEY]);
                         chrome.storage.sync.set(data[APP_EMERGENCY_BACKUP_KEY], function()
                         {
@@ -755,14 +755,14 @@ $(function()
     {
         $('body').append($(document.createElement('div'))
             .addClass('crouton').addClass(color || 'green').text(message)
-            .fadeIn(ANIMATION_FAST, function() 
+            .fadeIn(ANIMATION_FAST, function()
             {
-                if (autohide) 
+                if (autohide)
                 {
                     $(this).delay(TIME_SHOW_CROUTON).fadeOut(ANIMATION_FAST, function() {
                         $(this).remove();
                     })
-                } 
+                }
                 else    // Show a close button
                 {
                     $(this).append($(document.createElement('button'))
@@ -787,7 +787,7 @@ $(function()
             .appendTo('body')
             .fadeIn(ANIMATION_FAST)
             .click(function() {
-                $('.popup').fadeOut(ANIMATION_FAST, function() 
+                $('.popup').fadeOut(ANIMATION_FAST, function()
                 {
                     $('.popup, .modal').remove();
                     if (completionBlock) {
@@ -810,7 +810,7 @@ $(function()
                     .attr('type', 'button')
                     .css('display', (isConfirm ? 'inline-block' : 'none'))
                     .text('Cancel')
-                    .click(function() 
+                    .click(function()
                     {
                         $('.popup').fadeOut(ANIMATION_FAST, function() {
                             $('.popup, .modal').remove();
@@ -824,7 +824,7 @@ $(function()
                     .attr('type', 'button')
                     .css('margin-left', '4px')
                     .text('Ok')
-                    .click(function() 
+                    .click(function()
                     {
                         $('.popup').fadeOut(ANIMATION_FAST, function() {
                             $('.popup, .modal').remove();
@@ -903,7 +903,7 @@ $(function()
                             .css('margin-left', '4px')
                             .text('Save')
                             .click(function() {
-                                $('.popup').fadeOut(ANIMATION_FAST, function() 
+                                $('.popup').fadeOut(ANIMATION_FAST, function()
                                 {
                                     if (completionBlock) {
                                         completionBlock($('#portJSON').val());
