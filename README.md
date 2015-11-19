@@ -41,6 +41,9 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 
 ## Version History
+v2.0.0
+ - Attempt to add Google Docs support
+ 
 v1.9.1
  - Fix for Outlook O365 OWA
 
@@ -87,7 +90,7 @@ v1.8.0
  - Added demo area on the options page where you can test your shortcuts live!
  - Adding ability to convert what is in the demo area into HTML, so it doubles as a place where you can copy-paste HTML content and have it translated to expansion format.
  - Adding ability to determine cursor location when expanding into contenteditable divs by including a special tag in the expansion, instructions in Useful Tips section of options.
- 
+
 v1.7.0
  - Revamped options page!
  - Showing storage quotas
@@ -129,7 +132,7 @@ v1.3.5
  - Added reinjection of content scripts on upgrade and fresh install so you don't have to refresh your tabs.
  - Added friendly notification that lets you know when the extension has been updated and encourages you to refresh the page just in case.
 
-v1.3.2 
+v1.3.2
  - Fixed issue where if you type in one field and then jump to another field really fast, shortcuts won't work for a moment.
 
 v1.3.1

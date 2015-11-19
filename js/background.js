@@ -89,7 +89,7 @@ chrome.omnibox.onInputChanged.addListener(function (text, suggest)
         suggest(suggestions);
     }
 });
- 
+
 // On omnibox suggestion accepted
 chrome.omnibox.onInputEntered.addListener(function (text, disposition)
 {
@@ -110,7 +110,7 @@ chrome.omnibox.onInputEntered.addListener(function (text, disposition)
     debugLog('url:', text);
 
     // Update / open tab according to disposition
-    switch (disposition) 
+    switch (disposition)
     {
         default:    // Default to updating current tab
         case "currentTab":
@@ -133,7 +133,7 @@ chrome.runtime.onInstalled.addListener(function(details)
 	console.log("onInstalled: " + details.reason);
 
     // On first install
-	if (details.reason == "install") 
+	if (details.reason == "install")
     {
         // Open up options page
         chrome.tabs.create({url: "options.html"});
@@ -157,7 +157,7 @@ chrome.runtime.onInstalled.addListener(function(details)
     {
         // Run testing if need be
         //runTests();
-        
+
         // Check synced shortcuts in case of need to update, show options, etc.
         chrome.storage.sync.get(null, function(data)
         {
@@ -168,7 +168,7 @@ chrome.runtime.onInstalled.addListener(function(details)
             } else if (!data || Object.keys(data).length == 0) {
                 // If no shortcuts exist, show options page (should show emergency backup restore)
                 chrome.tabs.create({url: "options.html"});
-            } else if (data[SHORTCUT_VERSION_KEY] 
+            } else if (data[SHORTCUT_VERSION_KEY]
                     && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
                 // If version is off, try to initiate upgrade
                 processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
@@ -221,12 +221,12 @@ function testVersionMismatch(completionBlock)
 {
     debugLog('testVersionMismatch');
 
-    chrome.storage.sync.get(null, function(data) 
+    chrome.storage.sync.get(null, function(data)
     {
 	    if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
-        } 
-        else 
+        }
+        else
         {
             // Set an older shortcut version and store it back
             data[SHORTCUT_VERSION_KEY] = '1.7.0';
@@ -234,8 +234,8 @@ function testVersionMismatch(completionBlock)
             chrome.storage.sync.set(data, function() {
                 if (chrome.runtime.lastError) {	// Check for errors
                     console.log(chrome.runtime.lastError);
-                } 
-                else 
+                }
+                else
                 {
                     debugLog('test setup complete');
                     if (completionBlock) {
@@ -252,12 +252,12 @@ function testDataLoss(completionBlock)
 {
     debugLog('testDataLoss');
 
-    chrome.storage.sync.clear(function() 
+    chrome.storage.sync.clear(function()
     {
 	    if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
         } else {
-            chrome.storage.local.remove([APP_BACKUP_KEY, APP_BACKUP_TIMESTAMP_KEY], function() 
+            chrome.storage.local.remove([APP_BACKUP_KEY, APP_BACKUP_TIMESTAMP_KEY], function()
             {
                 if (chrome.runtime.lastError) {	// Check for errors
                     console.log(chrome.runtime.lastError);
@@ -285,7 +285,7 @@ function testV120Migration(completionBlock)
         "hbd" : "Just wanted to wish you a very merry happy birthday!",
     };
 
-    chrome.storage.sync.clear(function() 
+    chrome.storage.sync.clear(function()
     {
 	    if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
@@ -293,8 +293,8 @@ function testV120Migration(completionBlock)
             chrome.storage.sync.set(shortcuts, function() {
                 if (chrome.runtime.lastError) {	// Check for errors
                     console.log(chrome.runtime.lastError);
-                } 
-                else 
+                }
+                else
                 {
                     debugLog('test setup complete');
                     if (completionBlock) {
@@ -321,7 +321,7 @@ function testV170Migration(completionBlock)
         'p@' : 'This is your final warning: %clip% ',
     };
 
-    chrome.storage.sync.clear(function() 
+    chrome.storage.sync.clear(function()
     {
 	    if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
@@ -329,8 +329,8 @@ function testV170Migration(completionBlock)
             chrome.storage.sync.set(shortcuts, function() {
                 if (chrome.runtime.lastError) {	// Check for errors
                     console.log(chrome.runtime.lastError);
-                } 
-                else 
+                }
+                else
                 {
                     debugLog('test setup complete');
                     if (completionBlock) {
@@ -359,7 +359,7 @@ function testV171Migration(completionBlock)
         'v' : '1.7.0',
     };
 
-    chrome.storage.sync.clear(function() 
+    chrome.storage.sync.clear(function()
     {
 	    if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
@@ -367,8 +367,8 @@ function testV171Migration(completionBlock)
             chrome.storage.sync.set(shortcuts, function() {
                 if (chrome.runtime.lastError) {	// Check for errors
                     console.log(chrome.runtime.lastError);
-                } 
-                else 
+                }
+                else
                 {
                     debugLog('test setup complete');
                     if (completionBlock) {
@@ -430,17 +430,17 @@ function openOrFocusOptionsPage(params)
     }
 
     // Get the url for the extension options page
-    var optionsUrl = chrome.extension.getURL('options.html'); 
-    chrome.tabs.query({ 'url': optionsUrl }, function(tabs) 
+    var optionsUrl = chrome.extension.getURL('options.html');
+    chrome.tabs.query({ 'url': optionsUrl }, function(tabs)
     {
         if (tabs.length)    // If options tab is already open, focus on it
         {
             debugLog("options page found:", tabs[0].id);
             chrome.tabs.update(tabs[0].id, {
-                selected: true, 
+                selected: true,
                 url: optionsUrl + params,
             });
-        } 
+        }
         else {  // Open the options page otherwise
             chrome.tabs.create({url: optionsUrl + params});
         }
@@ -453,7 +453,7 @@ function processVersionUpgrade(oldVersion)
     debugLog('processVersionUpgrade:', oldVersion);
 
     // Make backup of synced data before proceeding
-    makeEmergencyBackup(function() 
+    makeEmergencyBackup(function()
     {
         var upgradeNotes = [];   // Upgrade version notes
 
@@ -473,8 +473,8 @@ function processVersionUpgrade(oldVersion)
             case '1.0.3':
             case '1.0.0':
                 upgradeShortcutsToV120([
-                    upgradeShortcutsToV170, 
-                    upgradeShortcutsToV171, 
+                    upgradeShortcutsToV170,
+                    upgradeShortcutsToV171,
                     upgradeShortcutsToLatest
                 ]);
                 break;
@@ -493,7 +493,7 @@ function processVersionUpgrade(oldVersion)
             case '1.2.2':
             case '1.2.0':
                 upgradeShortcutsToV170([
-                    upgradeShortcutsToV171, 
+                    upgradeShortcutsToV171,
                     upgradeShortcutsToLatest
                 ]);
                 break;
@@ -532,9 +532,12 @@ function processVersionUpgrade(oldVersion)
                 upgradeNotes.push({ title:"-", message:"Allow consecutive shortcuts to fire" });
                 upgradeNotes.push({ title:"-", message:"Add support for O365 OWA" });
                 upgradeNotes.push({ title:"-", message:"Add support for G+ communities" });
-               
+
             case '1.9.0':
                 upgradeNotes.push({ title:"-", message:"Fix for O365 OWA" });
+
+            case '1.9.1':
+                upgradeNotes.push({ title:"-", message:"Adding support for Google Docs" });
 
                 // Upgrade database to latest version and supply version notes
                 upgradeShortcutsToLatest(upgradeNotes);
@@ -633,15 +636,15 @@ function upgradeShortcutsToV120(completionBlocks)
             }
 
             // Delete old data, add new data
-            chrome.storage.sync.remove(OLD_STORAGE_KEY, function() 
+            chrome.storage.sync.remove(OLD_STORAGE_KEY, function()
             {
                 if (chrome.runtime.lastError) 	// Check for errors
                 {
                     console.log(chrome.runtime.lastError);
                     restoreEmergencyBackup();
-                } 
+                }
                 else {
-                    chrome.storage.sync.set(newDataStore, function() 
+                    chrome.storage.sync.set(newDataStore, function()
                     {
                         if (chrome.runtime.lastError) 	// Check for errors
                         {
@@ -686,14 +689,14 @@ function upgradeShortcutsToV170(completionBlocks)
 {
     console.log("upgradeShortcutsToV170");
 
-    // Add shortcut prefix to shortcuts -- we assume that shortcuts are in 
+    // Add shortcut prefix to shortcuts -- we assume that shortcuts are in
     //  post-v1.2.0 format and they haven't been upgraded / prefixed yet
     chrome.storage.sync.get(null, function(data)
     {
         if (chrome.runtime.lastError) {	// Check for errors
             console.log(chrome.runtime.lastError);
         }
-            
+
         // Loop through and apply prefix to all keys
         var newDataStore = {};
         for (var key in data) {
@@ -844,5 +847,3 @@ function upgradeShortcutsToLatest(upgradeNotesList)
         }
     });
 }
-
-
