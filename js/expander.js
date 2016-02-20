@@ -37,6 +37,7 @@ jQuery.noConflict();
     , OUTLOOK_DOMAIN_REGEX = /mail.live.com/
     , MAILCHIMP_DOMAIN_REGEX = /admin.mailchimp.com/
     , ATLASSIAN_DOMAIN_REGEX = /atlassian.net/
+    , ZENDESK_DOMAIN_REGEX = /zendesk.com/
 
     , EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
     , EVENT_NAME_KEYUP = 'keyup.auto-expander'
@@ -56,6 +57,7 @@ jQuery.noConflict();
     , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-NoteContentEditorView-root'  // Evernote web note editor
     , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'   // Basecamp message editor
     , SELECTOR_ATLASSIAN_EDIT = 'iframe#wysiwygTextarea_ifr'   // Confluence editor
+    , SELECTOR_ZENDESK_INBOX_EDIT = 'iframe#ticket_comment_body_ifr'   // Zendesk Inbox editor
   ;
 
   var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -303,6 +305,8 @@ jQuery.noConflict();
             replaceTextAtlassian(shortcut, autotext);
           } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
             replaceTextBasecamp(shortcut, autotext);
+          } else if (ZENDESK_DOMAIN_REGEX.test(domain)) {
+            replaceTextZendesk(shortcut, autotext);
           } else {
             debugLog("Domain:", domain);
             replaceTextContentEditable(shortcut, autotext, findFocusedNode());
@@ -534,6 +538,20 @@ jQuery.noConflict();
 
     // Get the focused / selected text node
     var iframeWindow = document.querySelector(SELECTOR_ATLASSIAN_EDIT).contentWindow;
+    var node = findFocusedNode(iframeWindow);
+    debugLog("node:", node);
+
+    // Pass onto editable iframe text handler
+    replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
+  }
+
+  // Specific handler for Zendesk Inbox frame editor text replacements
+  function replaceTextZendesk(shortcut, autotext)
+  {
+    debugLog("Domain: Zendesk");
+
+    // Get the focused / selected text node
+    var iframeWindow = document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT).contentWindow;
     var node = findFocusedNode(iframeWindow);
     debugLog("node:", node);
 
@@ -1113,6 +1131,21 @@ jQuery.noConflict();
         //  because the iframe gets recreated each time and starts with cross-origin
         var editorCheck = setInterval(function() {
           var $target = $(SELECTOR_MAILCHIMP_EDIT);
+          if ($target.length) {
+            addListenersToIframe($target);
+          }
+        }, TIME_EDITOR_CHECK);
+      }
+
+      // Special case for Zendesk Inbox
+      else if (ZENDESK_DOMAIN_REGEX.test(domain))
+      {
+        debugLog("Domain: Zendesk");
+
+        // SUPER annoying, need to continually check for existence of editor iframe
+        //  because the iframe gets recreated each time and starts with cross-origin
+        var editorCheck = setInterval(function() {
+          var $target = $(SELECTOR_ZENDESK_INBOX_EDIT);
           if ($target.length) {
             addListenersToIframe($target);
           }
