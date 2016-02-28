@@ -537,7 +537,7 @@ function processVersionUpgrade(oldVersion)
                 upgradeNotes.push({ title:"-", message:"Fix for O365 OWA" });
 
             case '1.9.1':
-                upgradeNotes.push({ title:"-", message:"Adding support for Google Docs" });
+                upgradeNotes.push({ title:"-", message:"Fix for Zendesk Inbox" });
 
                 // Upgrade database to latest version and supply version notes
                 upgradeShortcutsToLatest(upgradeNotes);

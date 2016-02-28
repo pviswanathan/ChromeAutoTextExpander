@@ -42,7 +42,11 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 ## Version History
 v2.0.0
- - Attempt to add Google Docs support
+ - Attempt to add Google Docs support (failed)
+ - Domain whitelist/blacklist
+
+v1.9.2
+ - Fix for Zendesk Inbox
  
 v1.9.1
  - Fix for Outlook O365 OWA
