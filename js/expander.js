@@ -549,14 +549,19 @@ jQuery.noConflict();
   function replaceTextZendesk(shortcut, autotext)
   {
     debugLog("Domain: Zendesk");
+    
+    if (document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT)) {
+      // Get the focused / selected text node
+      var iframeWindow = document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT).contentWindow;
+      var node = findFocusedNode(iframeWindow);
+      debugLog("node:", node);
 
-    // Get the focused / selected text node
-    var iframeWindow = document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT).contentWindow;
-    var node = findFocusedNode(iframeWindow);
-    debugLog("node:", node);
-
-    // Pass onto editable iframe text handler
-    replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
+      // Pass onto editable iframe text handler
+      replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
+    } else {
+      // To make it work with Zendesk's rich text editor
+      replaceTextContentEditable(shortcut, autotext, findFocusedNode());
+    }
   }
 
   // Reusable handler for editable iframe text replacements
