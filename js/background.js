@@ -539,6 +539,9 @@ function processVersionUpgrade(oldVersion)
             case '1.9.1':
                 upgradeNotes.push({ title:"-", message:"Fix for Zendesk Inbox" });
 
+            case '1.9.2':
+                upgradeNotes.push({ title:"-", message:"Fix for Zendesk.com" });
+
                 // Upgrade database to latest version and supply version notes
                 upgradeShortcutsToLatest(upgradeNotes);
                 break;

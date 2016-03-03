@@ -45,9 +45,12 @@ v2.0.0
  - Attempt to add Google Docs support (failed)
  - Domain whitelist/blacklist
 
+v1.9.3
+ - Fix for Zendesk (thanks @jaumebn)
+
 v1.9.2
- - Fix for Zendesk Inbox
- 
+ - Fix for Zendesk Inbox (thanks @takeo)
+
 v1.9.1
  - Fix for Outlook O365 OWA
 
