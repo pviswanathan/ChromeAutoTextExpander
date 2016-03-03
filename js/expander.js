@@ -267,6 +267,7 @@ jQuery.noConflict();
 
         // Setup for processing
         var domain = window.location.host;
+        var pathname = window.location.pathname;
         debugLog("textInput: ", textInput);
 
         // If input or textarea field, can easily change the val
@@ -305,7 +306,7 @@ jQuery.noConflict();
             replaceTextAtlassian(shortcut, autotext);
           } else if (BASECAMP_DOMAIN_REGEX.test(domain)) {
             replaceTextBasecamp(shortcut, autotext);
-          } else if (ZENDESK_DOMAIN_REGEX.test(domain)) {
+          } else if (ZENDESK_DOMAIN_REGEX.test(domain) && pathname.indexOf('/inbox') === 0) {
             replaceTextZendesk(shortcut, autotext);
           } else {
             debugLog("Domain:", domain);
@@ -548,8 +549,7 @@ jQuery.noConflict();
   // Specific handler for Zendesk Inbox frame editor text replacements
   function replaceTextZendesk(shortcut, autotext)
   {
-    debugLog("Domain: Zendesk");
-
+    debugLog("Domain: Zendesk Inbox");
     // Get the focused / selected text node
     var iframeWindow = document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT).contentWindow;
     var node = findFocusedNode(iframeWindow);
@@ -1140,16 +1140,18 @@ jQuery.noConflict();
       // Special case for Zendesk Inbox
       else if (ZENDESK_DOMAIN_REGEX.test(domain))
       {
-        debugLog("Domain: Zendesk");
+        if (window.location.pathname.indexOf('/inbox') === 0) {
+          debugLog("Domain: Zendesk Inbox");
 
-        // SUPER annoying, need to continually check for existence of editor iframe
-        //  because the iframe gets recreated each time and starts with cross-origin
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_ZENDESK_INBOX_EDIT);
-          if ($target.length) {
-            addListenersToIframe($target);
-          }
-        }, TIME_EDITOR_CHECK);
+          // SUPER annoying, need to continually check for existence of editor iframe
+          //  because the iframe gets recreated each time and starts with cross-origin
+          var editorCheck = setInterval(function() {
+            var $target = $(SELECTOR_ZENDESK_INBOX_EDIT);
+            if ($target.length) {
+              addListenersToIframe($target);
+            }
+          }, TIME_EDITOR_CHECK);
+        }
       }
     }
 
