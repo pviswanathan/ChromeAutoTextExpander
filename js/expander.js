@@ -35,9 +35,9 @@ jQuery.noConflict();
     , GPLUS_DOMAIN_REGEX = /plus.google.com/
     , GTT_DOMAIN_REGEX = /translate.google.com/
     , OUTLOOK_DOMAIN_REGEX = /mail.live.com/
-    , MAILCHIMP_DOMAIN_REGEX = /admin.mailchimp.com/
     , ATLASSIAN_DOMAIN_REGEX = /atlassian.net/
     , ZENDESK_DOMAIN_REGEX = /zendesk.com/
+    , CKE_EDITOR_REGEX = /(admin.mailchimp.com)|(salesforce.com)/
 
     , EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
     , EVENT_NAME_KEYUP = 'keyup.auto-expander'
@@ -52,12 +52,12 @@ jQuery.noConflict();
     , SELECTOR_INBOX_EDIT = 'div.dX'    // Class for Inbox's inline reply container
     , SELECTOR_GDOCS_EDIT = 'iframe.docs-texteventtarget-iframe'  // Google Docs
     , SELECTOR_GTT_EDIT = 'div.goog-splitpane-second-container'   // GTT editor
-    , SELECTOR_MAILCHIMP_EDIT = 'iframe.cke_wysiwyg_frame'  // Mailchimp web editor
     , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'   // Outlook web editor
     , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-NoteContentEditorView-root'  // Evernote web note editor
     , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'   // Basecamp message editor
     , SELECTOR_ATLASSIAN_EDIT = 'iframe#wysiwygTextarea_ifr'   // Confluence editor
     , SELECTOR_ZENDESK_INBOX_EDIT = 'iframe#ticket_comment_body_ifr'   // Zendesk Inbox editor
+    , SELECTOR_CKE_EDIT = 'iframe.cke_wysiwyg_frame'  // CKEditor
   ;
 
   var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -295,8 +295,6 @@ jQuery.noConflict();
             replaceTextOutlook(shortcut, autotext);
           } else if (EVERNOTE_DOMAIN_REGEX.test(domain)) {
             replaceTextEvernote(shortcut, autotext);
-          } else if (MAILCHIMP_DOMAIN_REGEX.test(domain)) {
-            replaceTextMailchimp(shortcut, autotext);
           } else if (GTT_DOMAIN_REGEX.test(domain)) {
             replaceTextGTT(shortcut, autotext);
           // } else if (GDOCS_DOMAIN_REGEX.test(domain)) {
@@ -307,6 +305,8 @@ jQuery.noConflict();
             replaceTextBasecamp(shortcut, autotext);
           } else if (ZENDESK_DOMAIN_REGEX.test(domain)) {
             replaceTextZendesk(shortcut, autotext);
+          } else if (CKE_EDITOR_REGEX.test(domain)) {
+            replaceTextCKE(shortcut, autotext);
           } else {
             debugLog("Domain:", domain);
             replaceTextContentEditable(shortcut, autotext, findFocusedNode());
@@ -438,21 +438,6 @@ jQuery.noConflict();
     replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
   }
 
-  // Specific handler for Mailchimp iframe replacements
-  function replaceTextMailchimp(shortcut, autotext)
-  {
-    debugLog("Domain: Mailchimp");
-
-    // Get the focused / selected text node
-    var iframeWindow = document.querySelector(SELECTOR_MAILCHIMP_EDIT)
-      .contentWindow;
-    var node = findFocusedNode(iframeWindow);
-    debugLog("node:", node);
-
-    // Pass onto editable iframe text handler
-    replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
-  }
-
   // Specific handler for Google Translate iframe text replacements
   function replaceTextGTT(shortcut, autotext)
   {
@@ -563,6 +548,22 @@ jQuery.noConflict();
       replaceTextContentEditable(shortcut, autotext, findFocusedNode());
     }
   }
+
+  // Specific handler for CKEditor iframe replacements
+  function replaceTextCKE(shortcut, autotext)
+  {
+    debugLog("Editor: CKE");
+
+    // Get the focused / selected text node
+    var iframeWindow = document.querySelector(SELECTOR_CKE_EDIT)
+      .contentWindow;
+    var node = findFocusedNode(iframeWindow);
+    debugLog("node:", node);
+
+    // Pass onto editable iframe text handler
+    replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
+  }
+
 
   // Reusable handler for editable iframe text replacements
   function replaceTextContentEditable(shortcut, autotext, node, win)
@@ -1127,21 +1128,6 @@ jQuery.noConflict();
         }, TIME_EDITOR_CHECK);
       }
 
-      // Special case for Mailchimp
-      else if (MAILCHIMP_DOMAIN_REGEX.test(domain))
-      {
-        debugLog("Domain: Mailchimp");
-
-        // SUPER annoying, need to continually check for existence of editor iframe
-        //  because the iframe gets recreated each time and starts with cross-origin
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_MAILCHIMP_EDIT);
-          if ($target.length) {
-            addListenersToIframe($target);
-          }
-        }, TIME_EDITOR_CHECK);
-      }
-
       // Special case for Zendesk Inbox
       else if (ZENDESK_DOMAIN_REGEX.test(domain))
       {
@@ -1156,6 +1142,22 @@ jQuery.noConflict();
           }
         }, TIME_EDITOR_CHECK);
       }
+
+      // Special case for CKEditor
+      else if (CKE_EDITOR_REGEX)
+      {
+        debugLog("Editor: CKEditor");
+
+        // SUPER annoying, need to continually check for existence of editor iframe
+        //  because the iframe gets recreated each time and starts with cross-origin
+        var editorCheck = setInterval(function() {
+          var $target = $(SELECTOR_CKE_EDIT);
+          if ($target.length) {
+            addListenersToIframe($target);
+          }
+        }, TIME_EDITOR_CHECK);
+      }
+
     }
 
 		// Attach to future iframes
