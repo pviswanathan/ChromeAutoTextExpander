@@ -26,66 +26,38 @@ jQuery.noConflict();
     , CLIP_MACRO_REGEX = /%clip%/g
     , WHITESPACE_REGEX = /(\s)/
 
-    , SUPPORTED_DOMAINS = {
-      'basecamp.com': {
-        name: 'Basecamp',
-        editor_selector: 'iframe.wysihtml5-sandbox',
-      }
-      'evernote.com': {
-        name: 'Evernote',
-        editor_selector: 'gwt-debug-NoteContentEditorView-root',
-      }
-      'facebook.com': {
-        name: 'Facebook',
-        editor_selector: null,
-      }
-      'mail.google.com': {
-        name: 'Gmail',
-        editor_selector: 'div.aoI',
-      }
-      'inbox.google.com': {
-        name: 'Inbox',
-        editor_selector: 'div.dX',
-      }
-      'plus.google.com': {
-        name: 'Google+',
-        editor_selector: null,
-      }
-      'docs.google.com': {
-        name: 'Google Docs',
-        editor_selector: 'iframe.docs-texteventtarget-iframe',
-      }
-      'translate.google.com': {
-        name: 'Google Translate',
-        editor_selector: 'div.goog-splitpane-second-container',
-      }
-      'admin.mailchimp.com': {
-        name: 'Mailchimp',
-        editor_selector: 'iframe.cke_wysiwyg_frame',
-      }
-      'mail.live.com': {
-        name: 'Outlook',
-        editor_selector: '#ComposeRteEditor_surface',
-      }
-      'atlassian.net': {
-        name: 'Atlassian',
-        editor_selector: 'iframe#wysiwygTextarea_ifr',
-      }
-      'zendesk.com': {
-        name: 'Zendesk',
-        editor_selector: 'iframe#ticket_comment_body_ifr',
-      }
-    }
-    , EVENT_NAME_SUFFIX = '.auto-expander'
-    , EVENT_NAME_KEYPRESS = 'keypress' + EVENT_NAME_SUFFIX
-    , EVENT_NAME_KEYUP = 'keyup' + EVENT_NAME_SUFFIX
-    , EVENT_NAME_BLUR = 'blur' + EVENT_NAME_SUFFIX
-    , EVENT_NAME_FOCUS = 'focus' + EVENT_NAME_SUFFIX
-    , EVENT_NAME_LOAD = 'load' + EVENT_NAME_SUFFIX
+    , BASECAMP_DOMAIN_REGEX = /basecamp.com/
+    , EVERNOTE_DOMAIN_REGEX = /evernote.com/
+    , FACEBOOK_DOMAIN_REGEX = /facebook.com/
+    , GMAIL_DOMAIN_REGEX = /mail.google.com/
+    , INBOX_DOMAIN_REGEX = /inbox.google.com/
+    , GDOCS_DOMAIN_REGEX = /docs.google.com/
+    , GPLUS_DOMAIN_REGEX = /plus.google.com/
+    , GTT_DOMAIN_REGEX = /translate.google.com/
+    , OUTLOOK_DOMAIN_REGEX = /mail.live.com/
+    , MAILCHIMP_DOMAIN_REGEX = /admin.mailchimp.com/
+    , ATLASSIAN_DOMAIN_REGEX = /atlassian.net/
+    , ZENDESK_DOMAIN_REGEX = /zendesk.com/
+
+    , EVENT_NAME_KEYPRESS = 'keypress.auto-expander'
+    , EVENT_NAME_KEYUP = 'keyup.auto-expander'
+    , EVENT_NAME_BLUR = 'blur.auto-expander'
+    , EVENT_NAME_FOCUS = 'focus.auto-expander'
+    , EVENT_NAME_LOAD = 'load.auto-expander'
     , EVENT_NAME_INSERTED = 'DOMNodeInserted'
 
     , SELECTOR_EDITABLE_BODY = 'body[contenteditable=true]'
     , SELECTOR_INPUT = 'div[contenteditable=true],body[contenteditable=true],textarea,input'
+    , SELECTOR_GMAIL_EDIT = 'div.aoI'   // Class for Gmail's popup message composer
+    , SELECTOR_INBOX_EDIT = 'div.dX'    // Class for Inbox's inline reply container
+    , SELECTOR_GDOCS_EDIT = 'iframe.docs-texteventtarget-iframe'  // Google Docs
+    , SELECTOR_GTT_EDIT = 'div.goog-splitpane-second-container'   // GTT editor
+    , SELECTOR_MAILCHIMP_EDIT = 'iframe.cke_wysiwyg_frame'  // Mailchimp web editor
+    , SELECTOR_OUTLOOK_EDIT = '#ComposeRteEditor_surface'   // Outlook web editor
+    , SELECTOR_EVERNOTE_EDIT = 'gwt-debug-NoteContentEditorView-root'  // Evernote web note editor
+    , SELECTOR_BASECAMP_EDIT = 'iframe.wysihtml5-sandbox'   // Basecamp message editor
+    , SELECTOR_ATLASSIAN_EDIT = 'iframe#wysiwygTextarea_ifr'   // Confluence editor
+    , SELECTOR_ZENDESK_INBOX_EDIT = 'iframe#ticket_comment_body_ifr'   // Zendesk Inbox editor
   ;
 
   var typingBuffer = [];		// Keep track of what's been typed before timeout
@@ -218,7 +190,8 @@ jQuery.noConflict();
 				console.log(chrome.runtime.lastError);
 			}
 			// Check that data is returned and shortcut exists
-			else if (data && Object.keys(data).length) {
+			else if (data && Object.keys(data).length)
+			{
         processAutoTextExpansion(shortcut, data[shortcutKey], lastChar, textInput);
 			}
 
@@ -576,7 +549,7 @@ jQuery.noConflict();
   function replaceTextZendesk(shortcut, autotext)
   {
     debugLog("Domain: Zendesk");
-
+    
     if (document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT)) {
       // Get the focused / selected text node
       var iframeWindow = document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT).contentWindow;
