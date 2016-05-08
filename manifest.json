@@ -1,50 +1,52 @@
 {
-	"name": "__MSG_EXTENSION_NAME__", 
-  "short_name": "__MSG_EXTENSION_SHORTNAME__", 
-  "version": "1.9.5", 
-  "manifest_version": 2, 
-  "description": "__MSG_EXTENSION_DESCRIPTION__", 
+	"name": "__MSG_EXTENSION_NAME__",
+  "short_name": "__MSG_EXTENSION_SHORTNAME__",
+  "version": "2.0.0",
+  "manifest_version": 2,
+  "description": "__MSG_EXTENSION_DESCRIPTION__",
   "icons": {
 		"16": "images/icon16.png"
 		, "48": "images/icon48.png"
 		, "128": "images/icon128.png"
-	}, 
-  "default_locale": "en", 
-  "offline_enabled": true, 
+	},
+  "default_locale": "en",
+  "offline_enabled": true,
   "omnibox": {
     "keyword" : "__MSG_KEYWORD_OMNIBAR_TRIGGER__"
-  }, 
+  },
   "background": {
 		"scripts": [
-      "js/constants.js", 
+      "js/constants.js",
       "js/background.js"
 		]
-	}, 
+	},
   "browser_action": {
     "default_icon": {
-      "19": "images/icon19.png", 
+      "19": "images/icon19.png",
       "38": "images/icon38.png"
-    }, 
+    },
     "default_title": "__MSG_BROWSER_ACTION_TITLE__"
-  }, 
-  "options_page": "options.html", 
+  },
+  "options_page": "options.html",
   "content_scripts": [{
-		"matches": [ "<all_urls>" ], 
+		"matches": [ "<all_urls>" ],
+		"match_about_blank": true,
+		"all_frames": true,
     "js": [
 			"js/third_party/jquery-2.1.1-simplified.min.js",
       "js/third_party/moment-with-locales.min.js",
-      "js/constants.js", 
+      "js/constants.js",
       "js/expander.js"
-		], 
+		],
     "run_at": "document_start"
-	}], 
+	}],
   "permissions": [
-		"tabs", 
-    "storage", 
-    "unlimitedStorage", 
-    "<all_urls>", 
-    "notifications", 
+		"tabs",
+    "storage",
+    "unlimitedStorage",
+    "<all_urls>",
+    "notifications",
     "clipboardRead"
-	], 
+	],
   "optional_permissions": []
 }

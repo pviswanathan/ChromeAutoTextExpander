@@ -944,77 +944,6 @@ jQuery.noConflict();
     $target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, clearTypingBuffer);
   }
 
-	// Add event listeners to iframe - based off PopChrom
-	function addListenersToIframe($target, ignoreCheck)
-	{
-    // return; // TODO: remove if this doesn't work
-
-    // Attach to iframe's contents
-    try
-    {
-      var iframeOrigin = $target.get(0).contentDocument.location.origin
-        , windowOrigin = location.origin;
-
-      if (ignoreCheck)
-      {
-        $target.contents().off(EVENT_NAME_KEYPRESS)
-          .on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
-        $target.contents()
-          .on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
-      }
-      // Check for origin match first before even trying to attach
-      else if (windowOrigin == iframeOrigin)
-      {
-        debugLog('origin match:', iframeOrigin);
-        $target.contents().off(EVENT_NAME_KEYPRESS)
-          .on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
-        $target.contents()
-          .on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
-      }
-      else
-      {
-        debugLog("couldn't attach to iframe due to security policy:");
-        debugLog(windowOrigin, "!=", iframeOrigin);
-      }
-    }
-    catch (exception) {
-      debugLog(exception);
-    }
-
-		// Attach to its load event in case it hasn't loaded yet
-		$target.on(EVENT_NAME_LOAD, function(event)		// On load
-		{
-			debugLog("Attempting to attach listeners to new iframe");
-			try
-      {
-        var $iframe = $(this)
-          , iframeOrigin = $iframe.get(0).contentDocument.location.origin;
-
-        // Check for origin match first before even trying to attach
-        if (location.origin == iframeOrigin)
-        {
-          debugLog('origin match:', iframeOrigin);
-
-          // Attach listeners
-          $iframe.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
-          $iframe.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
-
-          // Special cases
-          var domain = $iframe.contents().get(0).location.host;
-          debugLog('iframe location:', domain);
-        }
-        else
-        {
-          debugLog("couldn't attach to iframe due to security policy:");
-          debugLog(windowOrigin, "!=", iframeOrigin);
-        }
-      }
-      catch (exception) {
-        debugLog(exception);
-			}
-		});
-	}
-
 	// Attach listener to keypresses
 	function addListeners()
 	{
@@ -1086,98 +1015,98 @@ jQuery.noConflict();
       // }
 
       // Special case for Outlook.com
-      else if (OUTLOOK_DOMAIN_REGEX.test(domain))
-      {
-        debugLog("Domain: Outlook");
-
-        // Annoying, need to check for existence of editor element
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_OUTLOOK_EDIT);
-          if ($target.length) {
-            clearInterval(editorCheck);
-            addListenersToIframe($target);
-          }
-        }, TIME_EDITOR_CHECK);
-      }
+      // else if (OUTLOOK_DOMAIN_REGEX.test(domain))
+      // {
+      //   debugLog("Domain: Outlook");
+      //
+      //   // Annoying, need to check for existence of editor element
+      //   var editorCheck = setInterval(function() {
+      //     var $target = $(SELECTOR_OUTLOOK_EDIT);
+      //     if ($target.length) {
+      //       clearInterval(editorCheck);
+      //       addListenersToIframe($target);
+      //     }
+      //   }, TIME_EDITOR_CHECK);
+      // }
 
       // Special case for Google Translate
-      else if (GTT_DOMAIN_REGEX.test(domain))
-      {
-        debugLog("Domain: Google Translate");
-
-        // Annoying, need to check for existence of editor element
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_GTT_EDIT);
-          if ($target.length) {
-            clearInterval(editorCheck);
-            addListenersToIframe($target.find('iframe'));
-          }
-        }, TIME_EDITOR_CHECK);
-      }
+      // else if (GTT_DOMAIN_REGEX.test(domain))
+      // {
+      //   debugLog("Domain: Google Translate");
+      //
+      //   // Annoying, need to check for existence of editor element
+      //   var editorCheck = setInterval(function() {
+      //     var $target = $(SELECTOR_GTT_EDIT);
+      //     if ($target.length) {
+      //       clearInterval(editorCheck);
+      //       addListenersToIframe($target.find('iframe'));
+      //     }
+      //   }, TIME_EDITOR_CHECK);
+      // }
 
       // Special case for Atlassian
-      else if (ATLASSIAN_DOMAIN_REGEX.test(domain))
-      {
-        debugLog("Domain: Atlassian");
-
-        // SUPER annoying, need to continually check for existence of editor iframe
-        //  because the iframe gets recreated each time and starts with cross-origin
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_ATLASSIAN_EDIT);
-          if ($target.length) {
-            addListenersToIframe($target);
-          }
-        }, TIME_EDITOR_CHECK);
-      }
+      // else if (ATLASSIAN_DOMAIN_REGEX.test(domain))
+      // {
+      //   debugLog("Domain: Atlassian");
+      //
+      //   // SUPER annoying, need to continually check for existence of editor iframe
+      //   //  because the iframe gets recreated each time and starts with cross-origin
+      //   var editorCheck = setInterval(function() {
+      //     var $target = $(SELECTOR_ATLASSIAN_EDIT);
+      //     if ($target.length) {
+      //       addListenersToIframe($target);
+      //     }
+      //   }, TIME_EDITOR_CHECK);
+      // }
 
       // Special case for Zendesk Inbox
-      else if (ZENDESK_DOMAIN_REGEX.test(domain))
-      {
-        debugLog("Domain: Zendesk");
-
-        // SUPER annoying, need to continually check for existence of editor iframe
-        //  because the iframe gets recreated each time and starts with cross-origin
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_ZENDESK_INBOX_EDIT);
-          if ($target.length) {
-            addListenersToIframe($target);
-          }
-        }, TIME_EDITOR_CHECK);
-      }
+      // else if (ZENDESK_DOMAIN_REGEX.test(domain))
+      // {
+      //   debugLog("Domain: Zendesk");
+      //
+      //   // SUPER annoying, need to continually check for existence of editor iframe
+      //   //  because the iframe gets recreated each time and starts with cross-origin
+      //   var editorCheck = setInterval(function() {
+      //     var $target = $(SELECTOR_ZENDESK_INBOX_EDIT);
+      //     if ($target.length) {
+      //       addListenersToIframe($target);
+      //     }
+      //   }, TIME_EDITOR_CHECK);
+      // }
 
       // Special case for CKEditor
-      else if (CKE_EDITOR_REGEX.test(domain))
-      {
-        debugLog("Editor: CKEditor");
-
-        // SUPER annoying, need to continually check for existence of editor iframe
-        //  because the iframe gets recreated each time and starts with cross-origin
-        var editorCheck = setInterval(function() {
-          var $target = $(SELECTOR_CKE_EDIT);
-          if ($target.length) {
-            addListenersToIframe($target);
-          }
-        }, TIME_EDITOR_CHECK);
-      }
+      // else if (CKE_EDITOR_REGEX.test(domain))
+      // {
+      //   debugLog("Editor: CKEditor");
+      //
+      //   // SUPER annoying, need to continually check for existence of editor iframe
+      //   //  because the iframe gets recreated each time and starts with cross-origin
+      //   var editorCheck = setInterval(function() {
+      //     var $target = $(SELECTOR_CKE_EDIT);
+      //     if ($target.length) {
+      //       addListenersToIframe($target);
+      //     }
+      //   }, TIME_EDITOR_CHECK);
+      // }
 
     }
 
 		// Attach to future iframes
-		$document.on(EVENT_NAME_INSERTED, function(event)
-    {
-			var $target = $(event.target);
-			if ($target.is('iframe'))
-      {
-        debugLog('inserted:', $target);
-        addListenersToIframe($target);
-			}
-		});
+		// $document.on(EVENT_NAME_INSERTED, function(event)
+    // {
+		// 	var $target = $(event.target);
+		// 	if ($target.is('iframe'))
+    //   {
+    //     debugLog('inserted:', $target);
+    //     addListenersToIframe($target);
+		// 	}
+		// });
 
 		// Attach to existing iframes as well - this needs to be at the end
 		//  because sometimes this breaks depending on cross-domain policy
-		$document.find('iframe').each(function(index) {
-			addListenersToIframe($(this));
-		});
+		// $document.find('iframe').each(function(index) {
+		// 	addListenersToIframe($(this));
+		// });
 	}
 
 	// Detach listener for keypresses
