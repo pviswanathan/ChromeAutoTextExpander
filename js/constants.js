@@ -9,7 +9,7 @@ var SHORTCUT_PREFIX = '@'               // Prefix to distinguish shortcuts vs me
             el.appendChild(document.createComment(CURSOR_TRACKING_TAG));
             return el.innerHTML;
         })()
-    , APP_VERSION = '1.9.4'             // App version to check against shortcut database
+    , APP_VERSION = '1.9.5'             // App version to check against shortcut database
     , APP_FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
     , APP_BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
     , APP_BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local backup timestamp

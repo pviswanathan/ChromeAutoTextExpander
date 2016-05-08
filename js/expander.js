@@ -534,7 +534,7 @@ jQuery.noConflict();
   function replaceTextZendesk(shortcut, autotext)
   {
     debugLog("Domain: Zendesk");
-    
+
     if (document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT)) {
       // Get the focused / selected text node
       var iframeWindow = document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT).contentWindow;
@@ -947,6 +947,8 @@ jQuery.noConflict();
 	// Add event listeners to iframe - based off PopChrom
 	function addListenersToIframe($target, ignoreCheck)
 	{
+    // return; // TODO: remove if this doesn't work
+
     // Attach to iframe's contents
     try
     {
@@ -1144,7 +1146,7 @@ jQuery.noConflict();
       }
 
       // Special case for CKEditor
-      else if (CKE_EDITOR_REGEX)
+      else if (CKE_EDITOR_REGEX.test(domain))
       {
         debugLog("Editor: CKEditor");
 

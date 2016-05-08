@@ -545,6 +545,12 @@ function processVersionUpgrade(oldVersion)
             case '1.9.3':
                 upgradeNotes.push({ title:"-", message:"Support for Salesforce.com CKEditor" });
 
+            // case '1.9.4':
+            //     upgradeNotes.push({ title:"-", message:"Support for domain blacklist" });
+            //     upgradeNotes.push({ title:"-", message:"Better iframe handling" });
+            //     upgradeNotes.push({ title:"-", message:"Toggle on/off from icon" });
+            //     upgradeNotes.push({ title:"-", message:"Working indicator" });
+
                 // Upgrade database to latest version and supply version notes
                 upgradeShortcutsToLatest(upgradeNotes);
                 break;

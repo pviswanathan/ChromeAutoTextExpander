@@ -44,6 +44,12 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 v2.0.0
  - Attempt to add Google Docs support (failed)
  - Domain whitelist/blacklist
+ - Toggle on/off from icon
+ - Better iframe support
+ - Working indicator
+
+v1.9.5
+ - Fix for missing check on CKEditor regex
 
 v1.9.4
  - Add support for Salesforce CKEditor (thanks @kylelady)
