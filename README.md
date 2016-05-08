@@ -45,6 +45,9 @@ v2.0.0
  - Attempt to add Google Docs support (failed)
  - Domain whitelist/blacklist
 
+v1.9.4
+ - Add support for Salesforce CKEditor (thanks @kylelady)
+
 v1.9.3
  - Fix for Zendesk (thanks @jaumebn)
 

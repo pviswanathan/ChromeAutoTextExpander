@@ -542,6 +542,9 @@ function processVersionUpgrade(oldVersion)
             case '1.9.2':
                 upgradeNotes.push({ title:"-", message:"Fix for Zendesk.com" });
 
+            case '1.9.3':
+                upgradeNotes.push({ title:"-", message:"Support for Salesforce.com CKEditor" });
+
                 // Upgrade database to latest version and supply version notes
                 upgradeShortcutsToLatest(upgradeNotes);
                 break;
