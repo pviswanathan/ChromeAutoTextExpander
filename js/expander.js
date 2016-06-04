@@ -24,6 +24,7 @@ jQuery.noConflict();
     , DATE_MACRO_REGEX = /%d\(/g
     , DATE_MACRO_CLOSE_TAG = ')'
     , CLIP_MACRO_REGEX = /%clip%/g
+    , URL_MACRO_REGEX = /%url%/g
     , WHITESPACE_REGEX = /(\s)/
 
     , BASECAMP_DOMAIN_REGEX = /basecamp.com/
@@ -250,6 +251,9 @@ jQuery.noConflict();
 
         // Handle moment.js dates
         autotext = processDates(autotext);
+
+        // Handle %url% macro
+        autotext = processUrls(autotext);
 
         // Adjust capitalization
         switch (capitalization)
@@ -834,6 +838,13 @@ jQuery.noConflict();
       range.setStart(node, pos);
       range.select();
     }
+  }
+
+  // Process and replace %url% tags with content from current url
+  function processUrls(text)
+  {
+    var url = window.location.href;
+    return text.replace(URL_MACRO_REGEX, url);
   }
 
   // Process and replace clip tags with content from clipboard
