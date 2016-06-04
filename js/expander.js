@@ -4,7 +4,7 @@ jQuery.noConflict();
 // Encapsulated anonymous function
 (function($) {
 
-	// Variables & Constants
+  // Variables & Constants
   var KEYCODE_BACKSPACE = 8
     , KEYCODE_TAB = 9
     , KEYCODE_RETURN = 13
@@ -15,7 +15,7 @@ jQuery.noConflict();
     , ANIMATION_FAST = 200
     , ANIMATION_NORMAL = 400
     , ANIMATION_SLOW = 1000
-    , TIME_SHOW_CROUTON = 1000 * 3	              // Show croutons for 3s
+    , TIME_SHOW_CROUTON = 1000 * 3              // Show croutons for 3s
 
     , ENUM_CAPITALIZATION_NONE = 0
     , ENUM_CAPITALIZATION_FIRST = 1
@@ -60,92 +60,92 @@ jQuery.noConflict();
     , SELECTOR_CKE_EDIT = 'iframe.cke_wysiwyg_frame'  // CKEditor
   ;
 
-  var typingBuffer = [];		// Keep track of what's been typed before timeout
-  var typingTimer;			// Keep track of time between keypresses
-  var typingTimeout;		 	// Delay before we clear buffer
-  var keyPressEvent;			// Keep track of keypress event to prevent re-firing
-  var keyUpEvent;				// Keep track of keyup event to prevent re-firing
-  var clipboard;				// Keep track of what's in the clipboard
+  var typingBuffer = [];    // Keep track of what's been typed before timeout
+  var typingTimer;      // Keep track of time between keypresses
+  var typingTimeout;       // Delay before we clear buffer
+  var keyPressEvent;      // Keep track of keypress event to prevent re-firing
+  var keyUpEvent;        // Keep track of keyup event to prevent re-firing
+  var clipboard;        // Keep track of what's in the clipboard
   var disableShortcuts;       // Flag to disable shortcuts in case of unreliable state
 
-	// Custom log function
-	function debugLog() {
-		if (DEBUG && console) {
-			console.log.apply(console, arguments);
-		}
-	}
+  // Custom log function
+  function debugLog() {
+    if (DEBUG && console) {
+      console.log.apply(console, arguments);
+    }
+  }
 
-	// When user presses a key
-	function keyPressHandler(event)
-	{
+  // When user presses a key
+  function keyPressHandler(event)
+  {
     debugLog('keyPressHandler:', event.target);
 
-		// Make sure it's not the same event firing over and over again
-		if (keyPressEvent == event) {
-			return;
-		} else {
-			keyPressEvent = event;
-		}
+    // Make sure it's not the same event firing over and over again
+    if (keyPressEvent == event) {
+      return;
+    } else {
+      keyPressEvent = event;
+    }
 
-		// Get character that was typed
-		var charCode = event.keyCode || event.which;
-		if (charCode == KEYCODE_RETURN) {	// If return, clear and get out
-			return clearTypingBuffer();
-		}
+    // Get character that was typed
+    var charCode = event.keyCode || event.which;
+    if (charCode == KEYCODE_RETURN) {  // If return, clear and get out
+      return clearTypingBuffer();
+    }
 
-		// Clear timer if still running, and start it again
-		clearTypingTimer();
-		typingTimer = setTimeout(clearTypingBuffer, typingTimeout);
+    // Clear timer if still running, and start it again
+    clearTypingTimer();
+    typingTimer = setTimeout(clearTypingBuffer, typingTimeout);
 
-		// Add new character to typing buffer
-		var char = String.fromCharCode(charCode);
-		typingBuffer.push(char);
+    // Add new character to typing buffer
+    var char = String.fromCharCode(charCode);
+    typingBuffer.push(char);
 
-		// Check typed text for shortcuts
-		checkShortcuts(typingBuffer.join(''), char, event.target);
-	}
+    // Check typed text for shortcuts
+    checkShortcuts(typingBuffer.join(''), char, event.target);
+  }
 
-	// When user lifts up on a key, to catch backspace
-	function keyUpHandler(event)
-	{
-		// Make sure it's not the same event firing over and over again
-		if (keyUpEvent == event) {
-			return;
-		} else {
-			keyUpEvent = event;
-		}
+  // When user lifts up on a key, to catch backspace
+  function keyUpHandler(event)
+  {
+    // Make sure it's not the same event firing over and over again
+    if (keyUpEvent == event) {
+      return;
+    } else {
+      keyUpEvent = event;
+    }
 
-		// Get key that was lifted on
-		var charCode = event.keyCode || event.which;
+    // Get key that was lifted on
+    var charCode = event.keyCode || event.which;
 
-		// When user types backspace, pop character off buffer
-		if (charCode == KEYCODE_BACKSPACE)
-		{
-			// Clear timer and restart
-			clearTypingTimer();
-			typingTimer = setTimeout(clearTypingBuffer, typingTimeout);
+    // When user types backspace, pop character off buffer
+    if (charCode == KEYCODE_BACKSPACE)
+    {
+      // Clear timer and restart
+      clearTypingTimer();
+      typingTimer = setTimeout(clearTypingBuffer, typingTimeout);
 
-			// Remove last character typed
-			typingBuffer.pop();
-		}
+      // Remove last character typed
+      typingBuffer.pop();
+    }
 
-		// If user uses tab or return, clear and get out
-		if (charCode == KEYCODE_TAB || charCode == KEYCODE_RETURN) {
-			return clearTypingBuffer();
-		}
-	}
+    // If user uses tab or return, clear and get out
+    if (charCode == KEYCODE_TAB || charCode == KEYCODE_RETURN) {
+      return clearTypingBuffer();
+    }
+  }
 
   // Updates buffer clear timeout from custom value
   function updateBufferTimeout()
   {
-		chrome.storage.sync.get(SHORTCUT_TIMEOUT_KEY, function (data)
-		{
-			// Check for errors
-			if (chrome.runtime.lastError) {
-				console.log(chrome.runtime.lastError);
-			}
-			// Check that data is returned and shortcut library exists
-			else if (data && Object.keys(data).length) {
+    chrome.storage.sync.get(SHORTCUT_TIMEOUT_KEY, function (data)
+    {
+      // Check for errors
+      if (chrome.runtime.lastError) {
+        console.log(chrome.runtime.lastError);
+      }
+      // Check that data is returned and shortcut library exists
+      else if (data && Object.keys(data).length) {
         typingTimeout = data[SHORTCUT_TIMEOUT_KEY];
       } else {  // Use default value on error / no custom value set
         typingTimeout = DEFAULT_CLEAR_BUFFER_TIMEOUT;
@@ -153,47 +153,47 @@ jQuery.noConflict();
     });
   }
 
-	// Clears the typing timer
-	function clearTypingTimer()
-	{
-		// Clear timer handle
-		if (typingTimer) {
-			clearTimeout(typingTimer);
-			typingTimer = null;
-		}
-	}
+  // Clears the typing timer
+  function clearTypingTimer()
+  {
+    // Clear timer handle
+    if (typingTimer) {
+      clearTimeout(typingTimer);
+      typingTimer = null;
+    }
+  }
 
-	// Clears the typing buffer
-	function clearTypingBuffer(event)
-	{
-		// Clear timer
-		clearTypingTimer();
+  // Clears the typing buffer
+  function clearTypingBuffer(event)
+  {
+    // Clear timer
+    clearTypingTimer();
 
-		// Clear buffer
-		typingBuffer.length = 0;
-	}
+    // Clear buffer
+    typingBuffer.length = 0;
+  }
 
-	// Check to see if text in argument corresponds to any shortcuts
-	function checkShortcuts(shortcut, lastChar, textInput)
-	{
- 		debugLog("checkShortcuts:", lastChar, shortcut);
+  // Check to see if text in argument corresponds to any shortcuts
+  function checkShortcuts(shortcut, lastChar, textInput)
+  {
+     debugLog("checkShortcuts:", lastChar, shortcut);
 
     var isAllCaps = (shortcut == shortcut.toUpperCase());   // Check for all caps
-		var shortcutKey = SHORTCUT_PREFIX + shortcut;           // Key for expansion
-		var shortcutKeyLowercase = SHORTCUT_PREFIX + shortcut.toLowerCase(); // For auto-capitalization
+    var shortcutKey = SHORTCUT_PREFIX + shortcut;           // Key for expansion
+    var shortcutKeyLowercase = SHORTCUT_PREFIX + shortcut.toLowerCase(); // For auto-capitalization
 
-		// Get shortcuts
-		chrome.storage.sync.get(shortcutKey, function (data)
-		{
-			// Check for errors
-			if (chrome.runtime.lastError) {
-				console.log(chrome.runtime.lastError);
-			}
-			// Check that data is returned and shortcut exists
-			else if (data && Object.keys(data).length)
-			{
+    // Get shortcuts
+    chrome.storage.sync.get(shortcutKey, function (data)
+    {
+      // Check for errors
+      if (chrome.runtime.lastError) {
+        console.log(chrome.runtime.lastError);
+      }
+      // Check that data is returned and shortcut exists
+      else if (data && Object.keys(data).length)
+      {
         processAutoTextExpansion(shortcut, data[shortcutKey], lastChar, textInput);
-			}
+      }
 
       // No expansion for the shortcut, see if case is different
       else if (shortcutKeyLowercase != shortcutKey)
@@ -219,17 +219,17 @@ jQuery.noConflict();
         });
       }
 
-			// If last character is whitespace, clear buffer
-			if (WHITESPACE_REGEX.test(lastChar)) {
-				clearTypingBuffer();
-			}
-		});
-	}
+      // If last character is whitespace, clear buffer
+      if (WHITESPACE_REGEX.test(lastChar)) {
+        clearTypingBuffer();
+      }
+    });
+  }
 
   // Process autotext expansion and replace text
   function processAutoTextExpansion(shortcut, autotext, lastChar, textInput, capitalization)
   {
- 		debugLog("processAutoTextExpansion:", autotext, capitalization);
+    debugLog("processAutoTextExpansion:", autotext, capitalization);
 
     // Check if shortcut exists and should be triggered
     if (autotext && textInput)
@@ -279,7 +279,7 @@ jQuery.noConflict();
 
           replaceTextRegular(shortcut, autotext, textInput);
         }
-        else	// Trouble... editable divs & special cases
+        else  // Trouble... editable divs & special cases
         {
           // Add whitespace if was last character
           if (lastChar == ' ') {
@@ -315,8 +315,8 @@ jQuery.noConflict();
 
         // Always clear the buffer after a shortcut fires
         clearTypingBuffer();
-      });	// END - getClipboardData()
-    }	// END - if (autotext)
+      });  // END - getClipboardData()
+    }  // END - if (autotext)
     else {  // Error
       console.log('Invalid input, missing autotext or textinput parameters.');
     }
@@ -613,66 +613,66 @@ jQuery.noConflict();
     }
   }
 
-	// Replacing shortcut with autotext in text at cursorPosition
-	function replaceText(text, shortcut, autotext, cursorPosition)
-	{
-		debugLog("cursorPosition:", cursorPosition);
-		debugLog("currentText:", text);
-		debugLog("shortcut:", shortcut);
-		debugLog("expandedText:", autotext);
+  // Replacing shortcut with autotext in text at cursorPosition
+  function replaceText(text, shortcut, autotext, cursorPosition)
+  {
+    debugLog("cursorPosition:", cursorPosition);
+    debugLog("currentText:", text);
+    debugLog("shortcut:", shortcut);
+    debugLog("expandedText:", autotext);
 
-		// Replace shortcut based off cursorPosition
-		return [text.slice(0, cursorPosition - shortcut.length),
-			autotext, text.slice(cursorPosition)].join('');
-	}
+    // Replace shortcut based off cursorPosition
+    return [text.slice(0, cursorPosition - shortcut.length),
+      autotext, text.slice(cursorPosition)].join('');
+  }
 
-	// Replacing shortcut with autotext HTML content at cursorPosition
-	function replaceHTML(text, shortcut, autotext, cursorPosition)
-	{
-		debugLog("cursorPosition:", cursorPosition);
-		debugLog("currentText:", text);
-		debugLog("shortcut:", shortcut);
-		debugLog("expandedText:", autotext);
+  // Replacing shortcut with autotext HTML content at cursorPosition
+  function replaceHTML(text, shortcut, autotext, cursorPosition)
+  {
+    debugLog("cursorPosition:", cursorPosition);
+    debugLog("currentText:", text);
+    debugLog("shortcut:", shortcut);
+    debugLog("expandedText:", autotext);
 
     // If autotext expansion already has cursor tag in it, don't insert
     var cursorTag = (autotext.indexOf(CURSOR_TRACKING_HTML) >= 0)
       ? "" : CURSOR_TRACKING_HTML;
 
-		// Replace shortcut based off cursorPosition,
+    // Replace shortcut based off cursorPosition,
     //  insert tracking tag for cursor if it isn't already defined in autotext
-		return [text.slice(0, cursorPosition - shortcut.length),
-			autotext, cursorTag, text.slice(cursorPosition)].join('');
-	}
+    return [text.slice(0, cursorPosition - shortcut.length),
+      autotext, cursorTag, text.slice(cursorPosition)].join('');
+  }
 
     // Find node that has text contents that matches text
-	function findMatchingTextNode(div, text)
-	{
-		return $(div).contents().filter(function() {
-      return (this.nodeType == Node.TEXT_NODE)	    // Return all text nodes
-        && (this.nodeValue.length == text.length);	// with same text length
+  function findMatchingTextNode(div, text)
+  {
+    return $(div).contents().filter(function() {
+      return (this.nodeType == Node.TEXT_NODE)      // Return all text nodes
+        && (this.nodeValue.length == text.length);  // with same text length
     }).filter(function() {
-      return (this.nodeValue == text);	// Filter for same text
+      return (this.nodeValue == text);  // Filter for same text
     }).first().get(0);
-	}
+  }
 
-	// Find node that user is editing right now, for editable divs
-	//  Optional passed window to perform selection find on
-	function findFocusedNode(win)
-	{
-		// Use default window if not given window to search in
-		if (!win) {
-			win = window;
-		}
+  // Find node that user is editing right now, for editable divs
+  //  Optional passed window to perform selection find on
+  function findFocusedNode(win)
+  {
+    // Use default window if not given window to search in
+    if (!win) {
+      win = window;
+    }
 
-		// Look for selection
-		if (win.getSelection) {
-			var selection = win.getSelection();
-			if (selection.rangeCount) {
-				return selection.getRangeAt(0).startContainer;
-			}
-		}
-		return null;
-	}
+    // Look for selection
+    if (win.getSelection) {
+      var selection = win.getSelection();
+      if (selection.rangeCount) {
+        return selection.getRangeAt(0).startContainer;
+      }
+    }
+    return null;
+  }
 
   // Returns the first match for a parent matching the given tag and classes.
   //  Tag parameter should be a string, el is the element to query on, and
@@ -710,13 +710,13 @@ jQuery.noConflict();
     }
     if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA')
     {
-      try { 	// Needed for new input[type=email] failing
+      try {   // Needed for new input[type=email] failing
         pos = el.selectionStart;
       } catch (exception) {
         console.log('getCursorPosition:', exception);
       }
     }
-    else	// Other elements
+    else  // Other elements
     {
       sel = win.getSelection();
       if (sel.rangeCount) {
@@ -733,7 +733,7 @@ jQuery.noConflict();
     debugLog('setCursorPosition:', pos);
     var sel, range;
     if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
-      try {	// Needed for new input[type=email] failing
+      try {  // Needed for new input[type=email] failing
         if (el.setSelectionRange) {
           el.setSelectionRange(pos, pos);
         } else if (el.createTextRange) {
@@ -746,8 +746,8 @@ jQuery.noConflict();
       } catch (exception) {
         console.log('setCursorPosition', exception);
       }
-    } else {	// Other elements
-      var node = el.childNodes[0];	// Need to get text node
+    } else {  // Other elements
+      var node = el.childNodes[0];  // Need to get text node
       if (window.getSelection && document.createRange) {
         range = document.createRange();
         range.selectNodeContents(el);
@@ -768,10 +768,10 @@ jQuery.noConflict();
     }
   }
 
-	// Sets cursor position after a specific node, and optional
+  // Sets cursor position after a specific node, and optional
   //  parameter to set what the window/document should be
-	function setCursorPositionAfterNode(node, win, doc)
-	{
+  function setCursorPositionAfterNode(node, win, doc)
+  {
     debugLog('setCursorPositionAfterNode:', node);
 
     // Setup variables
@@ -802,7 +802,7 @@ jQuery.noConflict();
     }
   }
 
-	// Sets cursor position for a specific node, and optional
+  // Sets cursor position for a specific node, and optional
   //  parameter to set what the window/document should be
   function setCursorPositionInNode(node, pos, win, doc)
   {
@@ -836,95 +836,95 @@ jQuery.noConflict();
     }
   }
 
-	// Process and replace clip tags with content from clipboard
-	function processClips(text)
-	{
-		debugLog('processClips', text);
+  // Process and replace clip tags with content from clipboard
+  function processClips(text)
+  {
+    debugLog('processClips', text);
 
-		// Find all indices of opening tags
-		var clipTags = [];
-		while (result = CLIP_MACRO_REGEX.exec(text)) {
-			clipTags.push(result.index);
-		}
+    // Find all indices of opening tags
+    var clipTags = [];
+    while (result = CLIP_MACRO_REGEX.exec(text)) {
+      clipTags.push(result.index);
+    }
 
-		// Only continue if we have any tags
-		if (!clipTags.length) {
-			return text;
-		}
-		debugLog('clipTags:', clipTags);
+    // Only continue if we have any tags
+    if (!clipTags.length) {
+      return text;
+    }
+    debugLog('clipTags:', clipTags);
 
-		// Loop through and replace clip tags with clipboard pasted text
-		var processedText = [text.slice(0, clipTags[0])];
-		debugLog(processedText);
+    // Loop through and replace clip tags with clipboard pasted text
+    var processedText = [text.slice(0, clipTags[0])];
+    debugLog(processedText);
     for (var i = 0, len = clipTags.length; i < len; ++i)
     {
       processedText.push(clipboard);
       debugLog('pre', processedText);
-      processedText.push(text.slice(clipTags[i] + 6,	// 6 for "%clip%"
+      processedText.push(text.slice(clipTags[i] + 6,  // 6 for "%clip%"
         (i == len - 1) ? undefined : clipTags[i+1]));
       debugLog('post', processedText);
     }
 
-		// Return processed dates
-		return processedText.join('');
-	}
+    // Return processed dates
+    return processedText.join('');
+  }
 
-	// Process and replace date tags and formats with moment.js
-	function processDates(text)
-	{
-		var dateOpenTags = [], dateCloseTags = [];
+  // Process and replace date tags and formats with moment.js
+  function processDates(text)
+  {
+    var dateOpenTags = [], dateCloseTags = [];
 
-		// Find all indices of opening tags
-		while (result = DATE_MACRO_REGEX.exec(text)) {
-			dateOpenTags.push(result.index);
-		}
+    // Find all indices of opening tags
+    while (result = DATE_MACRO_REGEX.exec(text)) {
+      dateOpenTags.push(result.index);
+    }
 
-		// Only continue if we have any tags
-		if (!dateOpenTags.length) {
-			return text;
-		}
+    // Only continue if we have any tags
+    if (!dateOpenTags.length) {
+      return text;
+    }
 
-		// Find matching closing tag for each date
-		for (var i = 0, len = dateOpenTags.length; i < len; ++i) {
-			dateCloseTags[i] = text.indexOf(
-				DATE_MACRO_CLOSE_TAG, dateOpenTags[i] + 1);
-		}
+    // Find matching closing tag for each date
+    for (var i = 0, len = dateOpenTags.length; i < len; ++i) {
+      dateCloseTags[i] = text.indexOf(
+        DATE_MACRO_CLOSE_TAG, dateOpenTags[i] + 1);
+    }
 
-		// Only continue if we have matching tags
-		if (dateOpenTags.length != dateCloseTags.length) {
-			return text;
-		}
+    // Only continue if we have matching tags
+    if (dateOpenTags.length != dateCloseTags.length) {
+      return text;
+    }
 
     // Set moment.js locale
     var mo = moment();
     mo.locale(chrome.i18n.getMessage('@@ui_locale'));
 
-		// Loop through and replace date tags with formatted text
-		var processedText = [text.slice(0, dateOpenTags[0])];
-		for (var i = 0, len = dateOpenTags.length; i < len; ++i)
-		{
-			processedText.push(mo.format(text.slice(
-				dateOpenTags[i] + 3, dateCloseTags[i])));		// 3 for "%d("
-			processedText.push(text.slice(dateCloseTags[i] + 1,	// 1 for ")"
-				(i == len - 1) ? undefined : dateOpenTags[i+1]));
-		}
+    // Loop through and replace date tags with formatted text
+    var processedText = [text.slice(0, dateOpenTags[0])];
+    for (var i = 0, len = dateOpenTags.length; i < len; ++i)
+    {
+      processedText.push(mo.format(text.slice(
+        dateOpenTags[i] + 3, dateCloseTags[i])));    // 3 for "%d("
+      processedText.push(text.slice(dateCloseTags[i] + 1,  // 1 for ")"
+        (i == len - 1) ? undefined : dateOpenTags[i+1]));
+    }
 
-		// Return processed dates
-		return processedText.join('');
-	}
+    // Return processed dates
+    return processedText.join('');
+  }
 
-	// Get what's stored in the clipboard
-	function getClipboardData(completionBlock) {
-		chrome.runtime.sendMessage({
-			request:"getClipboardData"
-		}, function(data) {
-			debugLog('getClipboardData:', data);
-			clipboard = data.paste;
-			if (completionBlock) {
-				completionBlock();
-			}
-		});
-	}
+  // Get what's stored in the clipboard
+  function getClipboardData(completionBlock) {
+    chrome.runtime.sendMessage({
+      request:"getClipboardData"
+    }, function(data) {
+      debugLog('getClipboardData:', data);
+      clipboard = data.paste;
+      if (completionBlock) {
+        completionBlock();
+      }
+    });
+  }
 
   // Add event listeners to specific container
   function refreshListenersOnContainer($target)
@@ -944,9 +944,9 @@ jQuery.noConflict();
     $target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, clearTypingBuffer);
   }
 
-	// Add event listeners to iframe - based off PopChrom
-	function addListenersToIframe($target, ignoreCheck)
-	{
+  // Add event listeners to iframe - based off PopChrom
+  function addListenersToIframe($target, ignoreCheck)
+  {
     // return; // TODO: remove if this doesn't work
 
     // Attach to iframe's contents
@@ -981,11 +981,11 @@ jQuery.noConflict();
       debugLog(exception);
     }
 
-		// Attach to its load event in case it hasn't loaded yet
-		$target.on(EVENT_NAME_LOAD, function(event)		// On load
-		{
-			debugLog("Attempting to attach listeners to new iframe");
-			try
+    // Attach to its load event in case it hasn't loaded yet
+    $target.on(EVENT_NAME_LOAD, function(event)    // On load
+    {
+      debugLog("Attempting to attach listeners to new iframe");
+      try
       {
         var $iframe = $(this)
           , iframeOrigin = $iframe.get(0).contentDocument.location.origin;
@@ -1011,13 +1011,13 @@ jQuery.noConflict();
       }
       catch (exception) {
         debugLog(exception);
-			}
-		});
-	}
+      }
+    });
+  }
 
-	// Attach listener to keypresses
-	function addListeners()
-	{
+  // Attach listener to keypresses
+  function addListeners()
+  {
     debugLog("addListeners()");
 
     var $document = $(document);
@@ -1162,43 +1162,43 @@ jQuery.noConflict();
 
     }
 
-		// Attach to future iframes
-		$document.on(EVENT_NAME_INSERTED, function(event)
+    // Attach to future iframes
+    $document.on(EVENT_NAME_INSERTED, function(event)
     {
-			var $target = $(event.target);
-			if ($target.is('iframe'))
+      var $target = $(event.target);
+      if ($target.is('iframe'))
       {
         debugLog('inserted:', $target);
         addListenersToIframe($target);
-			}
-		});
+      }
+    });
 
-		// Attach to existing iframes as well - this needs to be at the end
-		//  because sometimes this breaks depending on cross-domain policy
-		$document.find('iframe').each(function(index) {
-			addListenersToIframe($(this));
-		});
-	}
+    // Attach to existing iframes as well - this needs to be at the end
+    //  because sometimes this breaks depending on cross-domain policy
+    $document.find('iframe').each(function(index) {
+      addListenersToIframe($(this));
+    });
+  }
 
-	// Detach listener for keypresses
-	function removeListeners()
+  // Detach listener for keypresses
+  function removeListeners()
   {
-		$(document).off(EVENT_NAME_KEYPRESS);
-		$(document).off(EVENT_NAME_KEYUP);
-		$(document).off(EVENT_NAME_LOAD);
-		$(document).off(EVENT_NAME_BLUR);
-	}
+    $(document).off(EVENT_NAME_KEYPRESS);
+    $(document).off(EVENT_NAME_KEYUP);
+    $(document).off(EVENT_NAME_LOAD);
+    $(document).off(EVENT_NAME_BLUR);
+  }
 
   // Check shortcut database version matches app version
   function checkShortcutVersion()
   {
     chrome.storage.sync.get(SHORTCUT_VERSION_KEY, function (data)
     {
-			// Check for errors
-			if (chrome.runtime.lastError) {
-				console.log(chrome.runtime.lastError);
-			}
-			else if ((data && Object.keys(data).length)
+      // Check for errors
+      if (chrome.runtime.lastError) {
+        console.log(chrome.runtime.lastError);
+      }
+      else if ((data && Object.keys(data).length)
         && data[SHORTCUT_VERSION_KEY] != APP_VERSION)   // If versions don't match up
       {
         // Alert users that shortcuts aren't synced yet, they should reload
@@ -1263,12 +1263,12 @@ jQuery.noConflict();
     }
   }
 
-	// Document ready function
-	$(function()
+  // Document ready function
+  $(function()
   {
     checkShortcutVersion(); // Check version of shortcuts database
     updateBufferTimeout();  // Get custom timeout for clearing typing buffer
     addListeners();         // Add listener to track when user types
-	});
+  });
 
 })(jQuery);
