@@ -15,7 +15,7 @@ jQuery.noConflict();
     , ANIMATION_FAST = 200
     , ANIMATION_NORMAL = 400
     , ANIMATION_SLOW = 1000
-    , TIME_SHOW_CROUTON = 1000 * 3	              // Show croutons for 3s
+    , TIME_SHOW_CROUTON = 1000 * 3              // Show croutons for 3s
 
     , ENUM_CAPITALIZATION_NONE = 0
     , ENUM_CAPITALIZATION_FIRST = 1
@@ -24,6 +24,7 @@ jQuery.noConflict();
     , DATE_MACRO_REGEX = /%d\(/g
     , DATE_MACRO_CLOSE_TAG = ')'
     , CLIP_MACRO_REGEX = /%clip%/g
+    , URL_MACRO_REGEX = /%url%/g
     , WHITESPACE_REGEX = /(\s)/
 
     , BASECAMP_DOMAIN_REGEX = /basecamp.com/
@@ -59,12 +60,12 @@ jQuery.noConflict();
     , SELECTOR_CKE_EDIT = 'iframe.cke_wysiwyg_frame'  // CKEditor
   ;
 
-  var typingBuffer = [];		// Keep track of what's been typed before timeout
-  var typingTimer;			// Keep track of time between keypresses
-  var typingTimeout;		 	// Delay before we clear buffer
-  var keyPressEvent;			// Keep track of keypress event to prevent re-firing
-  var keyUpEvent;				// Keep track of keyup event to prevent re-firing
-  var clipboard;				// Keep track of what's in the clipboard
+  var typingBuffer = [];    // Keep track of what's been typed before timeout
+  var typingTimer;      // Keep track of time between keypresses
+  var typingTimeout;       // Delay before we clear buffer
+  var keyPressEvent;      // Keep track of keypress event to prevent re-firing
+  var keyUpEvent;        // Keep track of keyup event to prevent re-firing
+  var clipboard;        // Keep track of what's in the clipboard
   var disableShortcuts;       // Flag to disable shortcuts in case of unreliable state
 
   // Custom log function
@@ -250,6 +251,9 @@ jQuery.noConflict();
         // Handle moment.js dates
         autotext = processDates(autotext);
 
+        // Handle %url% macro
+        autotext = processUrls(autotext);
+
         // Adjust capitalization
         switch (capitalization)
         {
@@ -278,7 +282,7 @@ jQuery.noConflict();
 
           replaceTextRegular(shortcut, autotext, textInput);
         }
-        else	// Trouble... editable divs & special cases
+        else  // Trouble... editable divs & special cases
         {
           // Add whitespace if was last character
           if (lastChar == ' ') {
@@ -314,8 +318,8 @@ jQuery.noConflict();
 
         // Always clear the buffer after a shortcut fires
         clearTypingBuffer();
-      });	// END - getClipboardData()
-    }	// END - if (autotext)
+      });  // END - getClipboardData()
+    }  // END - if (autotext)
     else {  // Error
       console.log('Invalid input, missing autotext or textinput parameters.');
     }
@@ -647,10 +651,10 @@ jQuery.noConflict();
   function findMatchingTextNode(div, text)
   {
     return $(div).contents().filter(function() {
-      return (this.nodeType == Node.TEXT_NODE)	    // Return all text nodes
-        && (this.nodeValue.length == text.length);	// with same text length
+      return (this.nodeType == Node.TEXT_NODE)      // Return all text nodes
+        && (this.nodeValue.length == text.length);  // with same text length
     }).filter(function() {
-      return (this.nodeValue == text);	// Filter for same text
+      return (this.nodeValue == text);  // Filter for same text
     }).first().get(0);
   }
 
@@ -709,13 +713,13 @@ jQuery.noConflict();
     }
     if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA')
     {
-      try { 	// Needed for new input[type=email] failing
+      try {   // Needed for new input[type=email] failing
         pos = el.selectionStart;
       } catch (exception) {
         console.log('getCursorPosition:', exception);
       }
     }
-    else	// Other elements
+    else  // Other elements
     {
       sel = win.getSelection();
       if (sel.rangeCount) {
@@ -732,7 +736,7 @@ jQuery.noConflict();
     debugLog('setCursorPosition:', pos);
     var sel, range;
     if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
-      try {	// Needed for new input[type=email] failing
+      try {  // Needed for new input[type=email] failing
         if (el.setSelectionRange) {
           el.setSelectionRange(pos, pos);
         } else if (el.createTextRange) {
@@ -745,8 +749,8 @@ jQuery.noConflict();
       } catch (exception) {
         console.log('setCursorPosition', exception);
       }
-    } else {	// Other elements
-      var node = el.childNodes[0];	// Need to get text node
+    } else {  // Other elements
+      var node = el.childNodes[0];  // Need to get text node
       if (window.getSelection && document.createRange) {
         range = document.createRange();
         range.selectNodeContents(el);
@@ -835,6 +839,13 @@ jQuery.noConflict();
     }
   }
 
+  // Process and replace %url% tags with content from current url
+  function processUrls(text)
+  {
+    var url = window.location.href;
+    return text.replace(URL_MACRO_REGEX, url);
+  }
+
   // Process and replace clip tags with content from clipboard
   function processClips(text)
   {
@@ -859,7 +870,7 @@ jQuery.noConflict();
     {
       processedText.push(clipboard);
       debugLog('pre', processedText);
-      processedText.push(text.slice(clipTags[i] + 6,	// 6 for "%clip%"
+      processedText.push(text.slice(clipTags[i] + 6,  // 6 for "%clip%"
         (i == len - 1) ? undefined : clipTags[i+1]));
       debugLog('post', processedText);
     }
@@ -903,8 +914,8 @@ jQuery.noConflict();
     for (var i = 0, len = dateOpenTags.length; i < len; ++i)
     {
       processedText.push(mo.format(text.slice(
-        dateOpenTags[i] + 3, dateCloseTags[i])));		// 3 for "%d("
-      processedText.push(text.slice(dateCloseTags[i] + 1,	// 1 for ")"
+        dateOpenTags[i] + 3, dateCloseTags[i])));    // 3 for "%d("
+      processedText.push(text.slice(dateCloseTags[i] + 1,  // 1 for ")"
         (i == len - 1) ? undefined : dateOpenTags[i+1]));
     }
 
@@ -941,6 +952,77 @@ jQuery.noConflict();
     $target.off(EVENT_NAME_KEYPRESS).on(EVENT_NAME_KEYPRESS, keyPressHandler);
     $target.off(EVENT_NAME_KEYUP).on(EVENT_NAME_KEYUP, keyUpHandler);
     $target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, clearTypingBuffer);
+  }
+
+  // Add event listeners to iframe - based off PopChrom
+  function addListenersToIframe($target, ignoreCheck)
+  {
+    // return; // TODO: remove if this doesn't work
+
+    // Attach to iframe's contents
+    try
+    {
+      var iframeOrigin = $target.get(0).contentDocument.location.origin
+        , windowOrigin = location.origin;
+
+      if (ignoreCheck)
+      {
+        $target.contents().off(EVENT_NAME_KEYPRESS)
+          .on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+        $target.contents()
+          .on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+      }
+      // Check for origin match first before even trying to attach
+      else if (windowOrigin == iframeOrigin)
+      {
+        debugLog('origin match:', iframeOrigin);
+        $target.contents().off(EVENT_NAME_KEYPRESS)
+          .on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+        $target.contents()
+          .on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+      }
+      else
+      {
+        debugLog("couldn't attach to iframe due to security policy:");
+        debugLog(windowOrigin, "!=", iframeOrigin);
+      }
+    }
+    catch (exception) {
+      debugLog(exception);
+    }
+
+    // Attach to its load event in case it hasn't loaded yet
+    $target.on(EVENT_NAME_LOAD, function(event)    // On load
+    {
+      debugLog("Attempting to attach listeners to new iframe");
+      try
+      {
+        var $iframe = $(this)
+          , iframeOrigin = $iframe.get(0).contentDocument.location.origin;
+
+        // Check for origin match first before even trying to attach
+        if (location.origin == iframeOrigin)
+        {
+          debugLog('origin match:', iframeOrigin);
+
+          // Attach listeners
+          $iframe.contents().on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
+          $iframe.contents().on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
+
+          // Special cases
+          var domain = $iframe.contents().get(0).location.host;
+          debugLog('iframe location:', domain);
+        }
+        else
+        {
+          debugLog("couldn't attach to iframe due to security policy:");
+          debugLog(windowOrigin, "!=", iframeOrigin);
+        }
+      }
+      catch (exception) {
+        debugLog(exception);
+      }
+    });
   }
 
   // Attach listener to keypresses
@@ -1197,6 +1279,6 @@ jQuery.noConflict();
     checkShortcutVersion(); // Check version of shortcuts database
     updateBufferTimeout();  // Get custom timeout for clearing typing buffer
     addListeners();         // Add listener to track when user types
-	});
+  });
 
 })(jQuery);
