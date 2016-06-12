@@ -5,6 +5,7 @@ var SHORTCUT_PREFIX = '@'             // Prefix to distinguish shortcuts vs meta
   , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
   , SHORTCUT_VERSION_KEY = 'v#'       // Synced key for shortcut database version
   , CLIPBOARD_PASTE_TAG = '%clip%'    // Tag to paste clipboard contents in
+  , INSERT_URL_TAG = '%url%'          // Tag to insert current URL in
   , CURSOR_TRACKING_TAG = '?atec?'    // Way to track cursor location
   , CURSOR_TRACKING_HTML              // HTML to insert into expansion
     = (function() {

@@ -69,6 +69,7 @@ $(function()
     $('#omniboxKeyword').text(chrome.i18n.getMessage('KEYWORD_OMNIBAR_TRIGGER'));
     $('#cursorTag').text(CURSOR_TRACKING_HTML);
     $('#clipboardTag').text(CLIPBOARD_PASTE_TAG);
+    $('#insertUrlTag').text(INSERT_URL_TAG);
 
     // Settings
     $('#backupButton').html(chrome.i18n.getMessage('TITLE_BACKUP_BUTTON'));

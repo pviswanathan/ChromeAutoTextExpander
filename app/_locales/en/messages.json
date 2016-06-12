@@ -54,7 +54,11 @@
 		</li>
 		<li>
 			<strong>Clipboard paste macro support</strong><br/>
-			Use the <pre id='clipboardTag' class='inline-code'>%clip%</pre> tag in the expansion to indicate where to insert the contents of the clipboard. Formatting may not always carry over.
+			Use the <pre id='clipboardTag' class='inline-code'></pre> tag in the expansion to indicate where to insert the contents of the clipboard. Formatting may not always carry over.
+		</li>
+		<li>
+			<strong>Insert current URL macro support</strong><br/>
+			Use the <pre id='insertUrlTag' class='inline-code'></pre> tag in the expansion to insert the current URL.
 		</li>
 		<li>
 			<strong>Date/time macros support</strong><br/>
