@@ -42,11 +42,10 @@ Hope this is useful to someone out there; would love any help optimizing and imp
 
 ## Version History
 v2.0.0
- - Attempt to add Google Docs support (failed)
- - Domain whitelist/blacklist
+ - Better iframe support, now supporting Hangouts!
+ - New options UI: toggle autocap, explicit restore button, cleaned up tips, new layout for import/export and shortcut timeout
  - Toggle on/off from icon
- - Better iframe support
- - Working indicator
+ - Attempt to add Google Docs support (failed)
 
 v1.9.5
  - Fix for missing check on CKEditor regex
