@@ -1,0 +1,51 @@
+<html>
+  <head>
+    <title>Auto Text Expander : Demo</title>
+    <meta charset="utf-8" />
+    <!-- build:css styles/demo.css -->
+    <link href="styles/demo.css" rel="stylesheet">
+    <!-- endbuild -->
+  </head>
+
+  <body>
+    <!-- toolbar -->
+    <div id="toolbar">
+      <span>Demo HTML Element :</span>
+      <input id="demoDivButton" checked class="toolbar" type="radio" name="editor" title="Switch to Editable Div"/>
+      <label for="demoDivButton">Editable Div</label>
+      <input id="demoTextareaButton" class="toolbar" type="radio" name="editor" title="Switch to Demo Textarea"/>
+      <label for="demoTextareaButton">Textarea</label>
+
+      <button id="convertHTMLButton" class="active" type="button" title="Convert to HTML">
+        <img src="images/code-2x.png" alt=""/>
+      </button>
+    </div>
+
+    <!-- Rich text Editor -->
+    <div id="demoDiv" class="editor active" title="Shortcut Demo Editable Div" contenteditable=true>
+      Try your shortcuts here! Make sure to save them first.
+      <br /><br />
+      Want to spice things up with a little HTML? Draft up your content with
+      all your styling and links in Gmail first, then copy and paste into here
+      and hit the button in the bottom right corner to convert to HTML.
+      <br /><br />
+      Finally, copy and paste the HTML into your expansions to use them!
+    </div>
+
+    <!-- Textarea Editor -->
+    <textarea id="demoTextArea" class="editor" title="Shortcut Demo Textarea">
+      Try your shortcuts here! Make sure to save them first.
+
+      This is a textarea, which doesn't support HTML, but can add multiline text.
+
+      Switch to the editable div to test HTML expansions!
+    </textarea>
+
+    <!-- JS -->
+    <script src="vendor/scripts/jquery-2.1.1-simplified.min.js"></script>
+    <script src="vendor/scripts/moment-with-locales.min.js"></script>
+    <script src="scripts/constants.js"></script>
+    <script src="scripts/ate.js"></script>
+    <script src="scripts/demo.js"></script>
+  </body>
+</html>

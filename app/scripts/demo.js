@@ -1,11 +1,12 @@
+'use strict';
 
 (function($)
 {
     ////////////////////////
     // Setup editor buttons
-    $('#convertHTMLButton').click(function(event) 
+    $('#convertHTMLButton').click(function(event)
     {
-        console.log("convertHTMLButton clicked");
+        console.log('convertHTMLButton clicked');
         var text = $('#demoDiv').get(0).innerHTML;
         console.log('HTML:', text);
         $('#demoDiv').text(text);

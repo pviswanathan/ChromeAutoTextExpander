@@ -1,0 +1,58 @@
+{
+	"name": "__MSG_EXTENSION_NAME__",
+  "short_name": "__MSG_EXTENSION_SHORTNAME__",
+  "version": "2.0.0",
+  "manifest_version": 2,
+  "description": "__MSG_EXTENSION_DESCRIPTION__",
+  "icons": {
+    "16": "images/icon-16.png"
+		, "48": "images/icon-48.png"
+		, "128": "images/icon-128.png"
+  },
+  "default_locale": "en",
+  "offline_enabled": true,
+  "background": {
+    "scripts": [
+      "scripts/chromereload.js",
+      "scripts/constants.js",
+      "scripts/background.js"
+    ]
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "unlimitedStorage",
+    "<all_urls>",
+    "notifications",
+    "clipboardRead"
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+  		"matches": [ "<all_urls>" ],
+  		"match_about_blank": true,
+  		"all_frames": true,
+      "js": [
+  			"vendor/scripts/jquery-2.1.1-simplified.min.js",
+  			"vendor/scripts/moment-with-locales.min.js",
+        "scripts/constants.js",
+        "scripts/ate.js"
+  		],
+      "run_at": "document_start"
+  	}
+  ],
+  "omnibox": {
+    "keyword" : "__MSG_KEYWORD_OMNIBAR_TRIGGER__"
+  },
+  "browser_action": {
+    "default_icon": {
+      "19": "images/icon-19.png",
+      "38": "images/icon-38.png"
+    },
+    "default_title": "__MSG_BROWSER_ACTION_TITLE__"
+  }
+}

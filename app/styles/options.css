@@ -2,7 +2,8 @@
 /* General UI */
 body, html {
 	height: 100%;
-	width: 100%;
+	width: 640px;
+	max-width: 100%;
 	background: white;
 	color: #222;
 	font: normal 9pt/16px Verdana;
@@ -17,24 +18,18 @@ body, html {
 }
 
 h1 {
-	font: bold 16pt/16px Arial, Verdana;
+	font: bold 14pt/16px Arial, Verdana;
 	vertical-align: middle;
 	margin: 0;
 }
 h1 img {
 	vertical-align: middle;
-    margin-top: -8px;
+	margin-top: -8px;
 }
 h2 {
-    font: bold 12pt/16px Arial, Verdana;
-    clear: both;
-    color: #888;
-}
-
-p {
-	margin-top: 0;
-	text-align: center;
+	font: bold 12pt/16px Arial, Verdana;
 	clear: both;
+	color: #888;
 }
 
 #tipsList {
@@ -44,10 +39,10 @@ p {
 #tipsList li {
 	margin: 8px 0;
 }
-#cursorTrackerHTML, #omniboxKeyword {
-    margin: 0;
-    display: inline-block;
-    font-weight: bold;
+.inline-code {
+	margin: 0;
+	display: inline-block;
+	font-weight: bold;
 }
 
 
@@ -59,61 +54,67 @@ form {
 
 table {
 	width: 100%;
-    counter-reset: rowNumber;
+	counter-reset: rowNumber -1;
 	font: normal 9pt/9px Verdana;
-    margin-left: 12px;
+	margin-left: 12px;
+}
+table th {
+	text-align: left;
+  padding: .75em;
+	color: #888;
 }
 table tr {
-    counter-increment: rowNumber;
-    opacity: 0.66;
+	counter-increment: rowNumber;
+	opacity: 0.66;
 }
 table tr.saved {
-  opacity: 1.0;
+	opacity: 1.0;
 }
 table tr td {
 	padding: 0 2px 24px 2px;
 	vertical-align: top;
-    position: relative;
+	position: relative;
 }
 table tr td:first-child {   /* Shortcut field */
-    width: 100px;
+	width: 100px;
 }
 table tr td:last-child {    /* Delete "X" button */
-    width: 16px;
+	width: 16px;
 }
 table tr td:first-child::before { /* Row numbering */
-    content: counter(rowNumber);
-    min-width: 1em;
-    margin: 0;
-    padding: 9px 0;
-    color: #bbb;
-    position: absolute;
-    right: 108px;
-    text-align: right;
+	content: counter(rowNumber);
+	min-width: 1em;
+	margin: 0;
+	padding: 9px 0;
+	color: #888;
+	position: absolute;
+	right: 108px;
+	text-align: right;
 }
-table tr td a {
-    opacity: 0.5;
+table tr td .remove {
+	opacity: 0.5;
+	cursor: pointer;
 }
-table tr td a:hover {
-    opacity: 1.0;
+table tr td .remove:hover {
+	opacity: 1.0;
 }
 table tr td img {
-    width: 12px;
-    height: 12px;
-    position: absolute;
-    top: 7px;
-    left: 4px;
+	width: 12px;
+	height: 12px;
+	position: absolute;
+	top: 7px;
+	left: 4px;
 }
 
 input, textarea {
-	font: normal 10pt/auto Verdana;
+	font: normal 9pt/12pt Verdana;
 	color: #444;
 	padding: 6px;
 	height: 2.45em;
 	width: 100%;
 	background: #f8fbff;
 	overflow: auto;
-    resize: none;
+	resize: none;
 	border: 1px solid #ddd;
 	border-radius: 3px;
 }
@@ -127,66 +128,83 @@ fieldset {
 	padding: 0;
 }
 .backToTop {
+	clear: both;
+	text-align: center;
+}
+.backToTop a {
 	color: #888;
 	font: normal 9pt/9pt Verdana;
 }
 
 h1 span {
-	margin: 10px 16px 0 0;
+	margin: 0 16px 0 0;
 }
 h1 span a, h1 span a img {
 	font: normal 8pt/8pt Verdana;
 	outline: none;
+	text-decoration: none;
 }
 
 label, button {
 	padding: 6px 8px;
-    margin-bottom: 4px;
+	margin-bottom: 4px;
+}
+label {
 	font: bold 9pt/9pt Verdana;
 	color: #444;
+	margin-top: 12px;
+}
+button {
+	cursor: pointer;
 }
 
 button.icon {
 	position: relative;
 	padding-left: 24px;
+	margin-bottom: 4px;
 }
 button img {
-    position: absolute;
-    left: 6px;
-    top: 6px;
-    width: 12px;
-    height: 12px;
+	position: absolute;
+	left: 6px;
+	top: 8px;
+	width: 12px;
+	height: 12px;
 }
 
-.label, #restore.disabled, #totalQuota, #countQuota {
-	color: #999;
+.label, #backupDate, #totalQuota, #countQuota {
+	color: #888;
 	font: italic 8pt/8pt Verdana;
 	display: inline-block;
 	margin: 0;
 }
 .label {
-    margin: 0 4px;
-}
-#restore {
-	color: #66f;
+	margin: 0 4px;
 }
 
 #demo {
-    width: 100%;
-    height: 172px;
-    border: 1px solid #DDD;
-    border-radius: 4px;
-    margin: 8px 0;
+	width: 100%;
+	height: 172px;
+	border: 1px solid #DDD;
+	border-radius: 4px;
+	margin: 8px 0;
 }
 
 .timeout {
-    overflow: hidden;
-    display: block;
-    padding: 0 8px 0 0;
-    margin-bottom: 8px;
+	overflow: hidden;
+	display: block;
+	padding: 0 8px 0 0;
+	margin-bottom: 8px;
 }
 #timeout {
-    width: 100%;
+	width: 100%;
+}
+
+.panel {
+	display:none;
+	border: 1px solid #DDD;
+	border-radius: 4px;
+	margin: 8px 0;
+	padding: 8px;
 }
 
 .crouton {
@@ -202,14 +220,16 @@ button img {
 	background-color: #bbb;
 	display: none;
 }
-.crouton.red { background-color: #c66; }
-.crouton.green { background-color: #6c6; }
-.crouton.orange { background-color: #e90; }
+.crouton.red { background-color: #a44; }
+.crouton.green { background-color: #282; }
+.crouton.orange { background-color: #a60; }
 .crouton .closeButton {
-    font: bold 13px/13px Verdana;
-    margin: 0 6px;
-    padding: 4px;
-    float: right;
+	font: bold 13px/13px Verdana;
+	margin: 0 6px;
+	padding: 4px;
+	float: right;
+	min-width: 1.75em;
+	min-height: 1.75em;
 }
 
 .popup {

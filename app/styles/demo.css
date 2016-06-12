@@ -19,6 +19,10 @@ body, html {
 }
 .toolbar {
     margin-left: 8px;
+    cursor: pointer;
+}
+#toolbar label {
+  cursor: pointer;
 }
 
 #convertHTMLButton {
@@ -29,6 +33,7 @@ body, html {
     right: 4px;
     padding: 0px;
     display: none;
+    cursor: pointer;
 }
 #convertHTMLButton img {
     width: 12px;
@@ -53,6 +58,3 @@ textarea.editor {
 .active {
     display: inline-block !important;
 }
-
-
-

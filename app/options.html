@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Auto Text Expander : Options</title>
+    <meta charset="utf-8" />
+    <!-- build:css styles/options.css -->
+    <link href="styles/options.css" rel="stylesheet">
+    <!-- endbuild -->
+  </head>
+  <body>
+    <div id="content">
+      <h1>Auto Text Expander
+        <span id="version" class="label"><a id="versionHistory" href="https://github.com/carlinyuen/ChromeAutoTextExpander#version-history" target="_blank"></a></span>
+        <span class="fR">
+          <a id="request" href="https://chrome.google.com/webstore/support/iibninhmiggehlcdolcilmhacighjamp?hl=en-US&gl=US#feature" target="_blank" title="Feature Requests on the Chrome Webstore"><strong>Feature Requests</strong></a>
+          <a>-</a>
+          <a id="feedback" href="https://chrome.google.com/webstore/detail/auto-text-expander-for-go/iibninhmiggehlcdolcilmhacighjamp/reviews?hl=en-US" target="_blank" title="Feedback on the Chrome Webstore"><strong>Feedback</strong></a>
+        </span>
+      </h1>
+
+      <section id="tipsSection">
+        <p>
+          Manage your database of shortcuts and expansions below (<a id="tipsLink" class="error" href="#" title="Show usage tips"><strong>useful tips</strong></a>):
+        </p>
+        <ul id="tipsList"></ul>
+      </section>
+
+      <form>
+        <section id="settingsSection">
+          <h2>Settings</h2>
+
+          <section id="backupSection">
+            <button type="button" class="icon" id="backupButton"></button>
+            <button type="button" class="icon" id="restoreButton"></button>
+            <div class="label">Last backup: <span id="backupDate"></span></div>
+          </section>
+
+          <div>
+            <button type="button" class="icon" id="importButton"></button>
+            <button type="button" class="icon" id="timeoutButton"></button>
+            <button type="button" class="icon" id="blacklistButton"></button>
+          </div>
+
+          <section id="importSection">
+            <div id="importPanel" class="panel">
+              <h3 class="title"></h3>
+              <p class="description"></p>
+              <textarea id="importJSON"></textarea>
+              <span class="fR">
+                <button class="panelCancelButton" type="button">Cancel</button>
+                <button id="importJSONButton" type="button">Import</button>
+              </span>
+            </div>
+          </section>
+
+          <section id="timeoutSection">
+            <div id="timeoutPanel" class="panel">
+              <h3 class="title"></h3>
+              <p class="description"><p>
+              <label for="timeout" class="fL" title="Custom Shortcut Detection Timeout in Milliseconds">Timeout<span id="timeoutValue"></span></label>
+              <span class="timeout"><input id="timeoutSlider" name="timeout" type="range" min="250" max="10000" step="50"></span>
+            </div>
+          </section>
+
+          <section id="blacklistSection">
+            <div id="blacklistPanel" class="panel">
+              <h3 class="title"></h3>
+              <p class="description"></p>
+              <textarea id="blacklist"></textarea>
+            </div>
+          </section>
+          <br/>
+        </section>
+
+        <section id="demoSection">
+          <h2>Demo / Test Area</h2>
+          <iframe id="demo" src="demo.html"></iframe>
+        </section>
+
+        <br />
+
+        <section id="shortcutsSection">
+          <h2>Shortcuts
+            <div class="storage label">
+              <span id="countStorage">#</span> shortcuts used out of
+              <span id="countQuota">#</span>
+            </div>
+          </h2>
+          <fieldset>
+            <button type="button" class="refreshButton icon"></button>
+            <button type="button" class="addButton icon"></button>
+            <button type="button" class="saveButton icon"></button>
+            <div class="storage label">
+              <span id="totalStorage">#</span> bytes used out of
+              <a id="totalQuota" target="_blank"
+              href="https://developer.chrome.com/extensions/storage#properties"
+              title="Chrome Storage Quotas">#</a>
+            </div>
+          </fieldset>
+
+
+          <table id="edit" border="0" cellpadding="0" cellspacing="0">
+            <thead>
+              <tr>
+                <th>Shortcut</th>
+                <th>Expanded Text (Expansion)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="input">
+                <td><input type="text" class="shortcut" value="Shortcut" /></td>
+                <td><input type="text" class="autotext" value="Expanded Text" /></td>
+                <td><a href="#" class="remove" title="Remove Shortcut"><img src="images/trash-2x.png" alt="x" /></a></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <fieldset class="fR tR"> <!-- Saving options -->
+            <button type="button" class="refreshButton icon">
+              <img src="images/reload-2x.png" alt="" /> Refresh
+            </button>
+            <button type="button" class="addButton append icon">
+              <img src="images/plus-2x.png" alt="" /> Add
+            </button>
+            <button type="button" class="saveButton icon">
+              <img src="images/check-2x.png" alt="" /> Save
+            </button>
+          </fieldset>
+        </section>
+        <br />
+
+        <p class="backToTop"><a href="#">Back to Top</a></p>
+      </form>
+
+    </div>
+
+    <!-- JS -->
+    <!-- build:js scripts/options-vendor.js -->
+    <script src="vendor/scripts/jquery-2.1.0.min.js"></script>
+    <script src="vendor/scripts/jquery.autosize.min.js"></script>
+    <!-- bower:js -->
+    <!-- endbower -->
+    <!-- endbuild -->
+    <script src="scripts/constants.js"></script>
+    <script src="scripts/options.js"></script>
+  </body>
+</html>

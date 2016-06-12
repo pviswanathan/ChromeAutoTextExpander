@@ -1,0 +1,257 @@
+{
+	"EXTENSION_NAME": {
+		"message": "Auto Text Expander for Google Chrome™",
+		"description": "Extension name for the Chrome webstore."
+	},
+	"EXTENSION_SHORTNAME": {
+		"message": "(txt)^r",
+		"description": "Extension short name for the Chrome webstore (< 12 chars)."
+	},
+	"EXTENSION_TITLE": {
+		"message": "Auto Text Expander",
+		"description": "Extension short title."
+	},
+	"EXTENSION_DESCRIPTION": {
+		"message": "Create custom keyboard shortcuts to expand and replace text as you type!",
+		"description": "Extension description for the chrome webstore."
+	},
+	"KEYWORD_OMNIBAR_TRIGGER": {
+		"message": "ate",
+		"description": "Omnibar (url address bar) trigger for extension."
+	},
+	"BROWSER_ACTION_TITLE": {
+		"message": "Click to view options for AutoTextExpander",
+		"description": "Browser action default title."
+	},
+	"TITLE_OPTIONS_PAGE": {
+		"message": "Options",
+		"description": "Title for the options page"
+	},
+	"TEXT_TIPS_LIST": {
+		"message": "<li>
+			<strong>Disable the extension for the page</strong><br />
+			Toggle via the <pre id='iconText' class='inline-code'>(txt)</pre> icon next to the url bar.
+		</li>
+		<li>
+			<strong>Trigger after typing a space</strong><br/>
+			Add a space to the end of your shortcut to trigger after typing a space.
+		</li>
+		<li>
+			<strong>HTML and multi-line support</strong><br/>
+			HTML can be inserted into editable divs like in Gmail, which supports multi-line expansions. Use the Demo area to convert formatted content into HTML.
+		</li>
+		<li>
+			<strong>Backups &amp; limitations</strong><br/>
+			The Backup option stores your settings in Chrome for your current computer. If Chrome becomes out of sync, you can restore from your backup, but if you sign out of your browser, reset Chrome sync, or uninstall the extension, the backup will be erased. <strong class='error'>I highly advise to save a copy of your shortcuts from the Import/Export dialog.</strong>
+		</li>
+		<li>
+			<strong>Auto-capitalize and auto-all-caps support</strong><br/>
+			Capitalize the first letter in a multi-letter shortcut, type the full shortcut in caps to trigger all-caps, or disable it entirely in the settings.
+		</li>
+		<li>
+			<strong>Omnibox (url address bar) support</strong><br/>
+			Type <pre id='omniboxKeyword' class='inline-code'></pre> into the url bar followed by Tab or Space to activate.
+		</li>
+		<li>
+			<strong>Clipboard paste macro support</strong><br/>
+			Use the <pre id='clipboardTag' class='inline-code'>%clip%</pre> tag in the expansion to indicate where to insert the contents of the clipboard. Formatting may not always carry over.
+		</li>
+		<li>
+			<strong>Date/time macros support</strong><br/>
+			Use the <pre class='inline-code'>%d(dateFormat)</pre> tag to insert today's date. Please see <a href='http://momentjs.com/docs/#/displaying/format/' target='_blank' title='Date Formatting Documentation'>formatting documentation</a> for advanced formats. Example: <pre class='inline-code'>%d(MMMM Do YYYY)</pre>, expands to: <strong>September 4rd 2013</strong>.
+		</li>
+		<li>
+			<strong>Cursor placement support in editable divs</strong><br/>
+			Use the <pre id='cursorTag' class='inline-code'></pre> tag in the expansion to indicate where to place the cursor. Not supported in all fields.
+		</li>
+		<li>
+			<strong>Storage limits</strong><br/>
+			Unfortunately, Chrome limits the number and size of shortcuts and expansions stored. See limitations <a href='https://developer.chrome.com/extensions/storage#properties' title='Chrome Storage Quotas'>here</a>.
+		</li>
+		<li>
+			<strong>Unsupported elements</strong><br/>
+			The new HTML5 input[type=email] field and a few others don't allow for detection and setting of the cursor. Instead ATE assumes the cursor is at the end of the text and will replace from there.
+		</li>",
+		"description": "Body text of tips list popup."
+	},
+	"TITLE_DEMO_PAGE": {
+		"message": "Demo",
+		"description": "Title for the demo page"
+	},
+	"TITLE_WARNING_POPUP": {
+		"message": "Warning",
+		"description": "Title of warning popup."
+	},
+	"TITLE_IMPORT_PANEL": {
+		"message": "Import / Export Shortcuts",
+		"description": "Title of import / export settings panel."
+	},
+	"TEXT_IMPORT_PANEL": {
+		"message": "This is a <a href='http://jsonformatter.curiousconcept.com/' target='_blank' title='JSON format'>JSON</a> representation of your  shortcuts. You can import a different set by replacing the JSON (does not affect local backup, must explicitly save after importing), and you can also <a href='http://shancarter.github.io/mr-data-converter/' target='_blank' title='CSV or Tab to JSON'>convert</a> a CSV or TSV table of shortcuts to JSON. I encourage you to copy'n'paste the JSON to save a copy to your own hard drive. Just in case!",
+		"description": "Body text of import / export settings panel."
+	},
+	"TITLE_TIMEOUT_PANEL": {
+		"message": "Set Shortcut Timeout",
+		"description": "Title of shortcut timeout settings panel."
+	},
+	"TEXT_TIMEOUT_PANEL": {
+		"message": "The shortcut timeout is the time the system waits, since the last character you typed, before it decides to reset. Once the system resets, it will no longer include the previously typed characters as part of the shortcut.<br/><br/>For example: imagine if you had a shortcut <pre class='inline-code'>no-op</pre>, if you then type <pre class='inline-code'>No</pre> and wait longer than the shortcut timeout before typing <pre class='inline-code'>-op</pre>, it will allow you to type it without triggering the expansion. The default is <span id='timeoutDefault'></span> ms.",
+		"description": "Body text of shortcut timeout settings panel."
+	},
+	"TITLE_BLACKLIST_PANEL": {
+		"message": "Domain Blacklist",
+		"description": "Title of domain blacklist settings panel."
+	},
+	"TEXT_BLACKLIST_PANEL": {
+		"message": "This is a list of sites where the extension has been disabled and will not trigger. This state is indicated as a badge on the extension icon next to the URL bar (ON or OFF).",
+		"description": "Body text of domain blacklist settings panel."
+	},
+	"MESSAGE_REMOVE_ROW_POPUP": {
+		"message": "Are you sure you want to remove this shortcut? You may not be able to undo this action!",
+		"description": "Confirmation prompt to user when removing a row."
+	},
+	"MESSAGE_IMPORT_SUCCESS": {
+		"message": "Import successful! Shortcuts are NOT saved yet, please save them.",
+		"description": "Success message to user when import worked."
+	},
+	"MESSAGE_BACKUP_WARNING": {
+		"message": "This will overwrite the old backup (if any) with your current shortcuts. <strong>You will lose the backup if you sign out of the browser, reset Chrome sync, or uninstall the extension!</strong> Please use the import/export function to save a copy of your shortcuts.",
+		"description": "Warning message when user is about to attempt backing up his or her shortcuts."
+	},
+	"MESSAGE_RESTORE_WARNING": {
+		"message": "This will overwrite your current shortcuts with your last backup!",
+		"description": "Warning message when user is about to attempt restoring his or her shortcuts from their last backup."
+	},
+	"MESSAGE_EMERGENCY_RESTORE_WARNING": {
+		"message": "We've detected that your shortcut data may have been corrupted in the version upgrade due to Chrome sync issues. We have stored an emergency backup of your sync data just in case. Would you like to restore to this backup?",
+		"description": "Warning message to show user when we detect that they may want to restore to an emergency backup."
+	},
+	"ERROR_BACKUP_FAILED": {
+		"message": "Could not backup shortcuts! May be over size limit.",
+		"description": "Error message to be displayed to user when backup fails."
+	},
+	"ERROR_RESTORE_FAILED": {
+		"message": "Could not restore backup! Data may be corrupted or storage limits may have changed.",
+		"description": "Error message to be displayed to user when restore from backup fails."
+	},
+	"ERROR_OVER_SPACE_QUOTA": {
+		"message": "Over Chrome user storage quota!",
+		"description": "Error message to be displayed when user goes over the quota for total storage space that Chrome's sync API allows."
+	},
+	"ERROR_OVER_ITEM_SPACE_QUOTA": {
+		"message": "Over shortcut max length!",
+		"description": "Error message to be displayed when user goes over the quota for space per item that Chrome's sync API allows."
+	},
+	"ERROR_OVER_ITEM_QUOTA": {
+		"message": "Over Chrome user storage quota!",
+		"description": "Error message to be displayed when user goes over the max number of items that Chrome's sync API allows."
+	},
+	"ERROR_DUPLICATE_ITEMS": {
+		"message": "Duplicate shortcuts found!",
+		"description": "Error message to be displayed when duplicate shortcuts are found"
+	},
+	"ERROR_IMPORT_INVALID_JSON": {
+		"message": "Import failed! Shortcuts were in an invalid JSON format.",
+		"description": "Error message to be displayed when importing invalid json"
+	},
+	"ERROR_IMPORT_NOT_OBJECT": {
+		"message": "Import failed! Shortcuts have to be defined in a top level JS object.",
+		"description": "Error message to be displayed when importing with an array at the top level"
+	},
+	"ERROR_IMPORT_ADDING_ROWS": {
+		"message": "Import failed! Errors found while adding shortcuts.",
+		"description": "Error message to be displayed when errors adding rows from import"
+	},
+	"WARNING_SHORTCUT_VERSION_MISMATCH": {
+		"message": "Warning! Your shortcuts database version doesn't match your extension version. This may be because they haven't been fully synced yet. Please try reloading the extension or restarting the browser to avoid corrupting your data!",
+		"description": "Warning message to user that their shortcuts are not yet synced with their app version"
+	},
+	"WARNING_SHORTCUT_DISABLED": {
+		"message": "Your AutoTextExpander shortcuts have been disabled to prevent unexpected behavior.",
+		"description": "Warning message to user that their shortcuts are disabled when in unreliable states."
+	},
+	"PROMPT_CONTINUE": {
+		"message": "\n\nContinue?",
+		"description": "The prompt we append to the popup text for any confirmation dialogs"
+	},
+	"TITLE_SAVE_BUTTON": {
+		"message": "<img src='images/check-2x.png' alt=''/> Save",
+		"description": "Title for the save button for the options page"
+	},
+	"TITLE_ADD_BUTTON": {
+		"message": "<img src='images/plus-2x.png' alt=''/> Add",
+		"description": "Title for the add button for the options page"
+	},
+	"TITLE_REFRESH_BUTTON": {
+		"message": "<img src='images/reload-2x.png' alt=''/> Refresh",
+		"description": "Title for the refresh button for the options page"
+	},
+	"TITLE_BACKUP_BUTTON": {
+		"message": "<img src='images/cloud-upload-2x.png' alt=''/> Backup",
+		"description": "Title for the backup button for the options page"
+	},
+	"TITLE_RESTORE_BUTTON": {
+		"message": "<img src='images/cloud-download-2x.png' alt=''/> Restore",
+		"description": "Title for the restore button for the options page"
+	},
+	"TITLE_IMPORT_BUTTON": {
+		"message": "<img src='images/transfer-2x.png' alt=''/> Import / Export",
+		"description": "Title for the import/export button for the options page"
+	},
+	"TITLE_TIMEOUT_BUTTON": {
+		"message": "<img src='images/timer-2x.png' alt=''/> Shortcut Timeout",
+		"description": "Title for the shortcut timeout button for the options page"
+	},
+	"TITLE_BLACKLIST_BUTTON": {
+		"message": "<img src='images/ban-2x.png' alt=''/> Domain Blacklist",
+		"description": "Title for the domain blacklist button for the options page"
+	},
+	"TITLE_TIMEOUT_LABEL": {
+		"message": "Timeout",
+		"description": "Title for the shortcut timeout label on the options page"
+	},
+	"HEADER_SHORTCUT_SECTION": {
+		"message": "Shortcuts",
+		"description": "Header for the shortcuts section of the options page"
+	},
+	"TITLE_FEEDBACK_LINK": {
+		"message": "Feedback",
+		"description": "Title for the feedback link on the options page"
+	},
+	"TITLE_FEATURE_REQUEST_LINK": {
+		"message": "Feature Requests",
+		"description": "Title for the feature request link on the options page"
+	},
+	"TITLE_BACKUP_TIMESTAMP_LABEL": {
+		"message": "Last backup",
+		"description": "Title for the last local backup timestamp message label"
+	},
+	"TITLE_SHORTCUT_QUOTA_LABEL": {
+		"message": "shortcuts used out of",
+		"description": "Title for the # of shortcuts of sync storage used message label"
+	},
+	"TITLE_STORAGE_QUOTA_LABEL": {
+		"message": "bytes used out of",
+		"description": "Title for the # of bytes of sync storage used message label"
+	},
+	"TITLE_BACK_TO_TOP_LINK": {
+		"message": "Back to top",
+		"description": "Title for the link to jump back to the top of the page"
+	},
+	"TEXT_DEMO_SECTION": {
+		"message": "Try your shortcuts here! Make sure to save them first.",
+		"description": "Text to insert into the demo section of the options page"
+	},
+	"TITLE_TIPS_LINK": {
+		"message": "Useful tips",
+		"description": "Title for the link to useful tips and information on the options page"
+	},
+	"TEXT_OPTIONS_DESCRIPTION": {
+		"message": "Edit your database of shortcuts and expansions here!",
+		"description": "Text for options page description text."
+	},
+	"TEMPLATE": {
+		"message": "template",
+		"description": "Template"
+	}
+}
