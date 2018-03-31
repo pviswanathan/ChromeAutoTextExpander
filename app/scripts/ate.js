@@ -232,6 +232,10 @@ jQuery.noConflict();
   {
     debugLog('processAutoTextExpansion:', autotext, capitalization);
 
+    if (disableAutoExpander()) {
+      return;
+    }
+
     // Check if shortcut exists and should be triggered
     if (autotext && textInput)
     {
@@ -1204,6 +1208,10 @@ jQuery.noConflict();
         })
       );
     }
+  }
+
+  function disableAutoExpander() {
+    return !!$('*[data-disable-auto-expander]').length;
   }
 
   // Document ready function
