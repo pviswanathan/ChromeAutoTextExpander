@@ -48,7 +48,7 @@ jQuery.noConflict();
     , EVENT_NAME_LOAD = 'load.auto-expander'
     , EVENT_NAME_INSERTED = 'DOMNodeInserted'
 
-    , SELECTOR_INPUT = '*[contenteditable=true],textarea,input'
+    , SELECTOR_INPUT = '*[contenteditable=true]:not([data-disable-text-expander]),textarea,input'
     , SELECTOR_GMAIL_EDIT = 'div.aoI'   // Class for Gmail's popup message composer
     , SELECTOR_INBOX_EDIT = 'div.dX'    // Class for Inbox's inline reply container
     , SELECTOR_GDOCS_EDIT = 'iframe.docs-texteventtarget-iframe'  // Google Docs
