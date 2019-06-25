@@ -92,7 +92,7 @@ gulp.task('watch', ['lint', 'html'], () => {
   ]).on('change', $.livereload.reload);
 
   gulp.watch('app/scripts/**/*.js', ['lint']);
-  gulp.watch('bower.json', ['wiredep']);
+  // gulp.watch('bower.json', ['wiredep']); // Deprecated now...
 });
 
 gulp.task('size', () => {
@@ -110,7 +110,7 @@ gulp.task('wiredep', () => {
 gulp.task('package', function () {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-      .pipe($.zip('TEMP-' + manifest.version + '.zip'))
+      .pipe($.zip('ATE-' + manifest.version + '.zip'))
       .pipe(gulp.dest('package'));
 });
 
