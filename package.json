@@ -1,6 +1,7 @@
 {
-  "name": "temp",
+  "name": "ChromeAutoTextExpander",
   "private": true,
+  "license": "BSD",
   "engines": {
     "node": ">=0.8.0"
   },

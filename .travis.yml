@@ -1,0 +1,11 @@
+sudo: false
+language: node_js
+node_js:
+  - 12
+  - 10
+  - 8
+  - 7
+  - 6
+before_script:
+  - npm install -g gulp-cli
+script: gulp
