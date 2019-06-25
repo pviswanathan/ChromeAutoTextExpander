@@ -251,7 +251,7 @@ jQuery.noConflict();
 
         // Handle moment.js dates
         autotext = processDates(autotext);
-      
+
         // Handle %url% macro
         autotext = processUrls(autotext);
 
@@ -346,6 +346,11 @@ jQuery.noConflict();
       autotext,
       cursorPosition
     );
+    // Thanks to @briantingtc: mock and dispatch dom event when replacing text in input to correct for interactions with a React controlled input.
+    textInput.dispatchEvent(new Event('input', {
+      'bubbles': true,
+      'cancelable': true
+    }));
     setCursorPosition(textInput, cursorPosition - shortcut.length + autotext.length);
   }
 
