@@ -6,7 +6,7 @@
   "license": "BSD",
   "version": "2.0.0",
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=6.0.0"
   },
   "eslintConfig": {
     "env": {

@@ -1,4 +1,4 @@
-Google Chrome Extension : Auto Text Expander
+Google Chrome Extension : Auto Text Expander [![Build Status](https://travis-ci.org/carlinyuen/ChromeAutoTextExpander.svg?branch=master)](https://travis-ci.org/carlinyuen/ChromeAutoTextExpander)
 =========================
 Keywords: chrome, extension, expander, auto, automator, replace, text, shortcut, autotext.
 
@@ -75,7 +75,7 @@ v1.8.5
  - Increase max time for shortcut detection to 10s
  - Figure out what's going on with the @ shortcut prefix issue
 
-v1.8.4 
+v1.8.4
  - Changed popup warnings when Chrome is not syncing the shortcuts properly to use a warning banner instead that is less in-your-face and still let you navigate sites without crying in frustration.
  - Fixing inconsistency with handling of trailing spaces. Should only add a space after the expansion if you typed a space.
  - Adding auto-capitalization with checking for lower-case versions of the word typed, and applying all-caps or just first letter capitalization automatically.
