@@ -32,11 +32,11 @@ describe('background.js', function() {
 
   test('initial install', function() {
     // 1. mock chrome.* APIs to return predefined response
-    chrome.runtime.getManifest = () => ({version: '1.0'});
-    chrome.tabs.query.yields([
-      {id: 1, title: 'Tab 1'},
-      {id: 2, title: 'Tab 2'}
-    ]);
+    // chrome.runtime.getManifest = () => ({version: '1.0'});
+    // chrome.tabs.query.yields([
+    //   {id: 1, title: 'Tab 1'},
+    //   {id: 2, title: 'Tab 2'}
+    // ]);
 
     // 2. inject our mocked chrome.* api into some environment
     const context = { chrome: chrome };
