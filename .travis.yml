@@ -14,7 +14,7 @@ install:
   - npm install -g mocha-phantomjs
 before_script:
   — mocha —version
-  # - mocha -u tdd -—reporter spec
+  - mocha
   — phantomjs —version
   — mocha-phantomjs —version
   - mocha-phantomjs test/spec/index.html
