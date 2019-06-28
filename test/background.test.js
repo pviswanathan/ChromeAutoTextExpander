@@ -31,19 +31,18 @@ describe('background.js', function() {
   // });
 
   test('initial install', function() {
-    // 1. mock `chrome.tabs.query` to return predefined response
+    // 1. mock chrome.* APIs to return predefined response
+    chrome.runtime.getManifest = () => ({version: '1.0'});
     chrome.tabs.query.yields([
       {id: 1, title: 'Tab 1'},
       {id: 2, title: 'Tab 2'}
     ]);
 
     // 2. inject our mocked chrome.* api into some environment
-    const context = {
-      chrome: chrome
-    };
+    const context = { chrome: chrome };
 
     // 3. run our extension code in this environment
-    const code = fs.readFileSync('../app/scripts/background.js');
+    const code = fs.readFileSync('./app/scripts/background.js');
     vm.runInNewContext(code, context);
 
     // 4. assert that button badge equals to '2'

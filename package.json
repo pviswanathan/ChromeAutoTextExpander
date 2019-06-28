@@ -49,6 +49,7 @@
     "gulp-zip": "^5.0.0",
     "jest": "^24.8.0",
     "jest-cli": "^24.8.0",
+    "jquery": "^3.4.1",
     "run-sequence": "^2.2.1",
     "sinon-chrome": "^3.0.1",
     "wiredep": "^4.0.0"

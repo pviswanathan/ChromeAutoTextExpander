@@ -5,12 +5,13 @@
 jest
   .dontMock('fs')
   .dontMock('vm')
-  .dontMock('jQuery')
+  .dontMock('jquery')
   .dontMock('sinon-chrome');
 
 // Mock out Chrome's extension APIs
 import vm from 'vm';
 import fs from 'fs';
+import $ from 'jquery';
 import chrome from 'sinon-chrome';
 beforeEach(() => {
   window.chrome = chrome;
@@ -22,8 +23,7 @@ afterEach(() => {
 });
 
 // Setup
-import jQuery from '../app/vendor/scripts/jquery-2.1.1-simplified.min.js'
-var html = fs.readFileSync('../app/options.html').toString();
+var html = fs.readFileSync('./app/options.html').toString();
 
 describe('options.js', function() {
   document.documentElement.innerHTML = html;

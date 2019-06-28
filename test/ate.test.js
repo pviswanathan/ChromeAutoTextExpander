@@ -5,12 +5,13 @@
 jest
   .dontMock('fs')
   .dontMock('vm')
-  .dontMock('jQuery')
+  .dontMock('jquery')
   .dontMock('sinon-chrome');
 
 // Mock out Chrome's extension APIs
 import vm from 'vm';
 import fs from 'fs';
+import $ from 'jquery';
 import chrome from 'sinon-chrome';
 beforeEach(() => {
   window.chrome = chrome;
@@ -19,14 +20,17 @@ beforeEach(() => {
 afterEach(() => {
   chrome.flush();
   delete window.chrome;
+  document.documentElement.innerHTML = '';
 });
-
-// Setup
-import jQuery from '../app/vendor/scripts/jquery-2.1.1-simplified.min.js'
-var html = fs.readFileSync('../app/options.html').toString();
 
 describe('ate.js', function() {
 
   test('gmail.com', function() {
+    var html = fs.readFileSync('sites/gmail.html').toString();
+    document.documentElement.innerHTML = html;
+    const context = { chrome: chrome };
+    const code = fs.readFileSync('./app/scripts/ate.js');
+    vm.runInNewContext(code, context);
+    // TODO: emulate injecting into site and firing off a shortcut
   });
 });
