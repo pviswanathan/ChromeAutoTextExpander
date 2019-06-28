@@ -1,9 +1,28 @@
 {
   "name": "ChromeAutoTextExpander",
+  "description": "Create custom keyboard shortcuts to expand and replace text as you type!",
+  "author": "Carlin Yuen",
   "private": true,
   "license": "BSD",
+  "version": "2.0.0",
   "engines": {
     "node": ">=0.8.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "browser": true
+    },
+    "globals": {
+      "chrome": true
+    },
+    "rules": {
+      "eol-last": 0,
+      "quotes": [
+        2,
+        "single"
+      ]
+    }
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
@@ -30,21 +49,6 @@
     "run-sequence": "^1.1.5",
     "wiredep": "^4.0.0"
   },
-  "eslintConfig": {
-    "env": {
-      "node": true,
-      "browser": true
-    },
-    "globals": {
-      "chrome": true
-    },
-    "rules": {
-      "eol-last": 0,
-      "quotes": [
-        2,
-        "single"
-      ]
-    }
-  },
-  "dependencies": {}
+  "dependencies": {
+  }
 }
