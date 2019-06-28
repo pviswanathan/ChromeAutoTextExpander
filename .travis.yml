@@ -9,14 +9,9 @@ node_js:  # note: node v12+ doesn't work with gulp 3
   - 6
 install:
   - npm install -g gulp-cli
-  - npm install -g mocha
-  - npm install phantomjs -g
-  - npm install -g mocha-phantomjs
+  - npm install -g jest-cli
 before_script:
-  — mocha —version
-  - mocha
-  — phantomjs —version
-  — mocha-phantomjs —version
-  - mocha-phantomjs test/spec/index.html
+  — gulp —version
+  — jest —version
 script:
   - gulp build
