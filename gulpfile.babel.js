@@ -2,12 +2,11 @@
 import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
-import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
 const $ = gulpLoadPlugins();
 
-gulp.task('extras', () => {
+function extras(cb) {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
@@ -17,23 +16,19 @@ gulp.task('extras', () => {
     base: 'app',
     dot: true
   }).pipe(gulp.dest('dist'));
-});
-
-function lint(files, options) {
-  return () => {
-    return gulp.src(files)
-      .pipe($.eslint(options))
-      .pipe($.eslint.format());
-  };
 }
 
-gulp.task('lint', lint('app/scripts/**/*.js', {
-  env: {
-    es6: false
-  }
-}));
+export function lint(cb) {
+  return gulp.src('app/scripts/**/*.js')
+    .pipe($.eslint({
+      env: {
+        es6:false
+      }
+    }))
+    .pipe($.eslint.format());
+}
 
-gulp.task('images', () => {
+export function images(cb) {
   return gulp.src('app/images/**/*')
     .pipe($.if($.if.isFile, $.cache($.imagemin({
       progressive: true,
@@ -47,9 +42,9 @@ gulp.task('images', () => {
       this.end();
     })))
     .pipe(gulp.dest('dist/images'));
-});
+}
 
-gulp.task('html',  () => {
+function html(cb) {
   return gulp.src('app/*.html')
     .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
     .pipe($.sourcemaps.init())
@@ -58,9 +53,9 @@ gulp.task('html',  () => {
     .pipe($.sourcemaps.write())
     .pipe($.if('*.html', $.htmlmin({removeComments: true, collapseWhitespace: true})))
     .pipe(gulp.dest('dist'));
-});
+}
 
-gulp.task('chromeManifest', () => {
+function chromeManifest(cb) {
   return gulp.src('app/manifest.json')
     .pipe($.chromeManifest({
       buildnumber: true,
@@ -76,51 +71,51 @@ gulp.task('chromeManifest', () => {
   .pipe($.if(/^((?!(\.min)).)*\.js$/, $.uglify()))
   .pipe($.if(/^((?!(\.min)).)*\.js$/, $.sourcemaps.write('.')))
   .pipe(gulp.dest('dist'));
-});
+}
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
+export function clean(cb) {
+  del(['.tmp', 'dist']);
+  cb();
+}
 
-gulp.task('watch', ['lint', 'html'], () => {
+function watchFiles() {
   $.livereload.listen();
-
+  gulp.watch('app/scripts/**/*.js', lint);
   gulp.watch([
     'app/*.html',
     'app/scripts/**/*.js',
     'app/images/**/*',
     'app/styles/**/*',
     'app/_locales/**/*.json'
-  ]).on('change', $.livereload.reload);
+  ], $.livereload.reload);
+  // gulp.watch('bower.json', wiredepInit); // Deprecated now...
+}
+export const watch = gulp.series(lint, html, watchFiles);
 
-  gulp.watch('app/scripts/**/*.js', ['lint']);
-  // gulp.watch('bower.json', ['wiredep']); // Deprecated now...
-});
-
-gulp.task('size', () => {
+function size() {
   return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
-});
+}
 
-gulp.task('wiredep', () => {
+function wiredepInit(cb) {
   gulp.src('app/*.html')
     .pipe(wiredep({
       ignorePath: /^(\.\.\/)*\.\./
     }))
     .pipe(gulp.dest('app'));
-});
+  cb();
+}
 
-gulp.task('package', function () {
+export function dist() {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
       .pipe($.zip('ATE-' + manifest.version + '.zip'))
-      .pipe(gulp.dest('package'));
-});
+      .pipe(gulp.dest('dist'));
+}
 
-gulp.task('build', (cb) => {
-  runSequence(
-    'lint', 'chromeManifest',
-    ['html', 'images', 'extras'],
-    'size', cb);
-});
-
-gulp.task('default', ['clean'], cb => {
-  runSequence('build', cb);
-});
+export const build = gulp.series(
+    lint,
+    chromeManifest,
+    gulp.parallel(html, images, extras),
+    size
+  );
+export default gulp.series(clean, build);
