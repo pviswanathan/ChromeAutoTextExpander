@@ -16,11 +16,19 @@
     var should = chai.should();
   </script>
   <!-- include source files here... -->
+  <script src="spec/sinon-chrome.min.js"></script>
+  <script src="../../app/vendor/scripts/jquery-2.1.1-simplified.min.js"></script>
+  <script src="../../app/vendor/scripts/moment-with-locales.min.js"></script>
+  <script src="../../app/scripts/constants.js"></script>
+  <script src="../../app/scripts/ate.js"></script>
   <!-- include spec files here... -->
   <script src="spec/test.js"></script>
   <script>
-    if (navigator.userAgent.indexOf('PhantomJS') === -1) {
+    if (navigator.userAgent.indexOf('PhantomJS') === -1
+        || !window.mochaPhantomJS) {
       mocha.run();
+    } else {
+      mochaPhantomJS.run();
     }
   </script>
 </body>

@@ -7,6 +7,16 @@ node_js:  # note: node v12+ doesn't work with gulp 3
   - 8
   - 7
   - 6
-before_script:
+install:
   - npm install -g gulp-cli
-script: gulp build
+  - npm install -g mocha
+  - npm install phantomjs -g
+  - npm install -g mocha-phantomjs
+before_script:
+  — mocha —version
+  # - mocha -u tdd -—reporter spec
+  — phantomjs —version
+  — mocha-phantomjs —version
+  - mocha-phantomjs test/spec/index.html
+script:
+  - gulp build
