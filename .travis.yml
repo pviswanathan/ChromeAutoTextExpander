@@ -1,8 +1,8 @@
 sudo: false
 language: node_js
-node_js:
-  - "node"
-  - 12
+node_js:  # note: node v12+ doesn't work with gulp 3
+  # - "node"
+  # - 12
   - 10
   - 8
   - 7
