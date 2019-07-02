@@ -21,10 +21,9 @@ jQuery.noConflict();
     , ENUM_CAPITALIZATION_FIRST = 1
     , ENUM_CAPITALIZATION_ALL = 2
 
-    , DATE_MACRO_REGEX = /%d\(/g
-    , DATE_MACRO_CLOSE_TAG = ')'
-    , CLIP_MACRO_REGEX = /%clip%/g
-    , URL_MACRO_REGEX = /%url%/g
+    , DATE_MACRO_REGEX = new RegExp(INSERT_DATE_TAG, 'g')
+    , CLIP_MACRO_REGEX = new RegExp(CLIPBOARD_PASTE_TAG, 'g')
+    , URL_MACRO_REGEX = new RegExp(INSERT_URL_TAG, 'g')
     , WHITESPACE_REGEX = /(\s)/
 
     , BASECAMP_DOMAIN_REGEX = /basecamp.com/
@@ -897,7 +896,7 @@ jQuery.noConflict();
     // Find matching closing tag for each date
     for (var i = 0, len = dateOpenTags.length; i < len; ++i) {
       dateCloseTags[i] = text.indexOf(
-        DATE_MACRO_CLOSE_TAG, dateOpenTags[i] + 1);
+        INSERT_DATE_CLOSE_TAG, dateOpenTags[i] + 1);
     }
 
     // Only continue if we have matching tags

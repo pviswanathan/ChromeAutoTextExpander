@@ -13,7 +13,6 @@
   "offline_enabled": true,
   "background": {
     "scripts": [
-      "scripts/chromereload.js",
       "scripts/constants.js",
       "scripts/background.js",
       "scripts/backgroundOmnibox.js"

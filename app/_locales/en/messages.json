@@ -62,7 +62,7 @@
 		</li>
 		<li>
 			<strong>Date/time macros support</strong><br/>
-			Use the <pre class='inline-code'>%d(dateFormat)</pre> tag to insert today's date. Please see <a href='http://momentjs.com/docs/#/displaying/format/' target='_blank' title='Date Formatting Documentation'>formatting documentation</a> for advanced formats. Example: <pre class='inline-code'>%d(MMMM Do YYYY)</pre>, expands to: <strong>September 4rd 2013</strong>.
+			Use the <pre id='insertDateTag' class='inline-code'></pre> tag to insert today's date. Please see <a href='http://momentjs.com/docs/#/displaying/format/' target='_blank' title='Date Formatting Documentation'>formatting documentation</a> for advanced formats. Example: <pre id='insertDateFormat' class='inline-code'></pre>, expands to: <strong id='insertDateDemo'>September 4rd 2013</strong>.
 		</li>
 		<li>
 			<strong>Cursor placement support in editable divs</strong><br/>

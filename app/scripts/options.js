@@ -4,7 +4,10 @@
 $(function()
 {
   // Constants
-  var DEFAULT_SHORTCUT_FILLER = 'Shortcut'
+  const APP_FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
+    , DATE_MACRO_DEMO_FORMAT = 'MMMM Do YYYY'
+
+    , DEFAULT_SHORTCUT_FILLER = 'Shortcut'
     , DEFAULT_AUTOTEXT_FILLER = 'Expanded Text'
     , DEFAULT_CLEAR_BUFFER_TIMEOUT = 750          // Default to 750ms
 
@@ -70,6 +73,13 @@ $(function()
     $('#cursorTag').text(CURSOR_TRACKING_HTML);
     $('#clipboardTag').text(CLIPBOARD_PASTE_TAG);
     $('#insertUrlTag').text(INSERT_URL_TAG);
+    $('#insertDateTag').text(INSERT_DATE_TAG + 'dateformat' + INSERT_DATE_CLOSE_TAG);
+    $('#insertDateFormat').text(INSERT_DATE_TAG + DATE_MACRO_DEMO_FORMAT + INSERT_DATE_CLOSE_TAG);
+    $('#insertDateDemo').text((function(){
+      var mo = moment();
+      mo.locale(chrome.i18n.getMessage('@@ui_locale'));
+      return mo.format(DATE_MACRO_DEMO_FORMAT);  
+    })());
 
     // Settings
     $('#backupButton').html(chrome.i18n.getMessage('TITLE_BACKUP_BUTTON'));
