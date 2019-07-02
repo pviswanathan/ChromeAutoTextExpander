@@ -15,8 +15,8 @@
       "es6": true
     },
     "parserOptions": {
-        "ecmaVersion": 6,
-        "sourceType": "module"
+      "ecmaVersion": 6,
+      "sourceType": "module"
     },
     "globals": {
       "@babel/core": "^7.4.5",
@@ -47,9 +47,9 @@
     "gulp-imagemin": "^6.0.0",
     "gulp-livereload": "^4.0.1",
     "gulp-load-plugins": "^1.6.0",
+    "gulp-remove-logging": "^1.2.0",
     "gulp-size": "^3.0.0",
     "gulp-sourcemaps": "^2.6.5",
-    "gulp-strip-debug": "^3.0.0",
     "gulp-uglify": "^3.0.2",
     "gulp-useref": "^3.1.6",
     "gulp-zip": "^5.0.0",

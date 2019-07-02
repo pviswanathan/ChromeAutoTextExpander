@@ -48,7 +48,7 @@ function html(cb) {
   return gulp.src('app/*.html')
     .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
     .pipe($.sourcemaps.init())
-    .pipe($.if(/^((?!(\.min)).)*\.js$/, $.stripDebug()))
+    .pipe($.if(/^((?!(\.min)).)*\.js$/, $.removeLogging({methods:['log']})))
     .pipe($.if(/^((?!(\.min)).)*\.js$/, $.uglify()))
     .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
     .pipe($.sourcemaps.write())
@@ -68,7 +68,7 @@ function chromeManifest(cb) {
       }
   }))
   .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
-  .pipe($.if(/^((?!(\.min)).)*\.js$/, $.stripDebug()))
+  .pipe($.if(/^((?!(\.min)).)*\.js$/, $.removeLogging({methods:['log']})))
   .pipe($.if(/^((?!(\.min)).)*\.js$/, $.sourcemaps.init()))
   .pipe($.if(/^((?!(\.min)).)*\.js$/, $.uglify()))
   .pipe($.if(/^((?!(\.min)).)*\.js$/, $.sourcemaps.write('.')))

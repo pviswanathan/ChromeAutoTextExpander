@@ -37,30 +37,30 @@ $(function()
     , cachedInputValue    // Track value of input field that user focused on
   ;
 
-  setupMetadata();
-  setupUI();
-  setupShortcutEditor();
-  setupSettingsPanels();
-  refreshShortcuts();
+  init();
 
-  // Check if we opened the options page with a hash
-  var hash = window.location.hash;
-  if (hash) {
-    console.log('Hash:', hash);
-    if (hash == '#tipsLink') {  // If it is #tipsLink, trigger tips
-      $(hash).click();
-    }
-  }
-
-
-  //////////////////////////////////////////////////////////
-  // FUNCTIONS
-
-  // Setup metadata defaults
-  function setupMetadata()
+  function initialize()
   {
+    // Setup metadata defaults
     metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
     metadata[ATE_CONST.SHORTCUT_VERSION_KEY] = ATE_CONST.APP_VERSION;
+
+    // Setup UI
+    setupUI();
+    setupShortcutEditor();
+    setupSettingsPanels();
+
+    // Check if we opened the options page with a hash
+    var hash = window.location.hash;
+    if (hash) {
+      console.log('Hash:', hash);
+      if (hash == '#tipsLink') {  // If it is #tipsLink, trigger tips
+        $(hash).click();
+      }
+    }
+
+    // Reload shortcuts
+    refreshShortcuts();
   }
 
   // Set various dynamic UI fields: version, omnibar keyword, etc.
@@ -269,10 +269,10 @@ $(function()
     if (shortcutVersion && shortcutVersion != metadata[ATE_CONST.SHORTCUT_VERSION_KEY])
     {
       // Warn user that their shortcuts aren't synced yet, they should refresh
-      console.log(chrome.i18n.getMessage('WARNING_SHORTCUT_VERSION_MISMATCH'));
+      console.error(chrome.i18n.getMessage('WARNING_SHORTCUT_VERSION_MISMATCH'));
       alert(chrome.i18n.getMessage('WARNING_SHORTCUT_VERSION_MISMATCH'));
-      console.log('Database version:', shortcutVersion);
-      console.log('Extension version:', metadata[ATE_CONST.SHORTCUT_VERSION_KEY]);
+      console.error('Database version:', shortcutVersion);
+      console.error('Extension version:', metadata[ATE_CONST.SHORTCUT_VERSION_KEY]);
     }
   }
 
