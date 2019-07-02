@@ -15,6 +15,7 @@
     "scripts": [
       "scripts/constants.js",
       "scripts/background.js",
+      "scripts/backgroundMessages.js"
       "scripts/backgroundOmnibox.js"
     ]
   },

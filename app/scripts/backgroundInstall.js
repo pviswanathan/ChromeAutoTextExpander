@@ -4,37 +4,13 @@
 const MANIFEST = chrome.runtime.getManifest()     // Manifest reference
   , OLD_STORAGE_KEY = 'autoTextExpanderShortcuts' // For shortcut DB migration
   , OLD_SHORTCUT_VERSION_KEY = 'v'            // For shortcut DB migration
-  , TEST_OLD_APP_VERSION                      // For testing upgrades from older versions
 ;
+var oldAppVersion;                // For testing upgrades from older versions
 console.log('Initializing ATE v' + MANIFEST.version, chrome.i18n.getMessage('@@ui_locale'));
 
 
 //////////////////////////////////////////////////////////
 // ACTIONS
-
-// Listen for messages from the client side
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
-{
-  console.log(request);
-  console.log(sender);
-
-  switch (request.request)
-  {
-    case 'getClipboardData':
-      sendResponse({ paste:pasteFromClipboard() });
-      break;
-
-    // Set browser action badge text (up to 4 chars)
-    case 'setBadgeText':
-      chrome.browserAction.setBadgeText({text: request.text});
-      break;
-
-    default:
-      console.log('Unknown request received:', request);
-      break;
-  }
-});
-
 
 // On first install or upgrade, make sure to inject into all tabs
 chrome.runtime.onInstalled.addListener(function(details)
@@ -81,53 +57,45 @@ chrome.runtime.onInstalled.addListener(function(details)
         // chrome.tabs.create({url: 'options.html'});
       } else if (data[SHORTCUT_VERSION_KEY]
         && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
-          // If version is off, try to initiate upgrade
-          processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
-        }
-      });
-
-      // Run testing if need be
-      //runTests();
-    }
-  });
-
-  // If upgrade notification was clicked
-  chrome.notifications.onClicked.addListener(function (notificationID)
-  {
-    // Show options page -- since Chrome 40 update
-    chrome.runtime.openOptionsPage();
-    // openOrFocusOptionsPage('#tipsLink');
-  });
-
-  // Show options page when browser action is clicked
-  //  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
-  chrome.browserAction.onClicked.addListener(function(tab) {
-    chrome.runtime.openOptionsPage();
-    // openOrFocusOptionsPage();
-  });
-
-
-  //////////////////////////////////////////////////////////
-  // TESTING
-
-  function runTests()
-  {
-    /*
-    testVersionMismatch(function() {
-      // Do nothing
+        // If version is off, try to initiate upgrade
+        processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
+      }
     });
-    // */
-    /*
-    testV170Migration(function() {
-      processVersionUpgrade(TEST_OLD_APP_VERSION);
-    });
-    // */
-    /*
-    testDataLoss(function() {
-      // Do nothing
-    });
-    // */
+
+    // Run testing if need be
+    //runTests();
   }
+});
+
+// If upgrade notification was clicked
+chrome.notifications.onClicked.addListener(function (notificationID)
+{
+  // Show options page -- since Chrome 40 update
+  chrome.runtime.openOptionsPage();
+});
+
+
+//////////////////////////////////////////////////////////
+// TESTING
+
+function runTests()
+{
+  /*
+  testVersionMismatch(function() {
+    // Do nothing
+  });
+  // */
+  /*
+  testV170Migration(function() {
+    processVersionUpgrade(oldAppVersion);
+  });
+  // */
+  /*
+  testDataLoss(function() {
+    // Do nothing
+  });
+  // */
+}
 
 // Test shortcut database version mismatch
 function testVersionMismatch(completionBlock)
@@ -189,7 +157,7 @@ function testDataLoss(completionBlock)
 function testV120Migration(completionBlock)
 {
   console.log('testV120Migration');
-  TEST_OLD_APP_VERSION = '1.1.0';
+  oldAppVersion = '1.1.0';
 
   var shortcuts = {};
   shortcuts[OLD_STORAGE_KEY] = {
@@ -223,7 +191,7 @@ function testV120Migration(completionBlock)
 function testV170Migration(completionBlock)
 {
   console.log('testV170Migration');
-  TEST_OLD_APP_VERSION = '1.6.0';
+  oldAppVersion = '1.6.0';
 
   var shortcuts = {
     'd8 ' : 'it is %d(MMMM Do YYYY, h:mm:ss a) right now',
@@ -259,7 +227,7 @@ function testV170Migration(completionBlock)
 function testV171Migration(completionBlock)
 {
   console.log('testV171Migration');
-  TEST_OLD_APP_VERSION = '1.7.0';
+  oldAppVersion = '1.7.0';
 
   var shortcuts = {
     '@d8 ' : 'it is %d(MMMM Do YYYY, h:mm:ss a) right now',
@@ -313,51 +281,6 @@ function injectScript(tab)
       file: contentScripts[i]
     });
   }
-}
-
-// Get paste contents from clipboard
-function pasteFromClipboard()
-{
-  // Create element to paste content into
-  document.querySelector('body').innerHTML += '<textarea id="clipboard"></textarea>';
-  var clipboard = document.getElementById('clipboard');
-  clipboard.select();
-
-  // Execute paste
-  var result;
-  if (document.execCommand('paste', true)) {
-    result = clipboard.value;
-  }
-
-  // Cleanup and return value
-  clipboard.parentNode.removeChild(clipboard);
-  return result;
-}
-
-// Opens or focuses on the options page if open
-function openOrFocusOptionsPage(params)
-{
-  // Check params is valid string
-  if (!params) {
-    params = '';
-  }
-
-  // Get the url for the extension options page
-  var optionsUrl = chrome.extension.getURL('options.html');
-  chrome.tabs.query({ 'url': optionsUrl }, function(tabs)
-  {
-    if (tabs.length)    // If options tab is already open, focus on it
-    {
-      console.log('options page found:', tabs[0].id);
-      chrome.tabs.update(tabs[0].id, {
-        selected: true,
-        url: optionsUrl + params,
-      });
-    }
-    else {  // Open the options page otherwise
-      chrome.tabs.create({url: optionsUrl + params});
-    }
-  });
 }
 
 // Function for anything extra that needs doing related to new version upgrade
