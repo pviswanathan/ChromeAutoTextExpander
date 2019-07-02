@@ -7,12 +7,15 @@ node_js:  # note: node v12+ doesn't work with gulp 3
   - 8
   - 7
   - 6
+
 install:
   - npm install -g gulp-cli
   - npm install -g jest-cli
+
 before_script:
   — gulp —version
   — jest —version
   — npm test
+  
 script:
   - gulp build
