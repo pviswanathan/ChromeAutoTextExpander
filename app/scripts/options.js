@@ -38,7 +38,7 @@ var ateOptionsModule = (function($)
     , cachedInputValue    // Track value of input field that user focused on
   ;
 
-
+  // Initialize the options page
   function init()
   {
     // Setup metadata defaults
@@ -127,14 +127,14 @@ var ateOptionsModule = (function($)
       if (this.value == '') {
         this.value = DEFAULT_SHORTCUT_FILLER;
       } else if (cachedInputValue != this.value) {
-        saveShortcuts();
+        validateShortcuts(saveShortcuts);
       }
     });
     $('#edit').on('blur', 'textarea.autotext', function(event) {
       if (this.value == '') {
         this.value = DEFAULT_AUTOTEXT_FILLER;
       } else if (cachedInputValue != this.value) {
-        saveShortcuts();
+        validateShortcuts(saveShortcuts);
       }
     });
     $('#edit').on('click', '.remove', removeRow);
@@ -143,7 +143,7 @@ var ateOptionsModule = (function($)
     $('.saveButton')
       .html(chrome.i18n.getMessage('TITLE_SAVE_BUTTON'))
       .click(function(event) {
-        saveShortcuts();
+        validateShortcuts(saveShortcuts);
       });
     $('.refreshButton')
       .html(chrome.i18n.getMessage('TITLE_REFRESH_BUTTON'))
@@ -181,7 +181,7 @@ var ateOptionsModule = (function($)
       var timeout = $(this).val();
       metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY] = timeout;
       updateShortcutTimeoutLabel(timeout);
-      saveShortcuts();
+      validateShortcuts(saveShortcuts);
     });
     $('#timeoutSlider').on('mousemove', function(e)
     {
@@ -338,7 +338,7 @@ var ateOptionsModule = (function($)
               addRow('brb ', 'be right back');
 
               // Save
-              saveShortcuts();
+              validateShortcuts(saveShortcuts);
 
               // Set textarea height to fit content and resize as user types
               $('textarea').autosize();
@@ -488,7 +488,7 @@ var ateOptionsModule = (function($)
   }
 
   // Validate if row has valid shortcut info
-  function validateRow($input, callback)
+  function validateRow($input, completionBlock)
   {
     // Check for errors
     var errors = {};
@@ -514,16 +514,17 @@ var ateOptionsModule = (function($)
     }
 
     // Callback if given
-    if (callback) {
-      callback(errors);
+    if (completionBlock) {
+      completionBlock(errors);
     }
     return !errors.shortcut && !errors.autotext;
   }
 
-  // Save shortcuts to chrome sync data
-  function saveShortcuts(completionBlock)
+  // Check defined shortcuts to make sure they're okay to save/process
+  //  Returns object with all processed shortcuts & metadata for saving
+  function validateShortcuts(completionBlock)
   {
-    console.log('saveShortcuts');
+    console.log('checkShortcuts');
     var duplicates = [];
     var data = {};
 
@@ -573,6 +574,18 @@ var ateOptionsModule = (function($)
       return false;
     }
 
+    // Pass on data to completionBlock, or if no completionBlock, return
+    if (completionBlock) {
+      completionBlock(data);
+    }
+    return data;
+  }
+
+  // Save shortcuts to chrome sync data
+  function saveShortcuts(shortcuts, completionBlock)
+  {
+    console.log('saveShortcuts');
+
     // Clear old synced data
     chrome.storage.sync.clear(function()
     {
@@ -582,7 +595,7 @@ var ateOptionsModule = (function($)
       else	// Success! Old data cleared
       {
         // Save data into storage
-        chrome.storage.sync.set(data, function()
+        chrome.storage.sync.set(shortcuts, function()
         {
           if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError);
@@ -590,19 +603,19 @@ var ateOptionsModule = (function($)
           }
           else	// Success! Data saved
           {
-            console.log('saveShortcuts success:', data);
+            console.log('saveShortcuts success:', shortcuts);
 
             // Run through valid shortcuts and set them as saved
             $('tbody > tr').each(function(index)
             {
               var $row = $(this);
-              if (data[SHORTCUT_PREFIX + $row.find('.shortcut').val()]) {
+              if (shortcuts[ATE_CONST.SHORTCUT_PREFIX + $row.find('.shortcut').val()]) {
                 $row.addClass('saved');
               }
             });
 
             $('textarea').autosize();   // Set textarea height to fit content
-            refreshQuotaLabels(data);   // Update quota labels
+            refreshQuotaLabels(shortcuts);   // Update quota labels
 
             // Run completion block if exists
             if (completionBlock) {
@@ -961,7 +974,10 @@ var ateOptionsModule = (function($)
   return {
     init: init,
     showCrouton: showCrouton,
-    showCrouton: showModalPopup,
+    showModalPopup: showModalPopup,
+    validateShortcuts: validateShortcuts,
+    saveShortcuts: saveShortcuts,
+    refreshShortcuts: refreshShortcuts,
   };
 });
 
