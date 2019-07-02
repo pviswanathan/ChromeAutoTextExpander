@@ -19,7 +19,7 @@ chrome.omnibox.onInputStarted.addListener(function ()
     console.log('caching shortcuts...');
 
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     } else {
       shortcutCache = data;
     }

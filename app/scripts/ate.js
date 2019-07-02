@@ -136,7 +136,7 @@ jQuery.noConflict();
     {
       // Check for errors
       if (chrome.runtime.lastError) {
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
       }
       // Check that data is returned and shortcut library exists
       else if (data && Object.keys(data).length) {
@@ -181,7 +181,7 @@ jQuery.noConflict();
     {
       // Check for errors
       if (chrome.runtime.lastError) {
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
       }
       // Check that data is returned and shortcut exists
       else if (data && Object.keys(data).length)
@@ -198,7 +198,7 @@ jQuery.noConflict();
         {
           // Check for errors
           if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
+            console.error(chrome.runtime.lastError);
           }
           // Check that data is returned and shortcut exists
           else if (data && Object.keys(data).length)
@@ -1137,7 +1137,7 @@ jQuery.noConflict();
     {
       // Check for errors
       if (chrome.runtime.lastError) {
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
       }
       else if ((data && Object.keys(data).length)
         && data[SHORTCUT_VERSION_KEY] != APP_VERSION)   // If versions don't match up

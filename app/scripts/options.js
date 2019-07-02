@@ -78,7 +78,7 @@ $(function()
     $('#insertDateDemo').text((function(){
       var mo = moment();
       mo.locale(chrome.i18n.getMessage('@@ui_locale'));
-      return mo.format(DATE_MACRO_DEMO_FORMAT);  
+      return mo.format(DATE_MACRO_DEMO_FORMAT);
     })());
 
     // Settings
@@ -214,7 +214,7 @@ $(function()
     chrome.storage.sync.get(null, function(data)
     {
       if (chrome.runtime.lastError) {	// Check for errors
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
         showCrouton('Error retrieving shortcuts!', 'red');
         return;
       }
@@ -321,7 +321,7 @@ $(function()
           chrome.storage.local.get(APP_FIRST_RUN_KEY, function(firstRun)
           {
             if (chrome.runtime.lastError) {		// Check for errors
-              console.log(chrome.runtime.lastError);
+              console.error(chrome.runtime.lastError);
             }
             else if (!firstRun[APP_FIRST_RUN_KEY])		// First run
             {
@@ -577,7 +577,7 @@ $(function()
     chrome.storage.sync.clear(function()
     {
       if (chrome.runtime.lastError) {
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
       }
       else	// Success! Old data cleared
       {
@@ -585,7 +585,7 @@ $(function()
         chrome.storage.sync.set(data, function()
         {
           if (chrome.runtime.lastError) {
-            console.log(chrome.runtime.lastError);
+            console.error(chrome.runtime.lastError);
             showCrouton('Error saving shortcuts!', 'red');
           }
           else	// Success! Data saved
@@ -627,7 +627,7 @@ $(function()
           chrome.storage.sync.get(null, function(data)
           {
             if (chrome.runtime.lastError) {	// Check for errors
-              console.log(chrome.runtime.lastError);
+              console.error(chrome.runtime.lastError);
               showCrouton('Error retrieving shortcuts!', 'red');
             }
             else	// Save backup of shortcuts
@@ -638,7 +638,7 @@ $(function()
               chrome.storage.local.set(backup, function()
               {
                 if (chrome.runtime.lastError) {	// Check for errors
-                  console.log(chrome.runtime.lastError);
+                  console.error(chrome.runtime.lastError);
                   showCrouton(chrome.i18n.getMessage('ERROR_BACKUP_FAILED'), 'red');
                 }
                 else {	// Show success
@@ -659,7 +659,7 @@ $(function()
     chrome.storage.local.get(APP_BACKUP_TIMESTAMP_KEY, function(data)
     {
       if (chrome.runtime.lastError) {	// Check for errors
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
       }
       else if (data)	// Set date
       {
@@ -690,7 +690,7 @@ $(function()
     {
       if (chrome.runtime.lastError)	// Check for errors
       {
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
         showCrouton('Error retrieving backup!', 'red');
       }
       else {  // Pass data along
@@ -706,7 +706,7 @@ $(function()
     {
       if (chrome.runtime.lastError)	// Check for errors
       {
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
         showCrouton('Error retrieving backup!', 'red');
       }
       else {  // Pass data along
@@ -730,7 +730,7 @@ $(function()
           {
             if (chrome.runtime.lastError) 	// Check for errors
             {
-              console.log(chrome.runtime.lastError);
+              console.error(chrome.runtime.lastError);
               showCrouton(chrome.i18n.getMessage('ERROR_RESTORE_FAILED'), 'red');
             }
             else 	// Show success
@@ -776,7 +776,7 @@ $(function()
           {
             if (chrome.runtime.lastError) 	// Check for errors
             {
-              console.log(chrome.runtime.lastError);
+              console.error(chrome.runtime.lastError);
               showCrouton(chrome.i18n.getMessage('ERROR_RESTORE_FAILED'), 'red');
             }
             else 	// Show success
@@ -929,7 +929,7 @@ $(function()
     chrome.storage.sync.get(null, function(data)
     {
       if (chrome.runtime.lastError) {	// Check for errors
-        console.log(chrome.runtime.lastError);
+        console.error(chrome.runtime.lastError);
         showCrouton('Error retrieving shortcuts!', 'red');
       }
       else	// Parse json and show

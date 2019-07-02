@@ -74,7 +74,7 @@ function testVersionMismatch(completionBlock)
   chrome.storage.sync.get(null, function(data)
   {
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     }
     else
     {
@@ -83,7 +83,7 @@ function testVersionMismatch(completionBlock)
 
       chrome.storage.sync.set(data, function() {
         if (chrome.runtime.lastError) {	// Check for errors
-          console.log(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
         }
         else
         {
@@ -105,12 +105,12 @@ function testDataLoss(completionBlock)
   chrome.storage.sync.clear(function()
   {
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     } else {
       chrome.storage.local.remove([APP_BACKUP_KEY, APP_BACKUP_TIMESTAMP_KEY], function()
       {
         if (chrome.runtime.lastError) {	// Check for errors
-          console.log(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
         } else {
           console.log('test setup complete');
           if (completionBlock) {
@@ -138,11 +138,11 @@ function testV120Migration(completionBlock)
   chrome.storage.sync.clear(function()
   {
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     } else {
       chrome.storage.sync.set(shortcuts, function() {
         if (chrome.runtime.lastError) {	// Check for errors
-          console.log(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
         }
         else
         {
@@ -174,11 +174,11 @@ function testV170Migration(completionBlock)
   chrome.storage.sync.clear(function()
   {
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     } else {
       chrome.storage.sync.set(shortcuts, function() {
         if (chrome.runtime.lastError) {	// Check for errors
-          console.log(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
         }
         else
         {
@@ -212,11 +212,11 @@ function testV171Migration(completionBlock)
   chrome.storage.sync.clear(function()
   {
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     } else {
       chrome.storage.sync.set(shortcuts, function() {
         if (chrome.runtime.lastError) {	// Check for errors
-          console.log(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
         }
         else
         {
@@ -263,7 +263,7 @@ function checkShortcutsDatabase()
     console.log('checking shortcuts...');
 
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     } else if (!data || Object.keys(data).length == 0) {
       // If no shortcuts exist, show options page (should show emergency backup restore)
       chrome.runtime.openOptionsPage();
@@ -286,7 +286,6 @@ function processVersionUpgrade(oldVersion)
   makeEmergencyBackup(function()
   {
     var upgradeNotes = [];   // Upgrade version notes
-
     switch (oldVersion)
     {
       case '1.1.6':
@@ -302,13 +301,7 @@ function processVersionUpgrade(oldVersion)
       case '1.0.5':
       case '1.0.3':
       case '1.0.0':
-        upgradeShortcutsToV120([
-          upgradeShortcutsToV170,
-          upgradeShortcutsToV171,
-          upgradeShortcutsToLatest
-        ]);
-        break;
-
+        upgradeNotes.push({ title:'-', message:'New database storage format' });
       case '1.6.1':
       case '1.6.0':
       case '1.5.1':
@@ -322,69 +315,52 @@ function processVersionUpgrade(oldVersion)
       case '1.2.5':
       case '1.2.2':
       case '1.2.0':
-        upgradeShortcutsToV170([
-          upgradeShortcutsToV171,
-          upgradeShortcutsToLatest
-        ]);
-        break;
-
+        upgradeNotes.push({title:'-', message:'New database storage format'});
       case '1.7.0':
-        upgradeShortcutsToV171([
-          upgradeShortcutsToLatest
-        ]);
-        break;
-
+        upgradeNotes.push({title:'-', message:'New database storage format'});
       case '1.8.0':
-        upgradeNotes.push({ title:'-', message:'Added support for Google Inbox' });
-        upgradeNotes.push({ title:'-', message:'Added support for Google Translate' });
-        upgradeNotes.push({ title:'-', message:'Added support for MailChimp' });
-        upgradeNotes.push({ title:'-', message:'Added support for Confluence' });
-
+        upgradeNotes.push({title:'-', message:'Added support for Google Inbox'});
+        upgradeNotes.push({title:'-', message:'Added support for Google Translate'});
+        upgradeNotes.push({title:'-', message:'Added support for MailChimp'});
+        upgradeNotes.push({title:'-', message:'Added support for Confluence'});
       case '1.8.1':
-        upgradeNotes.push({ title:'-', message:'Fix for Salesforce support' });
-        upgradeNotes.push({ title:'-', message:'Add new Textarea for demoing' });
-        upgradeNotes.push({ title:'-', message:'Slight optimizations' });
-
+        upgradeNotes.push({title:'-', message:'Fix for Salesforce support'});
+        upgradeNotes.push({title:'-', message:'Add new Textarea for demoing'});
+        upgradeNotes.push({title:'-', message:'Slight optimizations'});
       case '1.8.2':
       case '1.8.3':
-        upgradeNotes.push({ title:'-', message:'Change sync error popups to banners' });
-        upgradeNotes.push({ title:'-', message:'Fix handling of trailing spaces' });
-        upgradeNotes.push({ title:'-', message:'Add auto-capitalization/-all-caps' });
-        upgradeNotes.push({ title:'-', message:'Updating banners to be dismissable' });
-
+        upgradeNotes.push({title:'-', message:'Change sync error popups to banners'});
+        upgradeNotes.push({title:'-', message:'Fix handling of trailing spaces'});
+        upgradeNotes.push({title:'-', message:'Add auto-capitalization/-all-caps'});
+        upgradeNotes.push({title:'-', message:'Updating banners to be dismissable'});
       case '1.8.4':
-        upgradeNotes.push({ title:'-', message:'Fix Inbox support' });
-        upgradeNotes.push({ title:'-', message:'Raise shortcut detection limit to 10s' });
-        upgradeNotes.push({ title:'-', message:'Fix for @ shortcut prefix issue' });
-
+        upgradeNotes.push({title:'-', message:'Fix Inbox support'});
+        upgradeNotes.push({title:'-', message:'Raise shortcut detection limit to 10s'});
+        upgradeNotes.push({title:'-', message:'Fix for @ shortcut prefix issue'});
       case '1.8.5':
-        upgradeNotes.push({ title:'-', message:'Add omnibox (url bar!) support' });
-        upgradeNotes.push({ title:'-', message:'Allow consecutive shortcuts to fire' });
-        upgradeNotes.push({ title:'-', message:'Add support for O365 OWA' });
-        upgradeNotes.push({ title:'-', message:'Add support for G+ communities' });
-
+        upgradeNotes.push({title:'-', message:'Add omnibox (url bar!) support'});
+        upgradeNotes.push({title:'-', message:'Allow consecutive shortcuts to fire'});
+        upgradeNotes.push({title:'-', message:'Add support for O365 OWA'});
+        upgradeNotes.push({title:'-', message:'Add support for G+ communities'});
       case '1.9.0':
-        upgradeNotes.push({ title:'-', message:'Fix for O365 OWA' });
-
+        upgradeNotes.push({title:'-', message:'Fix for O365 OWA'});
       case '1.9.1':
-        upgradeNotes.push({ title:'-', message:'Fix for Zendesk Inbox' });
-
+        upgradeNotes.push({title:'-', message:'Fix for Zendesk Inbox'});
       case '1.9.2':
-        upgradeNotes.push({ title:'-', message:'Fix for Zendesk.com' });
-
+        upgradeNotes.push({title:'-', message:'Fix for Zendesk.com'});
       case '1.9.3':
-        upgradeNotes.push({ title:'-', message:'Support for Salesforce.com CKEditor' });
-
+        upgradeNotes.push({title:'-', message:'Support for Salesforce.com CKEditor'});
       case '1.9.5':
-        upgradeNotes.push({ title:'-', message:'Support for Hangouts and more!' });
-        upgradeNotes.push({ title:'-', message:'New options UI' });
-        upgradeNotes.push({ title:'-', message:'Toggle on/off from icon' });
+        upgradeNotes.push({title:'-', message:'Support for Hangouts, Facebook'});
+        upgradeNotes.push({title:'-', message:'Toggle on/off from icon'});
 
         // Upgrade database to latest version and supply version notes
         upgradeShortcutsToLatest(upgradeNotes);
         break;
 
-      default: break;
+      default:
+        console.log('unexpected version number:', oldVersion);
+        break;
     }
   });
 }
@@ -396,8 +372,8 @@ function makeEmergencyBackup(completionBlock)
   {
     if (chrome.runtime.lastError) 	 // Check for errors
     {
-      console.log('SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE');
-      console.log(chrome.runtime.lastError);
+      console.error('SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE');
+      console.error(chrome.runtime.lastError);
     }
     else   // Store backup into emergency local storage
     {
@@ -407,8 +383,8 @@ function makeEmergencyBackup(completionBlock)
       chrome.storage.local.set(backup, function() {
         if (chrome.runtime.lastError) 	// Check for errors
         {
-          console.log('SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE');
-          console.log(chrome.runtime.lastError);
+          console.error('SERIOUS ERROR: COULD NOT MAKE EMERGENCY BACKUP BEFORE UPGRADE');
+          console.error(chrome.runtime.lastError);
         }
         else 	// Backup success
         {
@@ -429,16 +405,16 @@ function restoreEmergencyBackup(completionBlock)
   {
     if (chrome.runtime.lastError) 	 // Check for errors
     {
-      console.log('SERIOUS ERROR: COULD NOT GET EMERGENCY BACKUP');
-      console.log(chrome.runtime.lastError);
+      console.error('SERIOUS ERROR: COULD NOT GET EMERGENCY BACKUP');
+      console.error(chrome.runtime.lastError);
     }
     else   // Restore backup to synced storage
     {
       chrome.storage.sync.set(data[APP_EMERGENCY_BACKUP_KEY], function() {
         if (chrome.runtime.lastError) 	// Check for errors
         {
-          console.log('SERIOUS ERROR: COULD NOT RESTORE EMERGENCY BACKUP');
-          console.log(chrome.runtime.lastError);
+          console.error('SERIOUS ERROR: COULD NOT RESTORE EMERGENCY BACKUP');
+          console.error(chrome.runtime.lastError);
         }
         else 	// Restore success
         {
@@ -452,187 +428,6 @@ function restoreEmergencyBackup(completionBlock)
   });
 }
 
-// Migration of shortcuts to v1.2.0 format
-function upgradeShortcutsToV120(completionBlocks)
-{
-  console.log('upgradeShortcutsToV120');
-
-  // If old database still exists, port old shortcuts over to new shortcut syntax
-  chrome.storage.sync.get(OLD_STORAGE_KEY, function(data)
-  {
-    if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
-    }
-    else if (data && data[OLD_STORAGE_KEY])
-    {
-      // Loop through and move them to object to store
-      var newDataStore = {};
-      var oldDataStore = data[OLD_STORAGE_KEY];
-      for (var key in oldDataStore) {
-        if (oldDataStore.hasOwnProperty(key)) {
-          var value = oldDataStore[key];
-          console.log('migrating:', key, '=>', value);
-          newDataStore[key] = value;
-        }
-      }
-
-      // Delete old data, add new data
-      chrome.storage.sync.remove(OLD_STORAGE_KEY, function()
-      {
-        if (chrome.runtime.lastError) 	// Check for errors
-        {
-          console.log(chrome.runtime.lastError);
-          restoreEmergencyBackup();
-        }
-        else {
-          chrome.storage.sync.set(newDataStore, function()
-          {
-            if (chrome.runtime.lastError) 	// Check for errors
-            {
-              console.log(chrome.runtime.lastError);
-              restoreEmergencyBackup();
-            }
-            else	// Done with porting
-            {
-              // Send notification
-              chrome.notifications.create('', {
-                type: 'basic'
-                , iconUrl: 'images/icon128.png'
-                , title: 'Database Update v1.2.0'
-                , message: 'Your shortcuts have been ported to a new storage system for better reliability and larger text capacity! Please check that your shortcuts and expansions are correct.'
-                , isClickable: true
-              }, function(id) {});
-
-              // Call first completion block, and pass the rest on
-              if (completionBlocks && completionBlocks.length)
-              {
-                var block = completionBlocks.shift();
-                block(completionBlocks);
-              }
-            }
-          });
-        }
-      });
-    }
-    else    // Call first completion block, and pass the rest on
-    {
-      if (completionBlocks && completionBlocks.length)
-      {
-        var block = completionBlocks.shift();
-        block(completionBlocks);
-      }
-    }
-  });
-}
-
-// Migration of shortcuts to v1.7.0 format
-function upgradeShortcutsToV170(completionBlocks)
-{
-  console.log('upgradeShortcutsToV170');
-
-  // Add shortcut prefix to shortcuts -- we assume that shortcuts are in
-  //  post-v1.2.0 format and they haven't been upgraded / prefixed yet
-  chrome.storage.sync.get(null, function(data)
-  {
-    if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
-    }
-
-    // Loop through and apply prefix to all keys
-    var newDataStore = {};
-    for (var key in data) {
-      if (data.hasOwnProperty(key)) {
-        console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
-        newDataStore[SHORTCUT_PREFIX + key] = data[key];
-      }
-    }
-
-    // Add metadata for shortcut version (using new key actually)
-    newDataStore[SHORTCUT_VERSION_KEY] = '1.7.0';
-
-    // Delete old data, replace with new data
-    chrome.storage.sync.clear(function() {
-      if (chrome.runtime.lastError) { 	// Check for errors
-        console.log(chrome.runtime.lastError);
-      } else {
-        chrome.storage.sync.set(newDataStore, function() {
-          if (chrome.runtime.lastError) 	// Check for errors
-          {
-            console.log(chrome.runtime.lastError);
-            restoreEmergencyBackup();
-          }
-          else	// Done with migration
-          {
-            // Send notification
-            chrome.notifications.create('', {
-              type: 'basic'
-              , iconUrl: 'images/icon128.png'
-              , title: 'Database Update v1.7.0'
-              , message: 'Your shortcuts have been migrated to a new storage format! Please check that your shortcuts and expansions are correct.'
-              , isClickable: true
-            }, function(id) {});
-
-            // Call first completion block, and pass the rest on
-            if (completionBlocks && completionBlocks.length)
-            {
-              var block = completionBlocks.shift();
-              block(completionBlocks);
-            }
-          }
-        });
-      }
-    });
-  });
-
-}
-
-// Moves version shortcut to new format to avoid accientally tripping it
-function upgradeShortcutsToV171(completionBlocks)
-{
-  console.log('upgradeShortcutsToV171');
-
-  // Upgrade shortcut database version
-  chrome.storage.sync.get(null, function(data)
-  {
-    if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
-    }
-    else if (data && Object.keys(data).length) // Check that data is returned
-    {
-      console.log('updating database version to', MANIFEST.version);
-
-      // Update metadata for shortcut version to manifest version
-      delete data[OLD_SHORTCUT_VERSION_KEY];
-      data[SHORTCUT_VERSION_KEY] = MANIFEST.version;
-
-      // Delete old data, replace with new data
-      chrome.storage.sync.clear(function() {
-        if (chrome.runtime.lastError) { 	// Check for errors
-          console.log(chrome.runtime.lastError);
-        } else {
-          chrome.storage.sync.set(data, function() {
-            if (chrome.runtime.lastError) 	// Check for errors
-            {
-              console.log(chrome.runtime.lastError);
-              restoreEmergencyBackup();
-            }
-            else	// Done with migration
-            {
-              // Call first completion block, and pass the rest on
-              if (completionBlocks && completionBlocks.length)
-              {
-                var block = completionBlocks.shift();
-                block(completionBlocks);
-              }
-            }
-          });
-        }
-      });
-    }
-  });
-}
-
-
 // Updates the shortcut database with the latest version number, and support an optional message
 function upgradeShortcutsToLatest(upgradeNotesList)
 {
@@ -642,7 +437,7 @@ function upgradeShortcutsToLatest(upgradeNotesList)
   chrome.storage.sync.get(null, function(data)
   {
     if (chrome.runtime.lastError) {	// Check for errors
-      console.log(chrome.runtime.lastError);
+      console.error(chrome.runtime.lastError);
     }
     else if (data && Object.keys(data).length) // Check that data is returned
     {
@@ -654,12 +449,12 @@ function upgradeShortcutsToLatest(upgradeNotesList)
       // Delete old data, replace with new data
       chrome.storage.sync.clear(function() {
         if (chrome.runtime.lastError) { 	// Check for errors
-          console.log(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
         } else {
           chrome.storage.sync.set(data, function() {
             if (chrome.runtime.lastError) 	// Check for errors
             {
-              console.log(chrome.runtime.lastError);
+              console.error(chrome.runtime.lastError);
               restoreEmergencyBackup();
             }
             else	// Done with migration
