@@ -28,16 +28,22 @@ var html = fs.readFileSync('./app/options.html').toString();
 describe('options.js', function() {
   document.documentElement.innerHTML = html;
 
-  test('jquery init', function() {
-    expect(typeof window.jQuery).toBe('function');
+  test('jquery init', function(done) {
+    setTimeout(function() {
+      expect(typeof document.defaultView.jQuery).toBe('function');
+      done();
+    }, 3000);
   });
 
   test('moment init', function() {
-    expect(typeof window.moment).toBe('function');
+    setTimeout(function() {
+      expect(typeof document.defaultView.moment).toBe('function');
+      done();
+    }, 3000);
   });
 
   test('constants init', function() {
-    expect(APP_ID_PRODUCTION).toBe('iibninhmiggehlcdolcilmhacighjamp');
+    expect(document.defaultView.APP_ID_PRODUCTION).toBe('iibninhmiggehlcdolcilmhacighjamp');
   });
 
   // test('add a shortcut', function() {

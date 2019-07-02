@@ -324,7 +324,7 @@ $(function()
               addRow('sign@', '<strong>. Carlin</strong>\nChrome Extension Developer\n<a href="mailto:email.me@carlinyuen.com">email.me@carlinyuen.com</a>');
               addRow('hbd', 'Hey! Just wanted to wish you a happy birthday; hope you had a good one!');
               addRow('d8', 'it is %d(MMMM Do YYYY, h:mm:ss a) right now');
-              addRow('e@', 'email.me@carlinyuen.com');
+              addRow('e@', 'your.email@gmail.com');
               addRow('brb ', 'be right back');
 
               // Save

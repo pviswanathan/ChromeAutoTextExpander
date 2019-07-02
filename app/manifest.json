@@ -15,7 +15,8 @@
     "scripts": [
       "scripts/chromereload.js",
       "scripts/constants.js",
-      "scripts/background.js"
+      "scripts/background.js",
+      "scripts/backgroundOmnibox.js"
     ]
   },
   "permissions": [
