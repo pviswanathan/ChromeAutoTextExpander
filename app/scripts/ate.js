@@ -1,9 +1,9 @@
-// Prevent conflicts
-jQuery.noConflict();
+// Prevent conflicts with other libraries, including other jQuery versions
+var ateJQ = jQuery.noConflict(true);
 
-// Encapsulated anonymous function
-(function($) {
-
+// AutoTextExpander module, passed jQuery object by doc ready
+var ateModule = (function($)
+{
   // Variables & Constants
   var KEYCODE_BACKSPACE = 8
     , KEYCODE_TAB = 9
@@ -60,14 +60,22 @@ jQuery.noConflict();
     , SELECTOR_CKE_EDIT = 'iframe.cke_wysiwyg_frame'  // CKEditor
   ;
 
-  var typingBuffer = [];		// Keep track of what's been typed before timeout
-  var typingTimer;			// Keep track of time between keypresses
-  var typingTimeout;		 	// Delay before we clear buffer
-  var keyPressEvent;			// Keep track of keypress event to prevent re-firing
-  var keyUpEvent;				// Keep track of keyup event to prevent re-firing
-  var clipboard;				// Keep track of what's in the clipboard
-  var disableShortcuts;       // Flag to disable shortcuts in case of unreliable state
+  var typingBuffer = [];  // Keep track of what's been typed before timeout
+    , typingTimer;        // Keep track of time between keypresses
+    ,  typingTimeout;     // Delay before we clear buffer
+    ,  keyPressEvent;     // Keep track of keypress event to prevent re-firing
+    ,  keyUpEvent;        // Keep track of keyup event to prevent re-firing
+    ,  clipboard;         // Keep track of what's in the clipboard
+    ,  disableShortcuts   // Flag to disable shortcuts in unreliable state
+  ;
 
+  // Initialize module
+  function init()
+  {
+    checkShortcutVersion(); // Check version of shortcuts database
+    updateBufferTimeout();  // Get custom timeout for clearing typing buffer
+    addListeners();         // Add listener to track when user types
+	}
 
   // When user presses a key
   function keyPressHandler(event)
@@ -1204,12 +1212,16 @@ jQuery.noConflict();
     }
   }
 
-  // Document ready function
-  $(function()
-  {
-    checkShortcutVersion(); // Check version of shortcuts database
-    updateBufferTimeout();  // Get custom timeout for clearing typing buffer
-    addListeners();         // Add listener to track when user types
-	});
+  return {
+    init: init,
+    checkShortcutVersion: checkShortcutVersion,
+    removeListeners: removeListeners,
+    addListeners: addListeners,
+    refreshListenersOnContainer: refreshListenersOnContainer,
+    refreshListenersOnElement: refreshListenersOnElement,
+    checkShortcuts: checkShortcuts,
+  };
+})(ateJQ);
 
-})(jQuery);
+// Document ready
+$(ateModule.init);

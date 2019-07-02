@@ -979,7 +979,7 @@ var ateOptionsModule = (function($)
     saveShortcuts: saveShortcuts,
     refreshShortcuts: refreshShortcuts,
   };
-});
+})(jQuery);
 
 // Document ready
 $(ateOptionsModule.init);
