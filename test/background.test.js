@@ -52,4 +52,61 @@ describe('background.js', function() {
     });
   });
 
+
+  // // Test shortcut database version mismatch
+  // function testVersionMismatch(completionBlock)
+  // {
+  //   console.log('testVersionMismatch');
+  //
+  //   chrome.storage.sync.get(null, function(data)
+  //   {
+  //     if (chrome.runtime.lastError) {	// Check for errors
+  //       console.error(chrome.runtime.lastError);
+  //     }
+  //     else
+  //     {
+  //       // Set an older shortcut version and store it back
+  //       data[SHORTCUT_VERSION_KEY] = '1.7.0';
+  //
+  //       chrome.storage.sync.set(data, function() {
+  //         if (chrome.runtime.lastError) {	// Check for errors
+  //           console.error(chrome.runtime.lastError);
+  //         }
+  //         else
+  //         {
+  //           console.log('test setup complete');
+  //           if (completionBlock) {
+  //             completionBlock();
+  //           }
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
+  //
+  // // Test shortcut database loss
+  // function testDataLoss(completionBlock)
+  // {
+  //   console.log('testDataLoss');
+  //
+  //   chrome.storage.sync.clear(function()
+  //   {
+  //     if (chrome.runtime.lastError) {	// Check for errors
+  //       console.error(chrome.runtime.lastError);
+  //     } else {
+  //       chrome.storage.local.remove([APP_BACKUP_KEY, APP_BACKUP_TIMESTAMP_KEY], function()
+  //       {
+  //         if (chrome.runtime.lastError) {	// Check for errors
+  //           console.error(chrome.runtime.lastError);
+  //         } else {
+  //           console.log('test setup complete');
+  //           if (completionBlock) {
+  //             completionBlock();
+  //           }
+  //         }
+  //       });
+  //     }
+  //   });
+  // }
+
 });
