@@ -22,7 +22,7 @@ jQuery.noConflict();
     , ENUM_CAPITALIZATION_ALL = 2
 
     , DATE_MACRO_REGEX = new RegExp(INSERT_DATE_TAG, 'g')
-    , CLIP_MACRO_REGEX = new RegExp(CLIPBOARD_PASTE_TAG, 'g')
+    , CLIP_MACRO_REGEX = new RegExp(INSERT_CLIPBOARD_TAG, 'g')
     , URL_MACRO_REGEX = new RegExp(INSERT_URL_TAG, 'g')
     , WHITESPACE_REGEX = /(\s)/
 
@@ -132,7 +132,7 @@ jQuery.noConflict();
   // Updates buffer clear timeout from custom value
   function updateBufferTimeout()
   {
-    chrome.storage.sync.get(SHORTCUT_TIMEOUT_KEY, function (data)
+    chrome.storage.sync.get(ATE_CONST.SHORTCUT_TIMEOUT_KEY, function (data)
     {
       // Check for errors
       if (chrome.runtime.lastError) {
@@ -140,7 +140,7 @@ jQuery.noConflict();
       }
       // Check that data is returned and shortcut library exists
       else if (data && Object.keys(data).length) {
-        typingTimeout = data[SHORTCUT_TIMEOUT_KEY];
+        typingTimeout = data[ATE_CONST.SHORTCUT_TIMEOUT_KEY];
       } else {  // Use default value on error / no custom value set
         typingTimeout = DEFAULT_CLEAR_BUFFER_TIMEOUT;
       }
@@ -173,8 +173,8 @@ jQuery.noConflict();
     console.log('checkShortcuts:', lastChar, shortcut);
 
     var isAllCaps = (shortcut == shortcut.toUpperCase());   // Check for all caps
-    var shortcutKey = SHORTCUT_PREFIX + shortcut;           // Key for expansion
-    var shortcutKeyLowercase = SHORTCUT_PREFIX + shortcut.toLowerCase(); // For auto-capitalization
+    var shortcutKey = ATE_CONST.SHORTCUT_PREFIX + shortcut;           // Key for expansion
+    var shortcutKeyLowercase = ATE_CONST.SHORTCUT_PREFIX + shortcut.toLowerCase(); // For auto-capitalization
 
     // Get shortcuts
     chrome.storage.sync.get(shortcutKey, function (data)
@@ -505,7 +505,7 @@ jQuery.noConflict();
     // {
     //   console.log(tempNode.nodeType, tempNode);
     //   if (tempNode.nodeType === Node.COMMENT_NODE
-    //     && tempNode.nodeValue == CURSOR_TRACKING_TAG) {
+    //     && tempNode.nodeValue == ATE_CONST.CURSOR_TRACKING_TAG) {
     //     cursorNode = tempNode;
     //   }
     // }
@@ -601,7 +601,7 @@ jQuery.noConflict();
     {
       console.log(tempNode.nodeType, tempNode);
       if (tempNode.nodeType === Node.COMMENT_NODE
-        && tempNode.nodeValue == CURSOR_TRACKING_TAG) {
+        && tempNode.nodeValue == ATE_CONST.CURSOR_TRACKING_TAG) {
         cursorNode = tempNode;
       }
     }
@@ -637,8 +637,8 @@ jQuery.noConflict();
     console.log('expandedText:', autotext);
 
     // If autotext expansion already has cursor tag in it, don't insert
-    var cursorTag = (autotext.indexOf(CURSOR_TRACKING_HTML) >= 0)
-      ? '' : CURSOR_TRACKING_HTML;
+    var cursorTag = (autotext.indexOf(ATE_CONST.CURSOR_TRACKING_HTML) >= 0)
+      ? '' : ATE_CONST.CURSOR_TRACKING_HTML;
 
     // Replace shortcut based off cursorPosition,
     //  insert tracking tag for cursor if it isn't already defined in autotext
@@ -896,7 +896,7 @@ jQuery.noConflict();
     // Find matching closing tag for each date
     for (var i = 0, len = dateOpenTags.length; i < len; ++i) {
       dateCloseTags[i] = text.indexOf(
-        INSERT_DATE_CLOSE_TAG, dateOpenTags[i] + 1);
+        ATE_CONST.INSERT_DATE_CLOSE_TAG, dateOpenTags[i] + 1);
     }
 
     // Only continue if we have matching tags
@@ -1133,21 +1133,21 @@ jQuery.noConflict();
   // Check shortcut database version matches app version
   function checkShortcutVersion()
   {
-    chrome.storage.sync.get(SHORTCUT_VERSION_KEY, function (data)
+    chrome.storage.sync.get(ATE_CONST.SHORTCUT_VERSION_KEY, function (data)
     {
       // Check for errors
       if (chrome.runtime.lastError) {
         console.error(chrome.runtime.lastError);
       }
       else if ((data && Object.keys(data).length)
-        && data[SHORTCUT_VERSION_KEY] != APP_VERSION)   // If versions don't match up
+        && data[ATE_CONST.SHORTCUT_VERSION_KEY] != ATE_CONST.APP_VERSION)   // If versions don't match up
       {
         // Alert users that shortcuts aren't synced yet, they should reload
         var warning = chrome.i18n.getMessage('WARNING_SHORTCUT_VERSION_MISMATCH')
           + '\n\n' + chrome.i18n.getMessage('WARNING_SHORTCUT_DISABLED');
         console.log(warning);
-        console.log('Database version:', data[SHORTCUT_VERSION_KEY]);
-        console.log('Extension version:', APP_VERSION);
+        console.log('Database version:', data[ATE_CONST.SHORTCUT_VERSION_KEY]);
+        console.log('Extension version:', ATE_CONST.APP_VERSION);
         if (!disableShortcuts) {
           showCrouton(warning);
         }

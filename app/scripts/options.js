@@ -4,7 +4,7 @@
 $(function()
 {
   // Constants
-  var APP_FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
+  var FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
     , DATE_MACRO_DEMO_FORMAT = 'MMMM Do YYYY'
 
     , DEFAULT_SHORTCUT_FILLER = 'Shortcut'
@@ -59,8 +59,8 @@ $(function()
   // Setup metadata defaults
   function setupMetadata()
   {
-    metadata[SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
-    metadata[SHORTCUT_VERSION_KEY] = APP_VERSION;
+    metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
+    metadata[ATE_CONST.SHORTCUT_VERSION_KEY] = ATE_CONST.APP_VERSION;
   }
 
   // Set various dynamic UI fields: version, omnibar keyword, etc.
@@ -68,13 +68,13 @@ $(function()
   {
     // Tips
     $('#tipsList').html(chrome.i18n.getMessage('TEXT_TIPS_LIST'));
-    $('#versionHistory').text('v' + APP_VERSION);
+    $('#versionHistory').text('v' + ATE_CONST.APP_VERSION);
     $('#omniboxKeyword').text(chrome.i18n.getMessage('KEYWORD_OMNIBAR_TRIGGER'));
-    $('#cursorTag').text(CURSOR_TRACKING_HTML);
-    $('#clipboardTag').text(CLIPBOARD_PASTE_TAG);
-    $('#insertUrlTag').text(INSERT_URL_TAG);
-    $('#insertDateTag').text(INSERT_DATE_TAG + 'dateformat' + INSERT_DATE_CLOSE_TAG);
-    $('#insertDateFormat').text(INSERT_DATE_TAG + DATE_MACRO_DEMO_FORMAT + INSERT_DATE_CLOSE_TAG);
+    $('#cursorTag').text(ATE_CONST.CURSOR_TRACKING_HTML);
+    $('#clipboardTag').text(ATE_CONST.INSERT_CLIPBOARD_TAG);
+    $('#insertUrlTag').text(ATE_CONST.INSERT_URL_TAG);
+    $('#insertDateTag').text(ATE_CONST.INSERT_DATE_TAG + 'dateformat' + ATE_CONST.INSERT_DATE_CLOSE_TAG);
+    $('#insertDateFormat').text(ATE_CONST.INSERT_DATE_TAG + DATE_MACRO_DEMO_FORMAT + ATE_CONST.INSERT_DATE_CLOSE_TAG);
     $('#insertDateDemo').text((function(){
       var mo = moment();
       mo.locale(chrome.i18n.getMessage('@@ui_locale'));
@@ -179,14 +179,14 @@ $(function()
     $('#timeoutSlider').on('change', function(e)
     {
       var timeout = $(this).val();
-      metadata[SHORTCUT_TIMEOUT_KEY] = timeout;
+      metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY] = timeout;
       updateShortcutTimeoutLabel(timeout);
       saveShortcuts();
     });
     $('#timeoutSlider').on('mousemove', function(e)
     {
       var timeout = $(this).val();
-      metadata[SHORTCUT_TIMEOUT_KEY] = timeout;
+      metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY] = timeout;
       updateShortcutTimeoutLabel(timeout);
     });
 
@@ -253,26 +253,26 @@ $(function()
     console.log('processMetadata');
 
     // Check for shortcut timeout
-    var shortcutTimeout = data[SHORTCUT_TIMEOUT_KEY];
+    var shortcutTimeout = data[ATE_CONST.SHORTCUT_TIMEOUT_KEY];
     if (shortcutTimeout) {  // If exists, replace metadata
-      metadata[SHORTCUT_TIMEOUT_KEY] = shortcutTimeout;
+      metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY] = shortcutTimeout;
     } else {    // Otherwise, use metadata default value
-      shortcutTimeout = metadata[SHORTCUT_TIMEOUT_KEY];
+      shortcutTimeout = metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY];
     }
     updateShortcutTimeoutLabel(shortcutTimeout);
     $('#timeoutSlider').val(shortcutTimeout);
     console.log('shortcutTimeout:', shortcutTimeout);
 
     // Check that the shortcut database version matches app version
-    var shortcutVersion = data[SHORTCUT_VERSION_KEY];
+    var shortcutVersion = data[ATE_CONST.SHORTCUT_VERSION_KEY];
     console.log('database version:', shortcutVersion);
-    if (shortcutVersion && shortcutVersion != metadata[SHORTCUT_VERSION_KEY])
+    if (shortcutVersion && shortcutVersion != metadata[ATE_CONST.SHORTCUT_VERSION_KEY])
     {
       // Warn user that their shortcuts aren't synced yet, they should refresh
       console.log(chrome.i18n.getMessage('WARNING_SHORTCUT_VERSION_MISMATCH'));
       alert(chrome.i18n.getMessage('WARNING_SHORTCUT_VERSION_MISMATCH'));
       console.log('Database version:', shortcutVersion);
-      console.log('Extension version:', metadata[SHORTCUT_VERSION_KEY]);
+      console.log('Extension version:', metadata[ATE_CONST.SHORTCUT_VERSION_KEY]);
     }
   }
 
@@ -299,9 +299,9 @@ $(function()
           $.each(keys, function(index, key)
           {
             // Only apply shortcuts
-            if (key.indexOf(SHORTCUT_PREFIX) === 0)
+            if (key.indexOf(ATE_CONST.SHORTCUT_PREFIX) === 0)
             {
-              var shortcut = key.substr(SHORTCUT_PREFIX.length);
+              var shortcut = key.substr(ATE_CONST.SHORTCUT_PREFIX.length);
               if (!addRow(shortcut, data[key]))
               {
                 errors = true;
@@ -318,15 +318,15 @@ $(function()
         }
         else	// No shortcuts? Check if first run on this computer
         {
-          chrome.storage.local.get(APP_FIRST_RUN_KEY, function(firstRun)
+          chrome.storage.local.get(FIRST_RUN_KEY, function(firstRun)
           {
             if (chrome.runtime.lastError) {		// Check for errors
               console.error(chrome.runtime.lastError);
             }
-            else if (!firstRun[APP_FIRST_RUN_KEY])		// First run
+            else if (!firstRun[FIRST_RUN_KEY])		// First run
             {
               // Flag first run
-              firstRun[APP_FIRST_RUN_KEY] = true;
+              firstRun[FIRST_RUN_KEY] = true;
               chrome.storage.local.set(firstRun);
 
               // Example shortcuts
@@ -633,8 +633,8 @@ $(function()
             else	// Save backup of shortcuts
             {
               var backup = {};
-              backup[APP_BACKUP_KEY] = data;
-              backup[APP_BACKUP_TIMESTAMP_KEY] = new Date().getTime();
+              backup[ATE_CONST.APP_BACKUP_KEY] = data;
+              backup[ATE_CONST.APP_BACKUP_TIMESTAMP_KEY] = new Date().getTime();
               chrome.storage.local.set(backup, function()
               {
                 if (chrome.runtime.lastError) {	// Check for errors
@@ -656,14 +656,14 @@ $(function()
   // Update backup timestamp time
   function updateBackupTimestamp()
   {
-    chrome.storage.local.get(APP_BACKUP_TIMESTAMP_KEY, function(data)
+    chrome.storage.local.get(ATE_CONST.APP_BACKUP_TIMESTAMP_KEY, function(data)
     {
       if (chrome.runtime.lastError) {	// Check for errors
         console.error(chrome.runtime.lastError);
       }
       else if (data)	// Set date
       {
-        var timestamp = data[APP_BACKUP_TIMESTAMP_KEY];
+        var timestamp = data[ATE_CONST.APP_BACKUP_TIMESTAMP_KEY];
         if (timestamp) {
           var date = new Date(timestamp).toLocaleString();
           console.log('Last local backup date: ' + date);
@@ -686,7 +686,7 @@ $(function()
   // Get local backup, completionBlock parameter is required and should take an object
   function getLocalBackup(completionBlock)
   {
-    chrome.storage.local.get(APP_BACKUP_KEY, function(data)
+    chrome.storage.local.get(ATE_CONST.APP_BACKUP_KEY, function(data)
     {
       if (chrome.runtime.lastError)	// Check for errors
       {
@@ -702,7 +702,7 @@ $(function()
   // Get emergency local backup, completionBlock parameter required and should take an object
   function getEmergencyBackup(completionBlock)
   {
-    chrome.storage.local.get(APP_EMERGENCY_BACKUP_KEY, function(data)
+    chrome.storage.local.get(ATE_CONST.APP_EMERGENCY_BACKUP_KEY, function(data)
     {
       if (chrome.runtime.lastError)	// Check for errors
       {
@@ -725,8 +725,8 @@ $(function()
         getEmergencyBackup(function(data)	// Restore using emergency backup
         {
           console.log('Restoring emergency backup shortcuts: ',
-          data[APP_EMERGENCY_BACKUP_KEY]);
-          chrome.storage.sync.set(data[APP_EMERGENCY_BACKUP_KEY], function()
+          data[ATE_CONST.APP_EMERGENCY_BACKUP_KEY]);
+          chrome.storage.sync.set(data[ATE_CONST.APP_EMERGENCY_BACKUP_KEY], function()
           {
             if (chrome.runtime.lastError) 	// Check for errors
             {
@@ -771,8 +771,8 @@ $(function()
       {
         getLocalBackup(function(data)	// Restore using backup shortcuts
         {
-          console.log('Restoring shortcuts: ', data[APP_BACKUP_KEY]);
-          chrome.storage.sync.set(data[APP_BACKUP_KEY], function()
+          console.log('Restoring shortcuts: ', data[ATE_CONST.APP_BACKUP_KEY]);
+          chrome.storage.sync.set(data[ATE_CONST.APP_BACKUP_KEY], function()
           {
             if (chrome.runtime.lastError) 	// Check for errors
             {
@@ -814,9 +814,9 @@ $(function()
       // Loop through and add prefix to shortcuts and metadata to new store
       var shortcuts = {};
       $.each(newShortcuts, function(key, value) {
-        shortcuts[SHORTCUT_PREFIX + key] = value;
+        shortcuts[ATE_CONST.SHORTCUT_PREFIX + key] = value;
       });
-      shortcuts[SHORTCUT_VERSION_KEY] = metadata[SHORTCUT_VERSION_KEY];
+      shortcuts[ATE_CONST.SHORTCUT_VERSION_KEY] = metadata[ATE_CONST.SHORTCUT_VERSION_KEY];
 
       // Go through and try to set them up as new shortcuts,
       // should go through built-in validation for item quotas.
@@ -939,8 +939,8 @@ $(function()
         // Collect just the shortcuts, minus the prefix
         var shortcuts = {};
         $.each(data, function(key, value) {
-          if (key.indexOf(SHORTCUT_PREFIX) === 0) {
-            shortcuts[key.substr(SHORTCUT_PREFIX.length)] = value;
+          if (key.indexOf(ATE_CONST.SHORTCUT_PREFIX) === 0) {
+            shortcuts[key.substr(ATE_CONST.SHORTCUT_PREFIX.length)] = value;
           }
         });
 
