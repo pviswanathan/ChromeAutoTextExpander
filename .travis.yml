@@ -13,8 +13,6 @@ install:
   - npm install jest-cli
 
 before_script:
-  - gulp —version
-  - jest —version
   - npm test
 
 script:
