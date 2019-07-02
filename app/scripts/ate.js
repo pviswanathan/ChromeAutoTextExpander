@@ -69,17 +69,11 @@ jQuery.noConflict();
   var clipboard;				// Keep track of what's in the clipboard
   var disableShortcuts;       // Flag to disable shortcuts in case of unreliable state
 
-  // Custom log function
-  function debugLog() {
-    if (DEBUG && console) {
-      console.log.apply(console, arguments);
-    }
-  }
 
   // When user presses a key
   function keyPressHandler(event)
   {
-    debugLog('keyPressHandler:', event.target);
+    console.log('keyPressHandler:', event.target);
 
     // Make sure it's not the same event firing over and over again
     if (keyPressEvent == event) {
@@ -177,7 +171,7 @@ jQuery.noConflict();
   // Check to see if text in argument corresponds to any shortcuts
   function checkShortcuts(shortcut, lastChar, textInput)
   {
-    debugLog('checkShortcuts:', lastChar, shortcut);
+    console.log('checkShortcuts:', lastChar, shortcut);
 
     var isAllCaps = (shortcut == shortcut.toUpperCase());   // Check for all caps
     var shortcutKey = SHORTCUT_PREFIX + shortcut;           // Key for expansion
@@ -230,7 +224,7 @@ jQuery.noConflict();
   // Process autotext expansion and replace text
   function processAutoTextExpansion(shortcut, autotext, lastChar, textInput, capitalization)
   {
-    debugLog('processAutoTextExpansion:', autotext, capitalization);
+    console.log('processAutoTextExpansion:', autotext, capitalization);
 
     // Check if shortcut exists and should be triggered
     if (autotext && textInput)
@@ -271,7 +265,7 @@ jQuery.noConflict();
 
         // Setup for processing
         var domain = window.location.host;
-        debugLog('textInput: ', textInput);
+        console.log('textInput: ', textInput);
 
         // If input or textarea field, can easily change the val
         if (textInput.nodeName == 'TEXTAREA' || textInput.nodeName == 'INPUT')
@@ -312,7 +306,7 @@ jQuery.noConflict();
           } else if (CKE_EDITOR_REGEX.test(domain)) {
             replaceTextCKE(shortcut, autotext);
           } else {
-            debugLog('Domain:', domain);
+            console.log('Domain:', domain);
             replaceTextContentEditable(shortcut, autotext, findFocusedNode());
           }
         }
@@ -357,7 +351,7 @@ jQuery.noConflict();
   // Specific handler for Facebook element replacements
   function replaceTextFacebook(shortcut, autotext, textInput)
   {
-    debugLog('Domain: Facebook');
+    console.log('Domain: Facebook');
 
     var text;
     var cursorPosition = getCursorPosition(textInput);
@@ -365,7 +359,7 @@ jQuery.noConflict();
     // Check if it is the search bar vs comments
     if (hasParentSelector(textInput, 'div', ['textInput']))
     {
-      debugLog('facebook search bar');
+      console.log('facebook search bar');
       var span = textInput.querySelector('span'); // Can only get collection
       if (span) {
         textInput = span;
@@ -384,7 +378,7 @@ jQuery.noConflict();
       setCursorPosition(textInput, cursorPosition - shortcut.length + autotext.length);
     }
     else if (hasParentSelector(textInput,'div', ['UFICommentContainer'])) {
-      debugLog('facebook comments');  // doesn't work, due to ReactJS framework
+      console.log('facebook comments');  // doesn't work, due to ReactJS framework
     }
     else
     {
@@ -406,12 +400,12 @@ jQuery.noConflict();
   // Specific handler for Basecamp iframe replacements
   function replaceTextBasecamp(shortcut, autotext)
   {
-    debugLog('Domain: Basecamp');
+    console.log('Domain: Basecamp');
 
     // Get the focused / selected text node
     var iframeWindow = document.querySelector(SELECTOR_BASECAMP_EDIT).contentWindow;
     var node = findFocusedNode(iframeWindow);
-    debugLog('node:', node);
+    console.log('node:', node);
 
     // Pass onto editable iframe text handler
     replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
@@ -420,13 +414,13 @@ jQuery.noConflict();
   // Specific handler for Outlook iframe replacements
   function replaceTextOutlook(shortcut, autotext)
   {
-    debugLog('Domain: Outlook');
+    console.log('Domain: Outlook');
 
     // Get the focused / selected text node
     var iframeWindow = document.getElementById(SELECTOR_OUTLOOK_EDIT.substr(1))
       .contentWindow; // Need to cut off the # sign
     var node = findFocusedNode(iframeWindow);
-    debugLog('node:', node);
+    console.log('node:', node);
 
     // Pass onto editable iframe text handler
     replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
@@ -435,13 +429,13 @@ jQuery.noConflict();
   // Specific handler for Evernote iframe replacements
   function replaceTextEvernote(shortcut, autotext)
   {
-    debugLog('Domain: Evernote');
+    console.log('Domain: Evernote');
 
     // Get the focused / selected text node
     var iframeWindow = document.getElementById(SELECTOR_EVERNOTE_EDIT)
       .querySelector('iframe').contentWindow;
     var node = findFocusedNode(iframeWindow);
-    debugLog('node:', node);
+    console.log('node:', node);
 
     // Pass onto editable iframe text handler
     replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
@@ -450,13 +444,13 @@ jQuery.noConflict();
   // Specific handler for Google Translate iframe text replacements
   function replaceTextGTT(shortcut, autotext)
   {
-    debugLog('Domain: Google Translate');
+    console.log('Domain: Google Translate');
 
     // Get the focused / selected text node
     var iframeWindow = document.querySelector(SELECTOR_GTT_EDIT)
       .querySelector('iframe').contentWindow;
     var node = findFocusedNode(iframeWindow);
-    debugLog('node:', node);
+    console.log('node:', node);
 
     // Pass onto editable iframe text handler
     replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
@@ -465,12 +459,12 @@ jQuery.noConflict();
   // Specific handler for Google Docs iframe text replacements
   function replaceTextGDOCS(shortcut, autotext)
   {
-    debugLog('Domain: Google Docs');
+    console.log('Domain: Google Docs');
 
     // Get the focused / selected text node
     var iframeWindow = document.querySelector(SELECTOR_GDOCS_EDIT).contentWindow;
     var node = findFocusedNode(iframeWindow);
-    debugLog('node:', node);
+    console.log('node:', node);
 
     // We can catch the text / event, but we can't seem to replace
     // or dispatch events to create the additional text
@@ -484,7 +478,7 @@ jQuery.noConflict();
 
     //// Custom logic
     // var textInput = node;
-    // debugLog(textInput);
+    // console.log(textInput);
     //
     // // Get and process text, update cursor position
     // var text = replaceHTML(node.textContent, shortcut, autotext, 0)
@@ -510,7 +504,7 @@ jQuery.noConflict();
     // el.innerHTML = text;                            // Set HTML to div, then move to frag
     // for (var tempNode; tempNode = el.firstChild; frag.appendChild(tempNode))
     // {
-    //   debugLog(tempNode.nodeType, tempNode);
+    //   console.log(tempNode.nodeType, tempNode);
     //   if (tempNode.nodeType === Node.COMMENT_NODE
     //     && tempNode.nodeValue == CURSOR_TRACKING_TAG) {
     //     cursorNode = tempNode;
@@ -528,12 +522,12 @@ jQuery.noConflict();
   // Specific handler for Atlassian frame editor text replacements
   function replaceTextAtlassian(shortcut, autotext)
   {
-    debugLog('Domain: Atlassian');
+    console.log('Domain: Atlassian');
 
     // Get the focused / selected text node
     var iframeWindow = document.querySelector(SELECTOR_ATLASSIAN_EDIT).contentWindow;
     var node = findFocusedNode(iframeWindow);
-    debugLog('node:', node);
+    console.log('node:', node);
 
     // Pass onto editable iframe text handler
     replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
@@ -542,13 +536,13 @@ jQuery.noConflict();
   // Specific handler for Zendesk Inbox frame editor text replacements
   function replaceTextZendesk(shortcut, autotext)
   {
-    debugLog('Domain: Zendesk');
+    console.log('Domain: Zendesk');
 
     if (document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT)) {
       // Get the focused / selected text node
       var iframeWindow = document.querySelector(SELECTOR_ZENDESK_INBOX_EDIT).contentWindow;
       var node = findFocusedNode(iframeWindow);
-      debugLog('node:', node);
+      console.log('node:', node);
 
       // Pass onto editable iframe text handler
       replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
@@ -561,13 +555,13 @@ jQuery.noConflict();
   // Specific handler for CKEditor iframe replacements
   function replaceTextCKE(shortcut, autotext)
   {
-    debugLog('Editor: CKE');
+    console.log('Editor: CKE');
 
     // Get the focused / selected text node
     var iframeWindow = document.querySelector(SELECTOR_CKE_EDIT)
       .contentWindow;
     var node = findFocusedNode(iframeWindow);
-    debugLog('node:', node);
+    console.log('node:', node);
 
     // Pass onto editable iframe text handler
     replaceTextContentEditable(shortcut, autotext, node, iframeWindow);
@@ -579,7 +573,7 @@ jQuery.noConflict();
   {
     // Find focused div instead of what's receiving events
     var textInput = node.parentNode;
-    debugLog(textInput);
+    console.log(textInput);
 
     // Get and process text, update cursor position
     var cursorPosition = getCursorPosition(textInput, win)
@@ -606,7 +600,7 @@ jQuery.noConflict();
     el.innerHTML = text;                            // Set HTML to div, then move to frag
     for (var tempNode; tempNode = el.firstChild; frag.appendChild(tempNode))
     {
-      debugLog(tempNode.nodeType, tempNode);
+      console.log(tempNode.nodeType, tempNode);
       if (tempNode.nodeType === Node.COMMENT_NODE
         && tempNode.nodeValue == CURSOR_TRACKING_TAG) {
         cursorNode = tempNode;
@@ -625,10 +619,10 @@ jQuery.noConflict();
   // Replacing shortcut with autotext in text at cursorPosition
   function replaceText(text, shortcut, autotext, cursorPosition)
   {
-    debugLog('cursorPosition:', cursorPosition);
-    debugLog('currentText:', text);
-    debugLog('shortcut:', shortcut);
-    debugLog('expandedText:', autotext);
+    console.log('cursorPosition:', cursorPosition);
+    console.log('currentText:', text);
+    console.log('shortcut:', shortcut);
+    console.log('expandedText:', autotext);
 
     // Replace shortcut based off cursorPosition
     return [text.slice(0, cursorPosition - shortcut.length),
@@ -638,10 +632,10 @@ jQuery.noConflict();
   // Replacing shortcut with autotext HTML content at cursorPosition
   function replaceHTML(text, shortcut, autotext, cursorPosition)
   {
-    debugLog('cursorPosition:', cursorPosition);
-    debugLog('currentText:', text);
-    debugLog('shortcut:', shortcut);
-    debugLog('expandedText:', autotext);
+    console.log('cursorPosition:', cursorPosition);
+    console.log('currentText:', text);
+    console.log('shortcut:', shortcut);
+    console.log('expandedText:', autotext);
 
     // If autotext expansion already has cursor tag in it, don't insert
     var cursorTag = (autotext.indexOf(CURSOR_TRACKING_HTML) >= 0)
@@ -739,7 +733,7 @@ jQuery.noConflict();
   // Cross-browser solution for setting cursor position
   function setCursorPosition(el, pos)
   {
-    debugLog('setCursorPosition:', pos);
+    console.log('setCursorPosition:', pos);
     var sel, range;
     if (el.nodeName == 'INPUT' || el.nodeName == 'TEXTAREA') {
       try {	// Needed for new input[type=email] failing
@@ -781,7 +775,7 @@ jQuery.noConflict();
   //  parameter to set what the window/document should be
   function setCursorPositionAfterNode(node, win, doc)
   {
-    debugLog('setCursorPositionAfterNode:', node);
+    console.log('setCursorPositionAfterNode:', node);
 
     // Setup variables
     var sel, range;
@@ -815,7 +809,7 @@ jQuery.noConflict();
   //  parameter to set what the window/document should be
   function setCursorPositionInNode(node, pos, win, doc)
   {
-    debugLog('setCursorPositionInNode:', pos);
+    console.log('setCursorPositionInNode:', pos);
 
     // Setup variables
     var sel, range;
@@ -855,7 +849,7 @@ jQuery.noConflict();
   // Process and replace clip tags with content from clipboard
   function processClips(text)
   {
-    debugLog('processClips', text);
+    console.log('processClips', text);
 
     // Find all indices of opening tags
     var clipTags = [];
@@ -867,18 +861,18 @@ jQuery.noConflict();
     if (!clipTags.length) {
       return text;
     }
-    debugLog('clipTags:', clipTags);
+    console.log('clipTags:', clipTags);
 
     // Loop through and replace clip tags with clipboard pasted text
     var processedText = [text.slice(0, clipTags[0])];
-    debugLog(processedText);
+    console.log(processedText);
     for (var i = 0, len = clipTags.length; i < len; ++i)
     {
       processedText.push(clipboard);
-      debugLog('pre', processedText);
+      console.log('pre', processedText);
       processedText.push(text.slice(clipTags[i] + 6,	// 6 for '%clip%'
         (i == len - 1) ? undefined : clipTags[i+1]));
-      debugLog('post', processedText);
+      console.log('post', processedText);
     }
 
     // Return processed dates
@@ -934,7 +928,7 @@ jQuery.noConflict();
     chrome.runtime.sendMessage({
       request:'getClipboardData'
     }, function(data) {
-      debugLog('getClipboardData:', data);
+      console.log('getClipboardData:', data);
       clipboard = data.paste;
       if (completionBlock) {
         completionBlock();
@@ -945,7 +939,7 @@ jQuery.noConflict();
   // Add event listeners to specific container
   function refreshListenersOnContainer($target)
   {
-    debugLog('refreshListenersOnContainer:', $target);
+    console.log('refreshListenersOnContainer:', $target);
     $target.off(EVENT_NAME_KEYPRESS).on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
     $target.off(EVENT_NAME_KEYUP).on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
     $target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
@@ -955,7 +949,7 @@ jQuery.noConflict();
   // Add event listeners to specific element, without filtering on child elements
   function refreshListenersOnElement($target)
   {
-    debugLog('refreshListenersOnElement:', $target);
+    console.log('refreshListenersOnElement:', $target);
     $target.off(EVENT_NAME_KEYPRESS).on(EVENT_NAME_KEYPRESS, keyPressHandler);
     $target.off(EVENT_NAME_KEYUP).on(EVENT_NAME_KEYUP, keyUpHandler);
     $target.off(EVENT_NAME_BLUR).on(EVENT_NAME_BLUR, clearTypingBuffer);
@@ -965,7 +959,7 @@ jQuery.noConflict();
   // Attach listener to keypresses
   function addListeners()
   {
-    debugLog('addListeners()');
+    console.log('addListeners()');
 
     var $document = $(document);
     var domain = window.location.host;
@@ -973,13 +967,13 @@ jQuery.noConflict();
     // Special case for Google Inbox
     if (INBOX_DOMAIN_REGEX.test(domain))
     {
-      debugLog('Domain: Google Inbox');
+      console.log('Domain: Google Inbox');
       SELECTOR_INPUT += ',' + SELECTOR_INBOX_EDIT;
 
       // Need to check for focus on editable elements
       $document.on(EVENT_NAME_FOCUS, SELECTOR_INPUT, function(event)
       {
-        debugLog('focused on editable element:', event.target);
+        console.log('focused on editable element:', event.target);
         refreshListenersOnElement($(event.target));
       });
     }
@@ -988,12 +982,12 @@ jQuery.noConflict();
       // Special case for Google Plus
       if (GPLUS_DOMAIN_REGEX.test(domain))
       {
-        debugLog('Domain: Google Plus');
+        console.log('Domain: Google Plus');
         SELECTOR_INPUT += ',div.editable';
       }
 
       // Add default listeners to document
-      debugLog('adding default listeners to document');
+      console.log('adding default listeners to document');
       $document.on(EVENT_NAME_KEYPRESS, SELECTOR_INPUT, keyPressHandler);
       $document.on(EVENT_NAME_KEYUP, SELECTOR_INPUT, keyUpHandler);
       $document.on(EVENT_NAME_BLUR, SELECTOR_INPUT, clearTypingBuffer);
@@ -1002,13 +996,13 @@ jQuery.noConflict();
       // Special case for Gmail.com
       if (GMAIL_DOMAIN_REGEX.test(domain))
       {
-        debugLog('Domain: Gmail');
+        console.log('Domain: Gmail');
         SELECTOR_INPUT += ',div.editable';
 
         // Need to check for focus on div.aoI
         $document.on(EVENT_NAME_FOCUS, SELECTOR_GMAIL_EDIT, function(event)
         {
-          debugLog('focused on message editor');
+          console.log('focused on message editor');
 
           // Check that it is the dialog
           var $target = $(event.target);
@@ -1021,7 +1015,7 @@ jQuery.noConflict();
       // Special case for Google Docs
       // else if (GDOCS_DOMAIN_REGEX.test(domain))
       // {
-      //   debugLog('Domain: Google Docs');
+      //   console.log('Domain: Google Docs');
       //
       //   // Annoying, need to check for existence of editor element
       //   var editorCheck = setInterval(function() {
@@ -1036,7 +1030,7 @@ jQuery.noConflict();
       // Special case for Outlook.com
       // else if (OUTLOOK_DOMAIN_REGEX.test(domain))
       // {
-      //   debugLog('Domain: Outlook');
+      //   console.log('Domain: Outlook');
       //
       //   // Annoying, need to check for existence of editor element
       //   var editorCheck = setInterval(function() {
@@ -1051,7 +1045,7 @@ jQuery.noConflict();
       // Special case for Google Translate
       // else if (GTT_DOMAIN_REGEX.test(domain))
       // {
-      //   debugLog('Domain: Google Translate');
+      //   console.log('Domain: Google Translate');
       //
       //   // Annoying, need to check for existence of editor element
       //   var editorCheck = setInterval(function() {
@@ -1066,7 +1060,7 @@ jQuery.noConflict();
       // Special case for Atlassian
       // else if (ATLASSIAN_DOMAIN_REGEX.test(domain))
       // {
-      //   debugLog('Domain: Atlassian');
+      //   console.log('Domain: Atlassian');
       //
       //   // SUPER annoying, need to continually check for existence of editor iframe
       //   //  because the iframe gets recreated each time and starts with cross-origin
@@ -1081,7 +1075,7 @@ jQuery.noConflict();
       // Special case for Zendesk Inbox
       // else if (ZENDESK_DOMAIN_REGEX.test(domain))
       // {
-      //   debugLog('Domain: Zendesk');
+      //   console.log('Domain: Zendesk');
       //
       //   // SUPER annoying, need to continually check for existence of editor iframe
       //   //  because the iframe gets recreated each time and starts with cross-origin
@@ -1096,7 +1090,7 @@ jQuery.noConflict();
       // Special case for CKEditor
       // else if (CKE_EDITOR_REGEX.test(domain))
       // {
-      //   debugLog('Editor: CKEditor');
+      //   console.log('Editor: CKEditor');
       //
       //   // SUPER annoying, need to continually check for existence of editor iframe
       //   //  because the iframe gets recreated each time and starts with cross-origin
@@ -1116,7 +1110,7 @@ jQuery.noConflict();
     // 	var $target = $(event.target);
     // 	if ($target.is('iframe'))
     //   {
-    //     debugLog('inserted:', $target);
+    //     console.log('inserted:', $target);
     //     addListenersToIframe($target);
     // 	}
     // });

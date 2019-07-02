@@ -8,13 +8,6 @@ const MANIFEST = chrome.runtime.getManifest()     // Manifest reference
 ;
 console.log('Initializing ATE v' + MANIFEST.version, chrome.i18n.getMessage('@@ui_locale'));
 
-// Custom log function
-function debugLog() {
-  if (DEBUG && console) {
-    console.log.apply(console, arguments);
-  }
-}
-
 
 //////////////////////////////////////////////////////////
 // ACTIONS
@@ -22,8 +15,8 @@ function debugLog() {
 // Listen for messages from the client side
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
 {
-  debugLog(request);
-  debugLog(sender);
+  console.log(request);
+  console.log(sender);
 
   switch (request.request)
   {
@@ -58,7 +51,7 @@ chrome.runtime.onInstalled.addListener(function(details)
     // Inject script into all open tabs
     chrome.tabs.query({}, function(tabs)
     {
-      debugLog('Executing on tabs: ', tabs);
+      console.log('Executing on tabs: ', tabs);
       for (var i = 0, l = tabs.length; i < l; ++i) {
         injectScript(tabs[i]);
       }
@@ -78,7 +71,7 @@ chrome.runtime.onInstalled.addListener(function(details)
     // Check synced shortcuts in case of need to update, show options, etc.
     chrome.storage.sync.get(null, function(data)
     {
-      debugLog('checking shortcuts...');
+      console.log('checking shortcuts...');
 
       if (chrome.runtime.lastError) {	// Check for errors
         console.log(chrome.runtime.lastError);
@@ -139,7 +132,7 @@ chrome.runtime.onInstalled.addListener(function(details)
 // Test shortcut database version mismatch
 function testVersionMismatch(completionBlock)
 {
-  debugLog('testVersionMismatch');
+  console.log('testVersionMismatch');
 
   chrome.storage.sync.get(null, function(data)
   {
@@ -157,7 +150,7 @@ function testVersionMismatch(completionBlock)
         }
         else
         {
-          debugLog('test setup complete');
+          console.log('test setup complete');
           if (completionBlock) {
             completionBlock();
           }
@@ -170,7 +163,7 @@ function testVersionMismatch(completionBlock)
 // Test shortcut database loss
 function testDataLoss(completionBlock)
 {
-  debugLog('testDataLoss');
+  console.log('testDataLoss');
 
   chrome.storage.sync.clear(function()
   {
@@ -182,7 +175,7 @@ function testDataLoss(completionBlock)
         if (chrome.runtime.lastError) {	// Check for errors
           console.log(chrome.runtime.lastError);
         } else {
-          debugLog('test setup complete');
+          console.log('test setup complete');
           if (completionBlock) {
             completionBlock();
           }
@@ -195,7 +188,7 @@ function testDataLoss(completionBlock)
 // Test pre-v1.2.0 database migration
 function testV120Migration(completionBlock)
 {
-  debugLog('testV120Migration');
+  console.log('testV120Migration');
   TEST_OLD_APP_VERSION = '1.1.0';
 
   var shortcuts = {};
@@ -216,7 +209,7 @@ function testV120Migration(completionBlock)
         }
         else
         {
-          debugLog('test setup complete');
+          console.log('test setup complete');
           if (completionBlock) {
             completionBlock();
           }
@@ -229,7 +222,7 @@ function testV120Migration(completionBlock)
 // Test pre-v1.7.0 database migration
 function testV170Migration(completionBlock)
 {
-  debugLog('testV170Migration');
+  console.log('testV170Migration');
   TEST_OLD_APP_VERSION = '1.6.0';
 
   var shortcuts = {
@@ -252,7 +245,7 @@ function testV170Migration(completionBlock)
         }
         else
         {
-          debugLog('test setup complete');
+          console.log('test setup complete');
           if (completionBlock) {
             completionBlock();
           }
@@ -265,7 +258,7 @@ function testV170Migration(completionBlock)
 // Test v1.7.0 to v1.7.1 database migration
 function testV171Migration(completionBlock)
 {
-  debugLog('testV171Migration');
+  console.log('testV171Migration');
   TEST_OLD_APP_VERSION = '1.7.0';
 
   var shortcuts = {
@@ -290,7 +283,7 @@ function testV171Migration(completionBlock)
         }
         else
         {
-          debugLog('test setup complete');
+          console.log('test setup complete');
           if (completionBlock) {
             completionBlock();
           }
@@ -355,7 +348,7 @@ function openOrFocusOptionsPage(params)
   {
     if (tabs.length)    // If options tab is already open, focus on it
     {
-      debugLog('options page found:', tabs[0].id);
+      console.log('options page found:', tabs[0].id);
       chrome.tabs.update(tabs[0].id, {
         selected: true,
         url: optionsUrl + params,
@@ -370,7 +363,7 @@ function openOrFocusOptionsPage(params)
 // Function for anything extra that needs doing related to new version upgrade
 function processVersionUpgrade(oldVersion)
 {
-  debugLog('processVersionUpgrade:', oldVersion);
+  console.log('processVersionUpgrade:', oldVersion);
 
   // Make backup of synced data before proceeding
   makeEmergencyBackup(function()
@@ -502,7 +495,7 @@ function makeEmergencyBackup(completionBlock)
         }
         else 	// Backup success
         {
-          debugLog('Emergency backup before migration created.');
+          console.log('Emergency backup before migration created.');
           if (completionBlock) {
             completionBlock();
           }
@@ -532,7 +525,7 @@ function restoreEmergencyBackup(completionBlock)
         }
         else 	// Restore success
         {
-          debugLog('Emergency backup restored.');
+          console.log('Emergency backup restored.');
           if (completionBlock) {
             completionBlock();
           }
@@ -561,7 +554,7 @@ function upgradeShortcutsToV120(completionBlocks)
       for (var key in oldDataStore) {
         if (oldDataStore.hasOwnProperty(key)) {
           var value = oldDataStore[key];
-          debugLog('migrating:', key, '=>', value);
+          console.log('migrating:', key, '=>', value);
           newDataStore[key] = value;
         }
       }
@@ -632,7 +625,7 @@ function upgradeShortcutsToV170(completionBlocks)
     var newDataStore = {};
     for (var key in data) {
       if (data.hasOwnProperty(key)) {
-        debugLog('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
+        console.log('prefixing:', key, 'to', SHORTCUT_PREFIX + key);
         newDataStore[SHORTCUT_PREFIX + key] = data[key];
       }
     }
@@ -689,7 +682,7 @@ function upgradeShortcutsToV171(completionBlocks)
     }
     else if (data && Object.keys(data).length) // Check that data is returned
     {
-      debugLog('updating database version to', MANIFEST.version);
+      console.log('updating database version to', MANIFEST.version);
 
       // Update metadata for shortcut version to manifest version
       delete data[OLD_SHORTCUT_VERSION_KEY];
@@ -754,7 +747,7 @@ function upgradeShortcutsToLatest(upgradeNotesList)
             }
             else	// Done with migration
             {
-              debugLog('upgrade complete!');
+              console.log('upgrade complete!');
 
               // Add upgrade message
               upgradeNotesList.unshift({

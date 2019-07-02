@@ -82,7 +82,7 @@ v1.8.4
  - Updating crouton banners to require user-initiated dismiss sometimes, so they notice them.
 
 v1.8.3
- - Replacing console.log() statements with debugLog() to reduce developer console spam.
+ - Replacing console.log() statements with console.log() to reduce developer console spam.
 
 v1.8.2
  - Fix for Salesforce support (was cutting short attaching listeners to new iframes).

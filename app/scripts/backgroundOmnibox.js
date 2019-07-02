@@ -11,12 +11,12 @@ chrome.omnibox.setDefaultSuggestion({
 // On activation in omnibox
 chrome.omnibox.onInputStarted.addListener(function ()
 {
-  debugLog('Omnibox onInputStarted()');
+  console.log('Omnibox onInputStarted()');
 
   // Get and cache latest shortcuts for performance
   chrome.storage.sync.get(null, function(data)
   {
-    debugLog('caching shortcuts...');
+    console.log('caching shortcuts...');
 
     if (chrome.runtime.lastError) {	// Check for errors
       console.log(chrome.runtime.lastError);
@@ -29,7 +29,7 @@ chrome.omnibox.onInputStarted.addListener(function ()
 // On omnibox input changed (user typing)
 chrome.omnibox.onInputChanged.addListener(function (text, suggest)
 {
-  debugLog('Omnibox onInputChanged:', text);
+  console.log('Omnibox onInputChanged:', text);
 
   // Use text to check shortcuts for expansions
   var expansion = shortcutCache[SHORTCUT_PREFIX + text];
@@ -60,7 +60,7 @@ chrome.omnibox.onInputChanged.addListener(function (text, suggest)
 // On omnibox suggestion accepted
 chrome.omnibox.onInputEntered.addListener(function (text, disposition)
 {
-  debugLog('Omnibox onInputEntered:', text, disposition);
+  console.log('Omnibox onInputEntered:', text, disposition);
 
   // If the entered text is a shortcut, expand it and jump
   var expansion = shortcutCache[SHORTCUT_PREFIX + text];
@@ -74,7 +74,7 @@ chrome.omnibox.onInputEntered.addListener(function (text, disposition)
   if (text.indexOf('http') != 0) {
     text = 'http://' + text;
   }
-  debugLog('url:', text);
+  console.log('url:', text);
 
   // Update / open tab according to disposition
   switch (disposition)
