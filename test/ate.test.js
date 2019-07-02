@@ -26,11 +26,11 @@ afterEach(() => {
 describe('ate.js', function() {
 
   test('gmail.com', function() {
-    var html = fs.readFileSync('sites/gmail.html').toString();
-    document.documentElement.innerHTML = html;
-    const context = { chrome: chrome };
-    const code = fs.readFileSync('./app/scripts/ate.js');
-    vm.runInNewContext(code, context);
+    // var html = fs.readFileSync('sites/gmail.html').toString();
+    // document.documentElement.innerHTML = html;
+    // const context = { chrome: chrome };
+    // const code = fs.readFileSync('./app/scripts/ate.js');
+    // vm.runInNewContext(code, context);
     // TODO: emulate injecting into site and firing off a shortcut
   });
 });
