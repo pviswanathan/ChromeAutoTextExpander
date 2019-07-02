@@ -60,12 +60,12 @@ var ateModule = (function($)
     , SELECTOR_CKE_EDIT = 'iframe.cke_wysiwyg_frame'  // CKEditor
   ;
 
-  var typingBuffer = [];  // Keep track of what's been typed before timeout
-    , typingTimer;        // Keep track of time between keypresses
-    ,  typingTimeout;     // Delay before we clear buffer
-    ,  keyPressEvent;     // Keep track of keypress event to prevent re-firing
-    ,  keyUpEvent;        // Keep track of keyup event to prevent re-firing
-    ,  clipboard;         // Keep track of what's in the clipboard
+  var typingBuffer = []   // Keep track of what's been typed before timeout
+    , typingTimer         // Keep track of time between keypresses
+    ,  typingTimeout      // Delay before we clear buffer
+    ,  keyPressEvent      // Keep track of keypress event to prevent re-firing
+    ,  keyUpEvent         // Keep track of keyup event to prevent re-firing
+    ,  clipboard          // Keep track of what's in the clipboard
     ,  disableShortcuts   // Flag to disable shortcuts in unreliable state
   ;
 
