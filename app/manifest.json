@@ -17,7 +17,8 @@
       "scripts/backgroundInstall.js",
       "scripts/backgroundMessages.js",
       "scripts/backgroundOmnibox.js"
-    ]
+    ],
+		"persistent": "false"
   },
   "permissions": [
     "tabs",
