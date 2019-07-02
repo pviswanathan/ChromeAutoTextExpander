@@ -1,10 +1,11 @@
 'use strict';
 
-// Document ready
-$(function()
+// Options module, passed jQuery object by doc ready
+var ateOptionsModule = (function($)
 {
   // Constants
-  var FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
+  var FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Check for first run
+
     , DATE_MACRO_DEMO_FORMAT = 'MMMM Do YYYY'
 
     , DEFAULT_SHORTCUT_FILLER = 'Shortcut'
@@ -37,9 +38,8 @@ $(function()
     , cachedInputValue    // Track value of input field that user focused on
   ;
 
-  init();
 
-  function initialize()
+  function init()
   {
     // Setup metadata defaults
     metadata[ATE_CONST.SHORTCUT_TIMEOUT_KEY] = DEFAULT_CLEAR_BUFFER_TIMEOUT;
@@ -957,4 +957,13 @@ $(function()
       }
     });
   }
+
+  return {
+    init: init,
+    showCrouton: showCrouton,
+    showCrouton: showModalPopup,
+  };
 });
+
+// Document ready
+$(ateOptionsModule.init);
