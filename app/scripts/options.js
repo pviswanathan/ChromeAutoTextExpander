@@ -4,7 +4,7 @@
 $(function()
 {
   // Constants
-  const APP_FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
+  var APP_FIRST_RUN_KEY = 'autoTextExpanderFirstRun'  // Local key to check for first run
     , DATE_MACRO_DEMO_FORMAT = 'MMMM Do YYYY'
 
     , DEFAULT_SHORTCUT_FILLER = 'Shortcut'

@@ -1,7 +1,7 @@
 'use strict';
 
 // Constants & variables
-const MANIFEST = chrome.runtime.getManifest();     // Manifest reference
+var MANIFEST = chrome.runtime.getManifest();     // Manifest reference
 console.log('Initializing ATE v' + MANIFEST.version, chrome.i18n.getMessage('@@ui_locale'));
 
 // On first install or upgrade, make sure to inject into all tabs

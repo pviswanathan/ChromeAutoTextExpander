@@ -1,7 +1,7 @@
 'use strict';
 
 // GLOBAL CONSTANTS
-export const APP_VERSION = '2.0.0'           // App version to check against shortcut database
+var APP_VERSION = '2.0.0'           // App version to check against shortcut database
   , APP_BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
   , APP_BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local backup timestamp
   , APP_EMERGENCY_BACKUP_KEY = 'autoTextExpanderEmergencyBackup' // Emergency local backup
