@@ -1,12 +1,12 @@
 'use strict';
 
 // GLOBAL CONSTANTS
-const APP_VERSION = '2.0.0'           // App version to check against shortcut database
+export const APP_VERSION = '2.0.0'           // App version to check against shortcut database
   , APP_BACKUP_KEY = 'autoTextExpanderBackup'       // Local key for backups
   , APP_BACKUP_TIMESTAMP_KEY = 'autoTextExpanderBackupTimestamp' // Local backup timestamp
   , APP_EMERGENCY_BACKUP_KEY = 'autoTextExpanderEmergencyBackup' // Emergency local backup
   , APP_ID_PRODUCTION = 'iibninhmiggehlcdolcilmhacighjamp'
-  , DEBUG = (chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
+  , DEBUG = (!chrome || chrome.i18n.getMessage('@@extension_id') !== APP_ID_PRODUCTION)
   , SHORTCUT_PREFIX = '@'             // Prefix to distinguish shortcuts vs metadata
   , SHORTCUT_TIMEOUT_KEY = 'scto'     // Synced key for shortcut typing timeout
   , SHORTCUT_VERSION_KEY = 'v#'       // Synced key for shortcut database version

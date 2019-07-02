@@ -11,7 +11,12 @@
   "eslintConfig": {
     "env": {
       "node": true,
-      "browser": true
+      "browser": true,
+      "es6": true
+    },
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module"
     },
     "globals": {
       "@babel/core": "^7.4.5",
