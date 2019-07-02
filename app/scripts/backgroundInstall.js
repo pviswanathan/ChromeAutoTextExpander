@@ -60,8 +60,6 @@ function injectScript(tab)
 // Check shortcuts database
 function checkShortcutsDatabase()
 {
-  //runTests();
-
   // Check synced shortcuts in case of need to update, show options, etc.
   chrome.storage.sync.get(null, function(data)
   {
@@ -72,14 +70,12 @@ function checkShortcutsDatabase()
     } else if (!data || Object.keys(data).length == 0) {
       // If no shortcuts exist, show options page (should show emergency backup restore)
       chrome.runtime.openOptionsPage();
-    } else if (data[SHORTCUT_VERSION_KEY]
-      && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
+    } else if (data[ATE_CONST.SHORTCUT_VERSION_KEY]
+      && data[ATE_CONST.SHORTCUT_VERSION_KEY] != MANIFEST.version) {
       // If version is off, try to initiate upgrade
-      processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
+      processVersionUpgrade(data[ATE_CONST.SHORTCUT_VERSION_KEY]);
     }
   });
-
-  //runTests();
 }
 
 // Function for anything extra that needs doing related to new version upgrade
@@ -184,7 +180,7 @@ function makeEmergencyBackup(completionBlock)
     {
       // Setup backup
       var backup = {};
-      backup[APP_EMERGENCY_BACKUP_KEY] = data;
+      backup[ATE_CONST.APP_EMERGENCY_BACKUP_KEY] = data;
       chrome.storage.local.set(backup, function() {
         if (chrome.runtime.lastError) 	// Check for errors
         {
@@ -206,7 +202,7 @@ function makeEmergencyBackup(completionBlock)
 // Restore synced data from emergency backup
 function restoreEmergencyBackup(completionBlock)
 {
-  chrome.storage.local.get(APP_EMERGENCY_BACKUP_KEY, function(data)
+  chrome.storage.local.get(ATE_CONST.APP_EMERGENCY_BACKUP_KEY, function(data)
   {
     if (chrome.runtime.lastError) 	 // Check for errors
     {
@@ -215,7 +211,7 @@ function restoreEmergencyBackup(completionBlock)
     }
     else   // Restore backup to synced storage
     {
-      chrome.storage.sync.set(data[APP_EMERGENCY_BACKUP_KEY], function() {
+      chrome.storage.sync.set(data[ATE_CONST.APP_EMERGENCY_BACKUP_KEY], function() {
         if (chrome.runtime.lastError) 	// Check for errors
         {
           console.error('SERIOUS ERROR: COULD NOT RESTORE EMERGENCY BACKUP');
@@ -249,7 +245,7 @@ function upgradeShortcutsToLatest(upgradeNotesList)
       console.log('updating database version to', MANIFEST.version);
 
       // Update metadata for shortcut version to manifest version
-      data[SHORTCUT_VERSION_KEY] = MANIFEST.version;
+      data[ATE_CONST.SHORTCUT_VERSION_KEY] = MANIFEST.version;
 
       // Delete old data, replace with new data
       chrome.storage.sync.clear(function() {
@@ -277,7 +273,7 @@ function upgradeShortcutsToLatest(upgradeNotesList)
                 type: 'list'
                 , iconUrl: 'images/icon128.png'
                 , title: 'AutoTextExpander Updated v' + MANIFEST.version
-                , message: 'Hello! Please refresh your tabs to use the latest, and have a great day. :o)'
+                , message: 'Please refresh tabs to use the latest! Have a great day. :o)'
                 , items: upgradeNotesList
                 , isClickable: true
               }, function(id) {});

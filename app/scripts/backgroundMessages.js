@@ -1,37 +1,29 @@
 'use strict';
 
-// Listen for messages from the client side
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse)
-{
-  console.log(request);
-  console.log(sender);
+chrome.runtime.onMessage.addListener(extensionMessageHandler);
+chrome.browserAction.onClicked.addListener(function(tab) {
+  chrome.runtime.openOptionsPage(); // Show options page
+});
 
+// Handle messages from other scripts/pages
+function extensionMessageHandler(request, sender, sendResponse)
+{
+  console.log(request, sender);
   switch (request.request)
   {
     case 'getClipboardData':
       sendResponse({ paste:pasteFromClipboard() });
       break;
 
-    // Set browser action badge text (up to 4 chars)
-    case 'setBadgeText':
-      chrome.browserAction.setBadgeText({text: request.text});
+    case 'enableExpander':
+      setExpanderEnabled(request.enableExpander);
       break;
 
     default:
       console.log('Unknown request received:', request);
       break;
   }
-});
-
-// Show options page when browser action is clicked
-//  Source: http://adamfeuer.com/notes/2013/01/26/chrome-extension-making-browser-action-icon-open-options-page/
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.runtime.openOptionsPage();
-});
-
-
-//////////////////////////////////////////////////////////
-// FUNCTIONS
+}
 
 // Get paste contents from clipboard
 function pasteFromClipboard()
@@ -52,8 +44,12 @@ function pasteFromClipboard()
   return result;
 }
 
-// TODO: set browser action badge text when ate.js is disabled vs working
+// Set browser action badge text (up to 4 chars) based on disabled status
 function setExpanderEnabled(status)
 {
-
+  if (status) {
+    chrome.browserAction.setBadgeText({text: 'ON'});
+  } else {
+    chrome.browserAction.setBadgeText({text: 'OFF'});
+  }
 }

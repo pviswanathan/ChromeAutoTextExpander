@@ -2,15 +2,15 @@
 
 // GLOBAL CONSTANTS
 var ATE_CONST = {
-  APP_VERSION: '2.0.0'           // App version to check against shortcut database
-  , APP_BACKUP_KEY: 'autoTextExpanderBackup'       // Local key for backups
-  , APP_BACKUP_TIMESTAMP_KEY: 'autoTextExpanderBackupTimestamp' // Local backup timestamp
-  , APP_EMERGENCY_BACKUP_KEY: 'autoTextExpanderEmergencyBackup' // Emergency local backup
+  APP_VERSION: '2.0.0'               // App version to check against database
+  , APP_BACKUP_KEY: 'autoTextExpanderBackup'
+  , APP_BACKUP_TIMESTAMP_KEY: 'autoTextExpanderBackupTimestamp'
+  , APP_EMERGENCY_BACKUP_KEY: 'autoTextExpanderEmergencyBackup'
   , APP_ID_PRODUCTION: 'iibninhmiggehlcdolcilmhacighjamp'
-  , SHORTCUT_PREFIX: '@'             // Prefix to distinguish shortcuts vs metadata
+  , SHORTCUT_PREFIX: '@'             // Prefix for shortcuts, vs metadata
   , SHORTCUT_TIMEOUT_KEY: 'scto'     // Synced key for shortcut typing timeout
   , SHORTCUT_VERSION_KEY: 'v#'       // Synced key for shortcut database version
-  , INSERT_CLIPBOARD_TAG: '%clip%'    // Tag to paste clipboard contents in
+  , INSERT_CLIPBOARD_TAG: '%clip%'   // Tag to paste clipboard contents in
   , INSERT_URL_TAG: '%url%'          // Tag to insert current URL in
   , INSERT_DATE_TAG: '%d('           // Tag to insert date from moment.js
   , INSERT_DATE_CLOSE_TAG: ')'       // Closing tag for insert-date

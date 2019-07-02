@@ -7,39 +7,32 @@ var shortcutCache = {};                        // Cache for shortcuts
 chrome.omnibox.setDefaultSuggestion({
   description: '<dim>Search shortcuts for:</dim> <match>%s</match>'
 });
+chrome.omnibox.onInputChanged.addListener(omniboxInput);
+chrome.omnibox.onInputStarted.addListener(omniboxActivated);
+chrome.omnibox.onInputEntered.addListener(omniboxSubmitted);
 
 // On activation in omnibox
-chrome.omnibox.onInputStarted.addListener(function ()
-{
-  console.log('Omnibox onInputStarted()');
-
-  // Get and cache latest shortcuts for performance
-  chrome.storage.sync.get(null, function(data)
-  {
-    console.log('caching shortcuts...');
-
+function omniboxActivated() {
+  console.log('Omnibox omniboxActivated()');
+  chrome.storage.sync.get(null, function(data) {
+    console.log('caching latest shortcuts for performance');
     if (chrome.runtime.lastError) {	// Check for errors
       console.error(chrome.runtime.lastError);
     } else {
+      console.log('cached shortcuts');
       shortcutCache = data;
     }
   });
-});
+}
 
 // On omnibox input changed (user typing)
-chrome.omnibox.onInputChanged.addListener(function (text, suggest)
+function omniboxInput(text, suggest)
 {
   console.log('Omnibox onInputChanged:', text);
-
-  // Use text to check shortcuts for expansions
-  var expansion = shortcutCache[SHORTCUT_PREFIX + text];
-
-  // If exists, surface expansion as suggestion
-  if (expansion && expansion.length)
+  var expansion = shortcutCache[SHORTCUT_PREFIX + text]; // Use text to check shortcuts for expansions
+  if (expansion && expansion.length) // If exists, use expansion as suggestion
   {
     var suggestions = [];
-
-    // Process expansion
     var description = '<match>' + text + '</match>'
       + '<dim> &#8594; ' + expansion.split('\"').join('&quot;')
         .split('\'').join('&apos;')
@@ -51,22 +44,18 @@ chrome.omnibox.onInputChanged.addListener(function (text, suggest)
       content: expansion,
       description: description,
     });
-
-    // Send suggestions to callback
-    suggest(suggestions);
+    suggest(suggestions);   // Send suggestions to callback
   }
-});
+}
 
 // On omnibox suggestion accepted
-chrome.omnibox.onInputEntered.addListener(function (text, disposition)
+function omniboxSubmitted(text, disposition)
 {
   console.log('Omnibox onInputEntered:', text, disposition);
 
   // If the entered text is a shortcut, expand it and jump
   var expansion = shortcutCache[SHORTCUT_PREFIX + text];
-
-  // If exists, update text with expansion instead
-  if (expansion && expansion.length) {
+  if (expansion && expansion.length) { // If exists, update text with expansion
     text = expansion;
   }
 
@@ -92,4 +81,4 @@ chrome.omnibox.onInputEntered.addListener(function (text, disposition)
       chrome.tabs.create({url: text, active: false});
       break;
   }
-});
+}
