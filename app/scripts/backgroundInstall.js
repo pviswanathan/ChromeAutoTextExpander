@@ -17,61 +17,30 @@ chrome.runtime.onInstalled.addListener(function(details)
 {
   console.log('onInstalled: ' + details.reason);
 
-  // On first install
+  // If first time install
   if (details.reason == 'install')
   {
-    // Open up options page -- update since Chrome 40
-    chrome.runtime.openOptionsPage();
-    // chrome.tabs.create({url: 'options.html'});
-
-    // Inject script into all open tabs
-    chrome.tabs.query({}, function(tabs)
-    {
-      console.log('Executing on tabs: ', tabs);
+    chrome.runtime.openOptionsPage(); // Open options page -- since Chrome 40
+    chrome.tabs.query({}, function(tabs) { // Inject script into all open tabs
       for (var i = 0, l = tabs.length; i < l; ++i) {
         injectScript(tabs[i]);
       }
     });
   }
-
   // If upgrading to new version number
-  else if (details.reason == 'update' && details.previousVersion != MANIFEST.version) {
+  else if (details.reason == 'update'
+    && details.previousVersion != MANIFEST.version) {
     processVersionUpgrade(details.previousVersion);
   }
-
-  else    // All other - reloaded extension
-  {
-    // Run testing if need be
-    //runTests();
-
-    // Check synced shortcuts in case of need to update, show options, etc.
-    chrome.storage.sync.get(null, function(data)
-    {
-      console.log('checking shortcuts...');
-
-      if (chrome.runtime.lastError) {	// Check for errors
-        console.log(chrome.runtime.lastError);
-      } else if (!data || Object.keys(data).length == 0) {
-        // If no shortcuts exist, show options page (should show emergency backup restore)
-        chrome.runtime.openOptionsPage();
-        // chrome.tabs.create({url: 'options.html'});
-      } else if (data[SHORTCUT_VERSION_KEY]
-        && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
-        // If version is off, try to initiate upgrade
-        processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
-      }
-    });
-
-    // Run testing if need be
-    //runTests();
+  // All other - probably reloaded extension
+  else {
+    checkShortcutsDatabase();
   }
 });
 
 // If upgrade notification was clicked
-chrome.notifications.onClicked.addListener(function (notificationID)
-{
-  // Show options page -- since Chrome 40 update
-  chrome.runtime.openOptionsPage();
+chrome.notifications.onClicked.addListener(function (notificationID) {
+  chrome.runtime.openOptionsPage();   // Bring to options page
 });
 
 
@@ -281,6 +250,31 @@ function injectScript(tab)
       file: contentScripts[i]
     });
   }
+}
+
+// Check shortcuts database
+function checkShortcutsDatabase()
+{
+  //runTests();
+
+  // Check synced shortcuts in case of need to update, show options, etc.
+  chrome.storage.sync.get(null, function(data)
+  {
+    console.log('checking shortcuts...');
+
+    if (chrome.runtime.lastError) {	// Check for errors
+      console.log(chrome.runtime.lastError);
+    } else if (!data || Object.keys(data).length == 0) {
+      // If no shortcuts exist, show options page (should show emergency backup restore)
+      chrome.runtime.openOptionsPage();
+    } else if (data[SHORTCUT_VERSION_KEY]
+      && data[SHORTCUT_VERSION_KEY] != MANIFEST.version) {
+      // If version is off, try to initiate upgrade
+      processVersionUpgrade(data[SHORTCUT_VERSION_KEY]);
+    }
+  });
+
+  //runTests();
 }
 
 // Function for anything extra that needs doing related to new version upgrade
